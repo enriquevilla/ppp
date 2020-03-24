@@ -1,1 +1,3 @@
-<h1>Patito++</h1>\n<p>Enrique Marcelo Villa García</p>\n<p>Santiago Castaño Moreno</p>
+<h1>Patito++</h1>
+<p>Enrique Marcelo Villa García</p>
+<p>Santiago Castaño Moreno</p>
