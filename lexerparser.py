@@ -1,6 +1,7 @@
 # Patito++ PLY
 
 import ply.lex as lex
+
 reserved = {
     'program': 'PROGRAM',
     'main': 'MAIN',
@@ -60,7 +61,7 @@ t_DIVIDE        = r'/'
 t_MULTIPLY      = r'\*'
 t_LEFTPAR       = r'\('
 t_RIGHTPAR      = r'\)'
-t_EQUAL        = r'='
+t_EQUAL         = r'='
 t_COMA          = r','
 t_COLON         = r':'
 t_SEMICOLON     = r';'
@@ -95,3 +96,14 @@ def t_error(t):
 
 
 lexer = lex.lex()
+
+import ply.yacc as yacc
+
+def p_program(t):
+    'program : PROGRAM ID SEMICOLON vars function main'
+    print("Code valid")
+
+def p_error(t):
+    print("Syntax error in '%s'" % t.value)
+
+parser = yacc.yacc()
