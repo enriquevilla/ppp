@@ -253,9 +253,9 @@ def p_module(t):
     '''module : ID LEFTPAR moduleFunction'''
 
 def p_moduleFunction(t):
-    '''moduleFunction : ID COMA moduleFunction RIGHTPAR
+    '''moduleFunction : ID COMA moduleFunction
                         | ID RIGHTPAR
-                        | exp COMA moduleFunction RIGHTPAR
+                        | exp COMA moduleFunction
                         | exp RIGHTPAR'''
 
 def p_error(t):
@@ -263,19 +263,3 @@ def p_error(t):
 
 
 parser = yacc.yacc()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
