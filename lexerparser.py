@@ -9,6 +9,7 @@ reserved = {
     'int': 'INT',
     'float': 'FLOAT',
     'char': 'CHAR',
+    'void': 'VOID',
     'function': 'FUNCTION',
     'return': 'RETURN',
     'read': 'READ',
@@ -103,7 +104,114 @@ def p_program(t):
     'program : PROGRAM ID SEMICOLON vars function main'
     print("Code valid")
 
+def p_function(t):
+    '''function : functionType LEFTPAR param RIGHTPAR SEMICOLON LEFTBRACE statement RIGHTBRACE
+                | functionType LEFTPAR RIGHTPAR SEMICOLON LEFTBRACE statement RIGHTBRACE'''
+
+def p_functionType(t):
+    '''functionType : FUNCTION primitive
+                    | FUNCTION void'''
+
+def p_param(t):
+    'param : primitive ID functionParam'
+
+def p_functionParam(t):
+    '''functionParam : COMA param
+                    | '''
+
+def p_cst_prim(t):
+    '''cst_prim : CST_INT
+                | CST_DEC
+                | CST_CHAR '''
+
+def p_factor(t):
+    '''factor: LEFTPAR exp RIGHTPAR
+            | cst_prim
+            | module
+            | ID'''
+
+def p_term(t):
+    '''term : factor termFunction
+            | factor '''
+
+def p_termFunction(t):
+    '''termFunction : MULTIPLY term
+                    | DIVIDE term
+                    | ''' 
+
+def p_exp(t):
+    '''exp : term expFunction
+            | term '''
+
+def p_expFunction(t):
+    '''termFunction : PLUS exp
+                    | MINUS exp
+                    | ''' 
+
+def p_read(t):
+    'read : READ LEFTPAR id_list RIGHTPAR'
+
+def p_id_list(t):
+    'id_list : ID id_listFunction'
+
+def p_id_listFunction(t):
+    '''id_listFunction : COMA id_list
+                        | '''
+
+def p_print(t):
+    'print : PRINT LEFTPAR printFunction RIGHTPAR'
+
+def p_printFunction(t):
+    '''printFunction : print_param COMA printFunction2
+                    | print_param '''
+def p_printFunction2(t):
+    '''printFunction2 : printFunction'''
+
+def p_print_param(t):
+    '''print_param : exp
+                    | CST_STRING
+                    | ID '''
+
+def p_statement(t):
+    '''statement : return
+                | if statementFunction
+                | comment statementFunction
+                | read statementFunction
+                | print statementFunction
+                | assignment statementFunction
+                | declaration statementFunction
+                | module statementFunction'''
+
+def p_statementFunction(t): 
+    '''statementFunction : statement'''
+
+def p_module(t):
+    '''module : ID LEFTPAR moduleFunction'''
+
+def p_moduleFunction(t):
+    '''moduleFunction : ID COMA moduleFunction RIGHTPAR
+                        | ID RIGHTPAR
+                        | exp COMA moduleFunction RIGHTPAR
+                        | exp RIGHTPAR'''
+
 def p_error(t):
     print("Syntax error in '%s'" % t.value)
 
+
 parser = yacc.yacc()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
