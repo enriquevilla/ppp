@@ -37,14 +37,15 @@ tokens = [
     'RIGHTPAR',
     'EQUAL',
     'COMA',
-    'COLON',
     'SEMICOLON',
     'ID',
     'LEFTBRACK',
     'RIGHTBRACK',
     'LEFTBRACE',
     'RIGHTBRACE',
-    'PERCENT',
+    'EXCLAMATION',
+    'QUESTION',
+    'DOLLARSIGN',
     'CST_INT',
     'CST_FLOAT',
     'CST_STRING',
@@ -67,13 +68,14 @@ t_LEFTPAR       = r'\('
 t_RIGHTPAR      = r'\)'
 t_EQUAL         = r'='
 t_COMA          = r','
-t_COLON         = r':'
 t_SEMICOLON     = r';'
 t_LEFTBRACK     = r'\['
 t_RIGHTBRACK    = r'\]'
 t_LEFTBRACE     = r'\{'
 t_RIGHTBRACE    = r'\}'
-t_PERCENT       = r'%'
+t_EXCLAMATION   = r'¡'
+t_QUESTION      = r'\?'
+t_DOLLARSIGN    = r'\$'
 t_CST_INT       = r'[0-9]+'
 t_CST_FLOAT     = r'[0-9]+\.[0-9]+'
 t_CST_STRING    = r'("(\\"|[^"])*")|(\'(\\\'|[^\'])*\')'
@@ -203,11 +205,37 @@ def p_cst_prim(t):
                 | CST_FLOAT
                 | CST_CHAR '''
 
+def p_hyperExpression(t):
+    '''hyperExpression : superExpression opHyperExpression superExpression
+                       | superExpression'''
+
+def p_opHyperExpression(t):
+    '''opHyperExpression : AND
+                         | OR'''
+
+def p_superExpression(t):
+    '''superExpression : exp opSuperExpression exp
+                       | exp'''
+
+def p_opSuperExpression(t):
+    '''opSuperExpression : GT
+                         | LT
+                         | NOTEQUAL'''
+
+def p_exp(t):
+    '''exp : term expFunction
+           | term '''
+
+def p_expFunction(t):
+    '''expFunction : PLUS exp
+                   | MINUS exp
+                   | ''' 
+
 def p_factor(t):
     '''factor : LEFTPAR exp RIGHTPAR
-            | cst_prim
-            | module
-            | ID'''
+              | cst_prim
+              | module
+              | ID'''
 
 def p_term(t):
     '''term : factor termFunction
@@ -218,14 +246,6 @@ def p_termFunction(t):
                     | DIVIDE term
                     | ''' 
 
-def p_exp(t):
-    '''exp : term expFunction
-            | term '''
-
-def p_expFunction(t):
-    '''expFunction : PLUS exp
-                    | MINUS exp
-                    | ''' 
 
 def p_read(t):
     'read : READ LEFTPAR id_list RIGHTPAR'
@@ -235,31 +255,34 @@ def p_id_list(t):
 
 def p_id_listFunction(t):
     '''id_listFunction : COMA id_list
-                        | '''
+                       | '''
 
 def p_print(t):
     'print : PRINT LEFTPAR printFunction RIGHTPAR'
 
 def p_printFunction(t):
     '''printFunction : print_param COMA printFunction2
-                    | print_param '''
+                     | print_param '''
+
 def p_printFunction2(t):
     '''printFunction2 : printFunction'''
 
 def p_print_param(t):
     '''print_param : exp
-                    | CST_STRING
-                    | ID '''
+                   | CST_STRING
+                   | ID '''
 
 def p_statement(t):
     '''statement : return
-                | if statementFunction
-                | comment statementFunction
-                | read statementFunction
-                | print statementFunction
-                | assignment statementFunction
-                | declaration statementFunction
-                | module statementFunction'''
+                 | if statementFunction
+                 | comment statementFunction
+                 | read statementFunction
+                 | print statementFunction
+                 | assignment statementFunction
+                 | declaration statementFunction
+                 | module statementFunction
+                 | for statementFunction
+                 | while statementFunction'''
 
 def p_statementFunction(t): 
     '''statementFunction : statement'''
@@ -269,9 +292,9 @@ def p_module(t):
 
 def p_moduleFunction(t):
     '''moduleFunction : ID COMA moduleFunction
-                        | ID RIGHTPAR
-                        | exp COMA moduleFunction
-                        | exp RIGHTPAR'''
+                      | ID RIGHTPAR
+                      | exp COMA moduleFunction
+                      | exp RIGHTPAR'''
 
 def p_error(t):
     print("Syntax error in '%s'" % t.value)
