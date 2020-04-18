@@ -19,7 +19,6 @@ reserved = {
     'else': 'ELSE',
     'while': 'WHILE',
     'do': 'DO',
-    'from': 'FROM',
     'to': 'TO',
     'for': 'FOR'
 }
@@ -103,8 +102,12 @@ def t_error(t):
 
 lexer = lex.lex()
 
-program = '''program eatadick;
-
+program = '''
+program eatadick;
+var int i;
+main() {
+    i = 1;
+}
 '''
 
 lex.lex()
@@ -275,3 +278,5 @@ def p_error(t):
 
 
 parser = yacc.yacc()
+
+parser.parse(program)
