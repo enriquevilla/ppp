@@ -43,9 +43,9 @@ tokens = [
     'RIGHTBRACK',
     'LEFTBRACE',
     'RIGHTBRACE',
-    'EXCLAMATION',
-    'QUESTION',
-    'DOLLARSIGN',
+    # 'EXCLAMATION',
+    # 'QUESTION',
+    # 'DOLLARSIGN',
     'CST_INT',
     'CST_FLOAT',
     'CST_STRING',
@@ -73,9 +73,9 @@ t_LEFTBRACK     = r'\['
 t_RIGHTBRACK    = r'\]'
 t_LEFTBRACE     = r'\{'
 t_RIGHTBRACE    = r'\}'
-t_EXCLAMATION   = r'¡'
-t_QUESTION      = r'\?'
-t_DOLLARSIGN    = r'\$'
+# t_EXCLAMATION   = r'¡'
+# t_QUESTION      = r'\?'
+# t_DOLLARSIGN    = r'\$'
 t_CST_INT       = r'[0-9]+'
 t_CST_FLOAT     = r'[0-9]+\.[0-9]+'
 t_CST_STRING    = r'("(\\"|[^"])*")|(\'(\\\'|[^\'])*\')'
@@ -88,7 +88,6 @@ def t_ID(t):
         t.type = reserved[t.value]
     return t
 
-
 # Ignored characters
 t_ignore = " \t\r"
 
@@ -96,28 +95,27 @@ def t_newline(t):
     r'\n+'
     t.lexer.lineno += t.value.count("\n")
 
-
 def t_error(t):
     print("Illegal character '%s'" % t.value[0])
     t.lexer.skip(1)
-
 
 lexer = lex.lex()
 
 program = '''
 program eatadick;
-var int i;
+var int i[1][1], j[1], k;
 main() {
     i = 1;
+    print("hola");
 }
 '''
 
 lex.lex()
-lex.input(program)
-while 1:
-    tok = lex.token()
-    if not tok: break
-    print(tok)
+# lex.input(program)
+# while 1:
+#     tok = lex.token()
+#     if not tok: break
+#     print(tok)
 
 import ply.yacc as yacc
 
@@ -126,7 +124,7 @@ def p_program(t):
     print("Code valid")
 
 def p_programVars(t):
-    '''programVars : vars
+    '''programVars : declaration
                    | '''
     
 def p_programFunc(t):
@@ -137,7 +135,7 @@ def p_main(t):
     'main : MAIN LEFTPAR RIGHTPAR LEFTBRACE statement RIGHTBRACE'
 
 def p_assignment(t):
-    'assignment : ID EQUAL exp SEMICOLON'
+    'assignment : ID EQUAL hyperExpression SEMICOLON'
 
 def p_declaration(t):
     'declaration : VAR declarationPrim'
@@ -152,10 +150,10 @@ def p_primitive(t):
                  | CHAR '''
 
 def p_return(t):
-    'return : RETURN LEFTPAR exp RIGHTPAR'
+    'return : RETURN LEFTPAR hyperExpression RIGHTPAR'
 
 def p_if(t):
-    'if : IF LEFTPAR exp RIGHTPAR THEN LEFTBRACE statement RIGHTBRACE ifElse'
+    'if : IF LEFTPAR hyperExpression RIGHTPAR THEN LEFTBRACE statement RIGHTBRACE ifElse'
 
 def p_ifElse(t):
     '''ifElse : ELSE LEFTBRACE statement RIGHTBRACE
@@ -165,40 +163,43 @@ def p_comment(t):
     'comment : COMMENT_TEXT'
 
 def p_while(t):
-    'while : WHILE LEFTPAR exp RIGHTPAR DO statement'
+    'while : WHILE LEFTPAR hyperExpression RIGHTPAR DO statement'
 
 def p_for(t):
-    'for : FOR declaration TO exp DO statement'
+    'for : FOR forDec TO hyperExpression DO statement'
+
+def p_forDeclaration(t):
+    'forDeclaration : ID EQUAL CST_INT'
 
 def p_vars(t):
-    'vars : ID varsArray SEMICOLON'
+    'vars : ID varsArray'
 
 def p_varsComa(t):
     '''varsComa : COMA vars
                 | '''
 
 def p_varsArray(t):
-    '''varsArray : LEFTBRACK CST_INT RIGHTBRACK varsMatrix
+    '''varsArray : LEFTBRACK CST_INT RIGHTBRACK varsMatrix varsComa
                  | varsComa '''
 
 def p_varsMatrix(t):
-    '''varsMatrix : LEFTBRACK CST_INT RIGHTBRACK
+    '''varsMatrix : LEFTBRACK CST_INT RIGHTBRACK varsComa
                   | varsComa '''
 
 def p_function(t):
     '''function : functionType LEFTPAR param RIGHTPAR SEMICOLON LEFTBRACE statement RIGHTBRACE
-                | functionType LEFTPAR RIGHTPAR SEMICOLON LEFTBRACE statement RIGHTBRACE'''
+                | functionType LEFTPAR RIGHTPAR SEMICOLON LEFTBRACE statement RIGHTBRACE '''
 
 def p_functionType(t):
     '''functionType : FUNCTION primitive
-                    | FUNCTION VOID'''
+                    | FUNCTION VOID '''
 
 def p_param(t):
     'param : primitive ID functionParam'
 
 def p_functionParam(t):
     '''functionParam : COMA param
-                    | '''
+                     | '''
 
 def p_cst_prim(t):
     '''cst_prim : CST_INT
@@ -207,20 +208,20 @@ def p_cst_prim(t):
 
 def p_hyperExpression(t):
     '''hyperExpression : superExpression opHyperExpression superExpression
-                       | superExpression'''
+                       | superExpression '''
 
 def p_opHyperExpression(t):
     '''opHyperExpression : AND
-                         | OR'''
+                         | OR '''
 
 def p_superExpression(t):
     '''superExpression : exp opSuperExpression exp
-                       | exp'''
+                       | exp '''
 
 def p_opSuperExpression(t):
     '''opSuperExpression : GT
                          | LT
-                         | NOTEQUAL'''
+                         | NOTEQUAL '''
 
 def p_exp(t):
     '''exp : term expFunction
@@ -228,14 +229,7 @@ def p_exp(t):
 
 def p_expFunction(t):
     '''expFunction : PLUS exp
-                   | MINUS exp
-                   | ''' 
-
-def p_factor(t):
-    '''factor : LEFTPAR exp RIGHTPAR
-              | cst_prim
-              | module
-              | ID'''
+                   | MINUS exp ''' 
 
 def p_term(t):
     '''term : factor termFunction
@@ -243,12 +237,16 @@ def p_term(t):
 
 def p_termFunction(t):
     '''termFunction : MULTIPLY term
-                    | DIVIDE term
-                    | ''' 
+                    | DIVIDE term ''' 
 
+def p_factor(t):
+    '''factor : LEFTPAR hyperExpression RIGHTPAR
+              | cst_prim
+              | module
+              | ID '''
 
 def p_read(t):
-    'read : READ LEFTPAR id_list RIGHTPAR'
+    'read : READ LEFTPAR id_list RIGHTPAR SEMICOLON'
 
 def p_id_list(t):
     'id_list : ID id_listFunction'
@@ -258,19 +256,18 @@ def p_id_listFunction(t):
                        | '''
 
 def p_print(t):
-    'print : PRINT LEFTPAR printFunction RIGHTPAR'
+    'print : PRINT LEFTPAR printFunction RIGHTPAR SEMICOLON'
 
 def p_printFunction(t):
     '''printFunction : print_param COMA printFunction2
-                     | print_param '''
+                     | print_param'''
 
 def p_printFunction2(t):
-    '''printFunction2 : printFunction'''
+    'printFunction2 : printFunction'
 
 def p_print_param(t):
-    '''print_param : exp
-                   | CST_STRING
-                   | ID '''
+    '''print_param : hyperExpression
+                   | CST_STRING'''
 
 def p_statement(t):
     '''statement : return
@@ -282,23 +279,23 @@ def p_statement(t):
                  | declaration statementFunction
                  | module statementFunction
                  | for statementFunction
-                 | while statementFunction'''
+                 | while statementFunction
+                 | '''
 
 def p_statementFunction(t): 
-    '''statementFunction : statement'''
+    'statementFunction : statement'
 
 def p_module(t):
-    '''module : ID LEFTPAR moduleFunction'''
+    'module : ID LEFTPAR moduleFunction'
 
 def p_moduleFunction(t):
     '''moduleFunction : ID COMA moduleFunction
                       | ID RIGHTPAR
-                      | exp COMA moduleFunction
-                      | exp RIGHTPAR'''
+                      | hyperExpression COMA moduleFunction
+                      | hyperExpression RIGHTPAR'''
 
 def p_error(t):
     print("Syntax error in '%s'" % t.value)
-
 
 parser = yacc.yacc()
 
