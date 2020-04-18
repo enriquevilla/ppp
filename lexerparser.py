@@ -20,7 +20,8 @@ reserved = {
     'while': 'WHILE',
     'do': 'DO',
     'from': 'FROM',
-    'to': 'TO'
+    'to': 'TO',
+    'for': 'FOR'
 }
 
 tokens = [
@@ -78,7 +79,7 @@ t_CST_INT       = r'[0-9]+'
 t_CST_FLOAT     = r'[0-9]+\.[0-9]+'
 t_CST_STRING    = r'("(\\"|[^"])*")|(\'(\\\'|[^\'])*\')'
 t_CST_CHAR      = r'("(\\"|[^"])?")|(\'(\\\'|[^\'])?\')'
-t_COMMENT_TEXT  = r'.*\n'
+t_COMMENT_TEXT  = r'%%.*\n'
 
 def t_ID(t):
     r'[a-zA-Z_][a-zA-Z0-9_]*'
@@ -101,6 +102,17 @@ def t_error(t):
 
 
 lexer = lex.lex()
+
+program = '''program eatadick;
+
+'''
+
+lex.lex()
+lex.input(program)
+while 1:
+    tok = lex.token()
+    if not tok: break
+    print(tok)
 
 import ply.yacc as yacc
 
@@ -145,16 +157,16 @@ def p_ifElse(t):
               | '''
 
 def p_comment(t):
-    'comment : PERCENT PERCENT COMMENT_TEXT'
+    'comment : COMMENT_TEXT'
 
 def p_while(t):
-    'while : WHILE LEFTPAR expression RIGHTPAR DO statement'
+    'while : WHILE LEFTPAR exp RIGHTPAR DO statement'
 
 def p_for(t):
-    'for : FOR declaration TO expression DO statement'
+    'for : FOR declaration TO exp DO statement'
 
 def p_vars(t):
-    'vars : ID varsArray'
+    'vars : ID varsArray SEMICOLON'
 
 def p_varsComa(t):
     '''varsComa : COMA vars
@@ -174,7 +186,7 @@ def p_function(t):
 
 def p_functionType(t):
     '''functionType : FUNCTION primitive
-                    | FUNCTION void'''
+                    | FUNCTION VOID'''
 
 def p_param(t):
     'param : primitive ID functionParam'
@@ -185,11 +197,11 @@ def p_functionParam(t):
 
 def p_cst_prim(t):
     '''cst_prim : CST_INT
-                | CST_DEC
+                | CST_FLOAT
                 | CST_CHAR '''
 
 def p_factor(t):
-    '''factor: LEFTPAR exp RIGHTPAR
+    '''factor : LEFTPAR exp RIGHTPAR
             | cst_prim
             | module
             | ID'''
@@ -208,7 +220,7 @@ def p_exp(t):
             | term '''
 
 def p_expFunction(t):
-    '''termFunction : PLUS exp
+    '''expFunction : PLUS exp
                     | MINUS exp
                     | ''' 
 
