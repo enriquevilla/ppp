@@ -43,9 +43,9 @@ tokens = [
     'RIGHTBRACK',
     'LEFTBRACE',
     'RIGHTBRACE',
-    # 'EXCLAMATION',
-    # 'QUESTION',
-    # 'DOLLARSIGN',
+    'EXCLAMATION',
+    'QUESTION',
+    'DOLLARSIGN',
     'CST_INT',
     'CST_FLOAT',
     'CST_STRING',
@@ -73,9 +73,9 @@ t_LEFTBRACK     = r'\['
 t_RIGHTBRACK    = r'\]'
 t_LEFTBRACE     = r'\{'
 t_RIGHTBRACE    = r'\}'
-# t_EXCLAMATION   = r'¡'
-# t_QUESTION      = r'\?'
-# t_DOLLARSIGN    = r'\$'
+t_EXCLAMATION   = r'!'
+t_QUESTION      = r'\?'
+t_DOLLARSIGN    = r'\$'
 t_CST_INT       = r'[0-9]+'
 t_CST_FLOAT     = r'[0-9]+\.[0-9]+'
 t_CST_STRING    = r'("(\\"|[^"])*")|(\'(\\\'|[^\'])*\')'
@@ -96,19 +96,14 @@ def t_newline(t):
     t.lexer.lineno += t.value.count("\n")
 
 def t_error(t):
-    print("Illegal character '%s'" % t.value[0])
+    print("Illegal character '%s' in line %d" % (t.value[0], t.lexer.lineno))
     t.lexer.skip(1)
+    exit(0)
 
 lexer = lex.lex()
 
-program = '''
-program eatadick;
-var int i[1][1], j[1], k;
-main() {
-    i = 1;
-    print("hola");
-}
-'''
+f = open('prog.txt', 'r')
+program = f.read()
 
 lex.lex()
 # lex.input(program)
@@ -166,7 +161,7 @@ def p_while(t):
     'while : WHILE LEFTPAR hyperExpression RIGHTPAR DO statement'
 
 def p_for(t):
-    'for : FOR forDec TO hyperExpression DO statement'
+    'for : FOR forDeclaration TO hyperExpression DO statement'
 
 def p_forDeclaration(t):
     'forDeclaration : ID EQUAL CST_INT'
@@ -208,7 +203,13 @@ def p_cst_prim(t):
 
 def p_hyperExpression(t):
     '''hyperExpression : superExpression opHyperExpression superExpression
-                       | superExpression '''
+                       | superExpression matrixOperator'''
+
+def p_matrixOperator(t):
+    '''matrixOperator : EXCLAMATION
+                      | QUESTION
+                      | DOLLARSIGN
+                      | '''
 
 def p_opHyperExpression(t):
     '''opHyperExpression : AND
@@ -295,7 +296,7 @@ def p_moduleFunction(t):
                       | hyperExpression RIGHTPAR'''
 
 def p_error(t):
-    print("Syntax error in '%s'" % t.value)
+    print("Syntax error: Unexpected token '%s' in line %d" % (t.value, t.lexer.lineno))
 
 parser = yacc.yacc()
 
