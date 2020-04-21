@@ -167,19 +167,19 @@ def p_forDeclaration(t):
     'forDeclaration : ID EQUAL CST_INT'
 
 def p_vars(t):
-    'vars : ID varsArray'
+    'vars : ID varsArray varsComa'
 
 def p_varsComa(t):
     '''varsComa : COMA vars
                 | '''
 
 def p_varsArray(t):
-    '''varsArray : LEFTBRACK CST_INT RIGHTBRACK varsMatrix varsComa
-                 | varsComa '''
+    '''varsArray : LEFTBRACK CST_INT RIGHTBRACK varsMatrix
+                 | '''
 
 def p_varsMatrix(t):
-    '''varsMatrix : LEFTBRACK CST_INT RIGHTBRACK varsComa
-                  | varsComa '''
+    '''varsMatrix : LEFTBRACK CST_INT RIGHTBRACK
+                  | '''
 
 def p_function(t):
     '''function : functionType LEFTPAR param RIGHTPAR SEMICOLON LEFTBRACE statement RIGHTBRACE
@@ -272,19 +272,16 @@ def p_print_param(t):
 
 def p_statement(t):
     '''statement : return
-                 | if statementFunction
-                 | comment statementFunction
-                 | read statementFunction
-                 | print statementFunction
-                 | assignment statementFunction
-                 | declaration statementFunction
-                 | module statementFunction
-                 | for statementFunction
-                 | while statementFunction
+                 | if
+                 | comment
+                 | read
+                 | print
+                 | assignment
+                 | declaration
+                 | module
+                 | for
+                 | while 
                  | '''
-
-def p_statementFunction(t): 
-    'statementFunction : statement'
 
 def p_module(t):
     'module : ID LEFTPAR moduleFunction'
