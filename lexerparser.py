@@ -18,7 +18,6 @@ reserved = {
     'then': 'THEN',
     'else': 'ELSE',
     'while': 'WHILE',
-    'do': 'DO',
     'to': 'TO',
     'for': 'FOR'
 }
@@ -145,7 +144,7 @@ def p_primitive(t):
                  | CHAR '''
 
 def p_return(t):
-    'return : RETURN LEFTPAR hyperExpression RIGHTPAR'
+    'return : RETURN LEFTPAR hyperExpression RIGHTPAR SEMICOLON'
 
 def p_if(t):
     'if : IF LEFTPAR hyperExpression RIGHTPAR THEN LEFTBRACE statement RIGHTBRACE ifElse'
@@ -158,10 +157,10 @@ def p_comment(t):
     'comment : COMMENT_TEXT'
 
 def p_while(t):
-    'while : WHILE LEFTPAR hyperExpression RIGHTPAR DO statement'
+    'while : WHILE LEFTPAR hyperExpression RIGHTPAR LEFTBRACE statement RIGHTBRACE'
 
 def p_for(t):
-    'for : FOR forDeclaration TO hyperExpression DO statement'
+    'for : FOR forDeclaration TO hyperExpression LEFTBRACE statement RIGHTBRACE'
 
 def p_forDeclaration(t):
     'forDeclaration : ID EQUAL CST_INT'
@@ -182,8 +181,8 @@ def p_varsMatrix(t):
                   | '''
 
 def p_function(t):
-    '''function : functionType LEFTPAR param RIGHTPAR SEMICOLON LEFTBRACE statement RIGHTBRACE
-                | functionType LEFTPAR RIGHTPAR SEMICOLON LEFTBRACE statement RIGHTBRACE '''
+    '''function : functionType ID LEFTPAR param RIGHTPAR SEMICOLON LEFTBRACE statement RIGHTBRACE
+                | functionType ID LEFTPAR RIGHTPAR SEMICOLON LEFTBRACE statement RIGHTBRACE '''
 
 def p_functionType(t):
     '''functionType : FUNCTION primitive
@@ -272,25 +271,24 @@ def p_print_param(t):
 
 def p_statement(t):
     '''statement : return
-                 | if
-                 | comment
-                 | read
-                 | print
-                 | assignment
-                 | declaration
-                 | module
-                 | for
-                 | while 
+                 | if statement
+                 | comment statement
+                 | read statement
+                 | print statement
+                 | assignment statement
+                 | declaration statement
+                 | module statement
+                 | for statement
+                 | while statement 
                  | '''
 
 def p_module(t):
-    'module : ID LEFTPAR moduleFunction'
+    'module : ID LEFTPAR moduleFunction RIGHTPAR SEMICOLON'
 
 def p_moduleFunction(t):
-    '''moduleFunction : ID COMA moduleFunction
-                      | ID RIGHTPAR
-                      | hyperExpression COMA moduleFunction
-                      | hyperExpression RIGHTPAR'''
+    '''moduleFunction : hyperExpression COMA moduleFunction
+                      | hyperExpression RIGHTPAR
+                      | '''
 
 def p_error(t):
     print("Syntax error: Unexpected token '%s' in line %d" % (t.value, t.lexer.lineno))
