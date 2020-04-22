@@ -143,8 +143,10 @@ def p_varsMatrix(t):
 def p_function(t):
     '''function : functionType ID addToDir LEFTPAR param RIGHTPAR SEMICOLON LEFTBRACE statement RIGHTBRACE
                 | functionType ID addToDir LEFTPAR RIGHTPAR SEMICOLON LEFTBRACE statement RIGHTBRACE '''
-    # When exiting function scope, reset scope to global
+    # When exiting function scope, reset scope to global and delete variableTable and reference to it in functionDir
     global currentScope
+    # del variableTable[currentScope]
+    # del functionDir[currentScope]["vars"]
     currentScope = "global"
     
 def p_addToDir(t):
