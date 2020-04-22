@@ -1,13 +1,15 @@
 
 # Definition of Primitive Types
 type_dict = {
-	'void'	  	: 0,
-	'boolean'   : 1,
-	'int'	   	: 2,
-	'decimal'   : 3,
-	'string'	: 4,
+	'int'	  	: 0,
+	'float'		: 1,
+	'char'	   	: 2,
 }
-inv_type_dict = {v: k for k, v in type_dict.items()}
+inv_type_dict = {
+	0: 			'int',
+	1:			'float',
+	2:			'char'
+}
 
 # Helper Classes
 class Stack(object):
@@ -34,7 +36,7 @@ class Stack(object):
 	def size(self):
 		return len(self.values)
 	def pprint(self):
-		print self.values
+		print(self.values)
 	def inStack(self, var_name):
 		return var_name in self.values
 
@@ -61,6 +63,6 @@ class Queue(object):
 	def size(self):
 		return len(self.values)
 	def pprint(self):
-		print self.values
+		print(self.values)
 	def inQueue(self, var_name):
 		return var_name in self.values
