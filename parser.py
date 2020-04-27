@@ -1,11 +1,38 @@
 import lexer as lexer
 import ply.yacc as yacc
 
+import queue
+
 tokens = lexer.tokens
 
 functionDir = {}
 variableTable = {}
-currentScope = ""
+semanticCube = {}
+quadruples = []
+operators = []
+operands = []
+types = []
+temp = 1
+ty = {
+    0: "int",
+    1: "float",
+    2: "char"
+}
+ops = ["+", "-", "*", "/"]
+
+# print("Semantic Cube: ")
+for i in ty:
+    for j in ty:
+        for k in ops:
+            if i > j:
+                semanticCube[(ty[i], ty[j], k)] = ty[i]
+            else:
+                semanticCube[(ty[i], ty[j], k)] = ty[j]
+            if k != "+" and (ty[i] == "char" or ty[j] == "char"):
+                semanticCube[(ty[i], ty[j], k)] = "error"
+            # print("%s %s %s = %s" % (types[i], k, types[j], semanticCube[(types[i], types[j], k)]))
+
+currentScope = "global"
 currentType = "program"
 # functionDir visual example
 '''
@@ -27,22 +54,33 @@ currentType = "program"
     }
 '''
 
+# semanticCube explanation
+'''
+    keys are tuples => (operand1, operand2, operator)
+
+    semanticCube[(op1, op2, op)] => int/float/char/error
+
+    semanticCube[("int", "int", "+")] => "int"
+    semanticCube[("char", "float", "*")] => "error"
+'''
+
 def p_program(t):
     'program : PROGRAM ID globalTable SEMICOLON programVars programFunc main'
     print("Code valid")
-    print()
-    for i in functionDir:
-        print("\tfunction name: %s" % i)
-        print("\t\ttype: %s" % functionDir[i]["type"])
-        print("\t\tvars: %s" % functionDir[i]["vars"])
-        print()
+    # show variable table and function directory
+    # print()
+    # for i in functionDir:
+    #     print("\tfunction name: %s" % i)
+    #     print("\t\ttype: %s" % functionDir[i]["type"])
+    #     print("\t\tvars: %s" % functionDir[i]["vars"])
+    #     print()
+    print(operands)
+    print(types)
+    print(operators)
     variableTable.clear()
 
-def p_progVT(t):
+def p_globalTable(t):
     'globalTable : '
-    # currentScope is global by default
-    global currentScope
-    currentScope = "global"
     # Initialize variableTable for global and set program name and type
     variableTable[currentScope] = {}
     variableTable[currentScope][t[-1]] = {"type": "program"}
@@ -196,13 +234,34 @@ def p_functionParam(t):
                      | '''
 
 def p_cst_prim(t):
-    '''cst_prim : CST_INT
-                | CST_FLOAT
-                | CST_CHAR '''
+    '''cst_prim : CST_INT addTypeI
+                | CST_FLOAT addTypeF
+                | CST_CHAR addTypeC'''
+    t[0] = t[1]
+
+def p_addTypeI(t):
+    'addTypeI : '
+    types.append("int")
+
+def p_addTypeF(t):
+    'addTypeF : '
+    types.append("float")
+
+def p_addTypeC(t):
+    'addTypeC : '
+    types.append("char")
 
 def p_hyperExpression(t):
-    '''hyperExpression : superExpression opHyperExpression superExpression
-                       | superExpression matrixOperator'''
+    '''hyperExpression : superExpression opHyperExpression superExpression genQuad
+                       | superExpression matrixOperator genQuadMatOp'''
+
+def p_genQuad(t):
+    'genQuad : '
+    # quadruples.append((t[-3], t[-1], t[-2]))
+
+def p_genQuadMatOp(t):
+    'genQuadMatOp : '
+    # quadruples.append((t[-2], None, t[-1]))
 
 def p_matrixOperator(t):
     '''matrixOperator : EXCLAMATION
@@ -230,6 +289,7 @@ def p_exp(t):
 def p_expFunction(t):
     '''expFunction : PLUS exp
                    | MINUS exp ''' 
+    operators.append(t[1])
 
 def p_term(t):
     '''term : factor termFunction
@@ -238,12 +298,21 @@ def p_term(t):
 def p_termFunction(t):
     '''termFunction : MULTIPLY term
                     | DIVIDE term ''' 
+    operators.append(t[1])
 
 def p_factor(t):
     '''factor : LEFTPAR hyperExpression RIGHTPAR
-              | cst_prim
+              | cst_prim addOp
               | module
-              | ID '''
+              | ID addOp addTypeId'''
+
+def p_addOp(t):
+    'addOp : '
+    operands.append(t[-1])
+
+def p_addTypeId(t):
+    'addTypeId : '
+    types.append(variableTable[currentScope][t[-2]]["type"])
 
 def p_read(t):
     'read : READ LEFTPAR id_list RIGHTPAR SEMICOLON'
