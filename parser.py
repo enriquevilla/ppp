@@ -1,71 +1,12 @@
 import lexer as lexer
 import ply.yacc as yacc
-
-import queue
+import datastructures as ds
 
 tokens = lexer.tokens
-
-functionDir = {}
-variableTable = {}
-semanticCube = {}
-quadruples = []
-operators = []
-operands = []
-types = []
-temp = 1
-ty = {
-    0: "int",
-    1: "float",
-    2: "char"
-}
-ops = ["+", "-", "*", "/"]
-
-# print("Semantic Cube: ")
-for i in ty:
-    for j in ty:
-        for k in ops:
-            if i > j:
-                semanticCube[(ty[i], ty[j], k)] = ty[i]
-            else:
-                semanticCube[(ty[i], ty[j], k)] = ty[j]
-            if k != "+" and (ty[i] == "char" or ty[j] == "char"):
-                semanticCube[(ty[i], ty[j], k)] = "error"
-            # print("%s %s %s = %s" % (types[i], k, types[j], semanticCube[(types[i], types[j], k)]))
-
-currentScope = "global"
-currentType = "program"
-# functionDir visual example
-'''
-    "global": {
-        "type": "void",
-        "vars": variableTable["global"] -> "i": {
-                                                "type": "int"
-                                                "value": 1
-                                            }
-                                            ...
-    }
-    "main": {
-        "type": "void",
-        "vars": variableTable["main"] -> "c": {
-                                              "type": "char"
-                                              "value": "h"
-                                         }
-                                         ...
-    }
-'''
-
-# semanticCube explanation
-'''
-    keys are tuples => (operand1, operand2, operator)
-
-    semanticCube[(op1, op2, op)] => int/float/char/error
-
-    semanticCube[("int", "int", "+")] => "int"
-    semanticCube[("char", "float", "*")] => "error"
-'''
+tp = 1
 
 def p_program(t):
-    'program : PROGRAM ID globalTable SEMICOLON programVars programFunc main'
+    'program : PROGRAM ID programA1 SEMICOLON programVars programFunc main'
     print("Code valid")
     # show variable table and function directory
     # print()
@@ -74,21 +15,23 @@ def p_program(t):
     #     print("\t\ttype: %s" % functionDir[i]["type"])
     #     print("\t\tvars: %s" % functionDir[i]["vars"])
     #     print()
-    print(operands)
-    print(types)
-    print(operators)
-    variableTable.clear()
+    print(ds.operands)
+    print(ds.types)
+    print(ds.operators)
+    print(ds.quadruples)
+    ds.variableTable.clear()
 
+# global scope varTable
 def p_globalTable(t):
-    'globalTable : '
+    'programA1 : '
     # Initialize variableTable for global and set program name and type
-    variableTable[currentScope] = {}
-    variableTable[currentScope][t[-1]] = {"type": "program"}
+    ds.variableTable[ds.currentScope] = {}
+    ds.variableTable[ds.currentScope][t[-1]] = {"type": "program"}
     # Initialize functionDir for global scope
-    functionDir[currentScope] = {}
+    ds.functionDir[ds.currentScope] = {}
     # Set type and vars as reference to variableTable["global"]
-    functionDir[currentScope]["type"] = "void"
-    functionDir[currentScope]["vars"] = variableTable[currentScope]
+    ds.functionDir[ds.currentScope]["type"] = "void"
+    ds.functionDir[ds.currentScope]["vars"] = ds.variableTable[ds.currentScope]
 
 def p_programVars(t):
     '''programVars : declaration
@@ -99,22 +42,23 @@ def p_programFunc(t):
                    | '''
 
 def p_main(t):
-    'main : mainScope MAIN LEFTPAR RIGHTPAR LEFTBRACE statement RIGHTBRACE'
+    'main : mainA1 MAIN LEFTPAR RIGHTPAR LEFTBRACE statement RIGHTBRACE'
 
-def p_mainScope(t):
-    'mainScope : '
-    global currentScope
-    variableTable[currentScope]["main"] = {"type": "void"}
-    currentScope = "main"
+# main scope varTable
+def p_mainTable(t):
+    'mainA1 : '
+    ds.variableTable[ds.currentScope]["main"] = {"type": "void"}
+    ds.currentScope = "main"
     # Initialize variableTable and functionDir for main scope
-    variableTable[currentScope] = {}
-    functionDir[currentScope] = {}
+    ds.variableTable[ds.currentScope] = {}
+    ds.functionDir[ds.currentScope] = {}
     # Set function type and vars as reference to variableTable["main"]
-    functionDir[currentScope]["type"] = "void"
-    functionDir[currentScope]["vars"] = variableTable[currentScope]
+    ds.functionDir[ds.currentScope]["type"] = "void"
+    ds.functionDir[ds.currentScope]["vars"] = ds.variableTable[ds.currentScope]
 
 def p_assignment(t):
     'assignment : ID EQUAL hyperExpression SEMICOLON'
+    ds.quadruples.append(("=", ds.operands.pop(), None, t[1]))
 
 def p_declaration(t):
     'declaration : VAR declarationPrim'
@@ -128,8 +72,7 @@ def p_primitive(t):
                  | FLOAT
                  | CHAR '''
     # When stating type, change currentType for declaration
-    global currentType
-    currentType = t[1]
+    ds.currentType = t[1]
 
 def p_return(t):
     'return : RETURN LEFTPAR hyperExpression RIGHTPAR SEMICOLON'
@@ -154,17 +97,18 @@ def p_forDeclaration(t):
     'forDeclaration : ID EQUAL CST_INT'
 
 def p_vars(t):
-    'vars : ID addToTable varsArray varsComa'
-    
+    'vars : ID varsA1 varsArray varsComa'
+
+# add vars to varTable
 def p_addToTable(t):
-    'addToTable : '
+    'varsA1 : '
     # If current ID (t[-1]) exists in scope or global, throw error
-    if t[-1] in variableTable[currentScope] or t[-1] in variableTable["global"]:
+    if t[-1] in ds.variableTable[ds.currentScope] or t[-1] in ds.variableTable["global"]:
         print("Error: redefinition of variable '%s' in line %d." % (t[-1], t.lexer.lineno))
         exit(0)
     else:
         # Add current ID (t[-1]) to variableTable[scope]
-        variableTable[currentScope][t[-1]] = {"type": currentType}
+        ds.variableTable[ds.currentScope][t[-1]] = {"type": ds.currentType}
 
 def p_varsComa(t):
     '''varsComa : COMA vars
@@ -179,95 +123,94 @@ def p_varsMatrix(t):
                   | '''
 
 def p_function(t):
-    '''function : functionType ID addToDir LEFTPAR param RIGHTPAR SEMICOLON LEFTBRACE statement RIGHTBRACE
-                | functionType ID addToDir LEFTPAR RIGHTPAR SEMICOLON LEFTBRACE statement RIGHTBRACE '''
+    '''function : functionType ID functionA1 LEFTPAR param RIGHTPAR SEMICOLON LEFTBRACE statement RIGHTBRACE
+                | functionType ID functionA1 LEFTPAR RIGHTPAR SEMICOLON LEFTBRACE statement RIGHTBRACE '''
     # When exiting function scope, reset scope to global and delete variableTable and reference to it in functionDir
-    global currentScope
     # del variableTable[currentScope]
     # del functionDir[currentScope]["vars"]
-    currentScope = "global"
-    
+    ds.currentScope = "global"
+
+# add function to dir
 def p_addToDir(t):
-    'addToDir : '
-    global currentScope
+    'functionA1 : '
     # If function exists in global scope, throw an error
-    if t[-1] in functionDir["global"] or t[-1] in variableTable["global"]:
+    if t[-1] in ds.functionDir["global"] or t[-1] in ds.variableTable["global"]:
         print("Error: redefinition of '%s' in line %d." % (t[-1], t.lexer.lineno))
         exit(0)
     else:
-        # Add function to variableTable of currentScope
-        variableTable[currentScope][t[-1]] = {"type": currentType}
+        # Add function to variableTable of ds.currentScope
+        ds.variableTable[ds.currentScope][t[-1]] = {"type": ds.currentType}
         # Change scope to new function id
-        currentScope = t[-1]
+        ds.currentScope = t[-1]
         # Initialize variableTable and functionDir for new function id
-        variableTable[currentScope] = {}
-        functionDir[currentScope] = {}
-        # Set new function type and vars as reference to variableTable[currentScope]
-        functionDir[currentScope]["type"] = currentType
-        functionDir[currentScope]["vars"] = variableTable[currentScope]
+        ds.variableTable[ds.currentScope] = {}
+        ds.functionDir[ds.currentScope] = {}
+        # Set new function type and vars as reference to variableTable[ds.currentScope]
+        ds.functionDir[ds.currentScope]["type"] = ds.currentType
+        ds.functionDir[ds.currentScope]["vars"] = ds.variableTable[ds.currentScope]
 
 def p_functionType(t):
     '''functionType : FUNCTION primitive
-                    | FUNCTION VOID setVoid'''
+                    | FUNCTION VOID functionTypeA1'''
 
+# set void as current type
 def p_setVoid(t):
-    'setVoid : '
+    'functionTypeA1 : '
     # Set void as currentType
-    global currentType
-    currentType = t[-1]
+    ds.currentType = t[-1]
 
 def p_param(t):
-    'param : primitive ID addFuncParams functionParam'
+    'param : primitive ID paramA1 functionParam'
 
+# add function params to table
 def p_addFuncParams(t):
-    'addFuncParams : '
+    'paramA1 : '
     # If function param exists in scope or globally, throw error
-    if t[-1] in variableTable[currentScope] or t[-1] in variableTable["global"]:
+    if t[-1] in ds.variableTable[ds.currentScope] or t[-1] in ds.variableTable["global"]:
         print("Error: redefinition of variable '%s' in line %d." % (t[-1], t.lexer.lineno))
         exit(0)
     else:
-        # Add function param to variableTable of currentScope
-        variableTable[currentScope][t[-1]] = {"type": currentType}
+        # Add function param to variableTable of ds.currentScope
+        ds.variableTable[ds.currentScope][t[-1]] = {"type": ds.currentType}
 
 def p_functionParam(t):
     '''functionParam : COMA param
                      | '''
 
 def p_cst_prim(t):
-    '''cst_prim : CST_INT addTypeI
-                | CST_FLOAT addTypeF
-                | CST_CHAR addTypeC'''
+    '''cst_prim : CST_INT cstprimA1
+                | CST_FLOAT cstprimA2
+                | CST_CHAR cstprimA3'''
     t[0] = t[1]
 
+# add type int
 def p_addTypeI(t):
-    'addTypeI : '
-    types.append("int")
+    'cstprimA1 : '
+    ds.types.append("int")
 
+# add type float
 def p_addTypeF(t):
-    'addTypeF : '
-    types.append("float")
+    'cstprimA2 : '
+    ds.types.append("float")
 
+# add type char
 def p_addTypeC(t):
-    'addTypeC : '
-    types.append("char")
+    'cstprimA3 : '
+    ds.types.append("char")
 
 def p_hyperExpression(t):
-    '''hyperExpression : superExpression opHyperExpression superExpression genQuad
-                       | superExpression matrixOperator genQuadMatOp'''
-
-def p_genQuad(t):
-    'genQuad : '
-    # quadruples.append((t[-3], t[-1], t[-2]))
+    '''hyperExpression : superExpression opHyperExpression hyperExpression
+                       | superExpression opMatrix genQuadMatOp
+                       | superExpression'''
 
 def p_genQuadMatOp(t):
     'genQuadMatOp : '
     # quadruples.append((t[-2], None, t[-1]))
 
-def p_matrixOperator(t):
-    '''matrixOperator : EXCLAMATION
-                      | QUESTION
-                      | DOLLARSIGN
-                      | '''
+def p_opMatrix(t):
+    '''opMatrix : EXCLAMATION
+                | QUESTION
+                | DOLLARSIGN'''
 
 def p_opHyperExpression(t):
     '''opHyperExpression : AND
@@ -288,8 +231,12 @@ def p_exp(t):
 
 def p_expFunction(t):
     '''expFunction : PLUS exp
-                   | MINUS exp ''' 
-    operators.append(t[1])
+                   | MINUS exp '''
+    ds.operators.append(t[1])
+    global tp
+    ds.quadruples.append((ds.operators.pop(), ds.operands.pop(), ds.operands.pop(), "t%d"%tp))
+    ds.operands.append("t%d"%tp)
+    tp += 1
 
 def p_term(t):
     '''term : factor termFunction
@@ -298,7 +245,11 @@ def p_term(t):
 def p_termFunction(t):
     '''termFunction : MULTIPLY term
                     | DIVIDE term ''' 
-    operators.append(t[1])
+    ds.operators.append(t[1])
+    global tp
+    ds.quadruples.append((ds.operators.pop(), ds.operands.pop(), ds.operands.pop(), "t%d"%tp))
+    ds.operands.append("t%d"%tp)
+    tp += 1
 
 def p_factor(t):
     '''factor : LEFTPAR hyperExpression RIGHTPAR
@@ -308,11 +259,11 @@ def p_factor(t):
 
 def p_addOp(t):
     'addOp : '
-    operands.append(t[-1])
+    ds.operands.append(t[-1])
 
 def p_addTypeId(t):
     'addTypeId : '
-    types.append(variableTable[currentScope][t[-2]]["type"])
+    ds.types.append(ds.variableTable[ds.currentScope][t[-2]]["type"])
 
 def p_read(t):
     'read : READ LEFTPAR id_list RIGHTPAR SEMICOLON'
