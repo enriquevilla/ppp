@@ -27,7 +27,6 @@ currentType = "program"
 functionDir = {}
 variableTable = {}
 semanticCube = {}
-quadruples_original = Stack()
 operators = Stack()
 operands = Stack()
 types = Stack()
