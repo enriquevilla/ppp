@@ -1,4 +1,4 @@
-from datastructures import *
+from datastructures import Stack
 import sys
 
 class Quadruple(object):
@@ -118,12 +118,11 @@ class Quadruples(object):
 		
 		Prints the jump stack
 		"""
-		cls.jump_stack.pprint()
+		cls.jump_stack.print()
 
 	@classmethod
 	def print_all(cls):
 		"""prints all quadruples from list """
-		count = 0
 		print("Quads ===============================")
 		for x in cls.quadruples:
 			x.print()
