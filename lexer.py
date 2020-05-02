@@ -26,6 +26,7 @@ tokens = [
     'AND',
     'OR',
     'NOTEQUAL',
+    'ISEQUAL',
     'PLUS',
     'MINUS',
     'DIVIDE',
@@ -57,6 +58,7 @@ t_LT            = r'<'
 t_AND           = r'&'
 t_OR            = r'\|'
 t_NOTEQUAL      = r'<>'
+t_ISEQUAL       = r'=='
 t_PLUS          = r'\+'
 t_MINUS         = r'-'
 t_DIVIDE        = r'/'
