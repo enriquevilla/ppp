@@ -1,7 +1,8 @@
 import lexer as lexer
 import ply.yacc as yacc
-from datastructures import quadruples, types, operands, operators, variableTable
+from datastructures import quadruples_original, types, operands, operators, variableTable
 from datastructures import functionDir, temp, currentScope, currentType, semanticCube
+from quadruples import *
 
 tokens = lexer.tokens
 
@@ -19,7 +20,10 @@ def p_program(t):
     operands.print()
     types.print()
     operators.print()
-    quadruples.print()
+    print ("QUADS")
+    Quadruples.print_all()
+    print ("QUADS ORIGINAL")
+    #quadruples_original.print()
     variableTable.clear()
 
 # global scope varTable
@@ -62,13 +66,17 @@ def p_assignment(t):
     'assignment : ID EQUAL hyperExpression SEMICOLON'
     if t[1] in variableTable[currentScope]:
         if types.pop() == variableTable[currentScope][t[1]]["type"]:
-            quadruples.push(("=", operands.pop(), None, t[1]))
+            #quadruples_original.push(("=", operands.pop(), None, t[1]))
+            temp_quad = Quadruple("=", operands.pop(), None, t[1])
+            Quadruples.push_quad(temp_quad)
         else:
             print("Error: type mismatch in assignment for '%s' in line %d" % (t[1], t.lexer.lineno - 1))
             exit(0)
     elif t[1] in variableTable["global"]:
         if types.pop() == variableTable["global"][t[1]]["type"]:
-            quadruples.push(("=", operands.pop(), None, t[1]))
+            #quadruples_original.push(("=", operands.pop(), None, t[1]))
+            temp_quad = Quadruple("=", operands.pop(), None, t[1])
+            Quadruples.push_quad(temp_quad)
         else:
             print("Error: type mismatch in assignment for '%s' in line %d" % (t[1], t.lexer.lineno - 1))
             exit(0)
@@ -237,7 +245,9 @@ def p_opConsumeHyperExp(t):
             lType = types.pop()
             resType = semanticCube[(lType, rType, oper)]
             if resType != "error":
-                quadruples.push((oper, lOp, rOp, "t%d"%temp))
+                #quadruples_original.push((oper, lOp, rOp, "t%d"%temp))
+                temp_quad = Quadruple(oper, lOp, rOp, "t"+str(temp))
+                Quadruples.push_quad(temp_quad)
                 operands.push("t%d"%temp)
                 types.push(resType)
                 temp += 1
@@ -270,8 +280,9 @@ def p_opConsumeSuperExp(t):
             lType = types.pop()
             resType = semanticCube[(lType, rType, oper)]
             if resType != "error":
-                quadruples.push((oper, lOp, rOp, "t%d"%temp))
-                quadruples.peek()
+                #quadruples_original.push((oper, lOp, rOp, "t%d"%temp))
+                temp_quad = Quadruple(oper, lOp, rOp, "t"+str(temp))
+                Quadruples.push_quad(temp_quad)
                 operands.push("t%d"%temp)
                 types.push(resType)
                 temp += 1
@@ -301,7 +312,9 @@ def p_opConsumeExp(t):
             lType = types.pop()
             resType = semanticCube[(lType, rType, oper)]
             if resType != "error":
-                quadruples.push((oper, lOp, rOp, "t%d"%temp))
+                #quadruples_original.push((oper, lOp, rOp, "t%d"%temp))
+                temp_quad = Quadruple(oper, lOp, rOp, "t"+str(temp))
+                Quadruples.push_quad(temp_quad)
                 operands.push("t%d"%temp)
                 types.push(resType)
                 temp += 1
@@ -329,7 +342,9 @@ def p_opConsumeTerm(t):
             lType = types.pop()
             resType = semanticCube[(lType, rType, oper)]
             if resType != "error":
-                quadruples.push((oper, lOp, rOp, "t%d"%temp))
+                #quadruples_original.push((oper, lOp, rOp, "t%d"%temp))
+                temp_quad = Quadruple(oper, lOp, rOp, "t"+str(temp))
+                Quadruples.push_quad(temp_quad)
                 operands.push("t%d"%temp)
                 types.push(resType)
                 temp += 1
@@ -373,7 +388,9 @@ def p_id_list(t):
 def p_addRead(t):
     'addRead : '
     if t[-1] in variableTable[currentScope] or t[-1] in variableTable["global"]:
-        quadruples.push(("read", None, None, t[-1]))
+        #quadruples_original.push(("read", None, None, t[-1]))
+        temp_quad = Quadruple("read", None, None, t[-1])
+        Quadruples.push_quad(temp_quad)
     else:
         print("Error: undefined '%s' used in line %d" % (t[-1], t.lexer.lineno))
 
@@ -390,7 +407,9 @@ def p_printFunction(t):
 
 def p_addPrint(t):
     'addPrint : '
-    quadruples.push(("print", None, None, operands.pop()))
+    #quadruples_original.push(("print", None, None, operands.pop()))
+    temp_quad = Quadruple("print", None, None, operands.pop())
+    Quadruples.push_quad(temp_quad)
     types.pop()
 
 def p_printFunction2(t):
@@ -402,7 +421,9 @@ def p_print_param(t):
 
 def p_addPrintString(t):
     'addPrintString : '
-    quadruples.push(("print", None, None, t[-1]))
+    #quadruples_original.push(("print", None, None, t[-1]))
+    temp_quad = Quadruple("print", None, None, t[-1])
+    Quadruples.push_quad(temp_quad)
 
 def p_statement(t):
     '''statement : return
