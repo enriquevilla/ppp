@@ -64,16 +64,17 @@ def p_assignment(t):
 	'assignment : ID EQUAL hyperExpression SEMICOLON'
 	if t[1] in variableTable[currentScope]:
 		if types.pop() == variableTable[currentScope][t[1]]["type"]:
-			temp_quad = Quadruple("=", operands.pop(), None, t[1])
+			temp_quad = Quadruple("=", operands.peek(), '_', t[1])
 			Quadruples.push_quad(temp_quad)
-			variableTable[currentScope][t[1]]["value"] = t[3]
+			variableTable[currentScope][t[1]]["value"] = operands.pop()
 		else:
 			print("Error: type mismatch in assignment for '%s' in line %d" % (t[1], t.lexer.lineno - 1))
 			exit(0)
 	elif t[1] in variableTable["global"]:
 		if types.pop() == variableTable["global"][t[1]]["type"]:
-			temp_quad = Quadruple("=", operands.pop(), None, t[1])
+			temp_quad = Quadruple("=", operands.peek(), '_', t[1])
 			Quadruples.push_quad(temp_quad)
+			variableTable["global"][t[1]]["value"] = operands.pop()
 		else:
 			print("Error: type mismatch in assignment for '%s' in line %d" % (t[1], t.lexer.lineno - 1))
 			exit(0)
@@ -106,7 +107,7 @@ def p_createJumpQuadIf(t):
 		if operands.peek() == 1 or operands.peek() == 0:
 			res = operands.pop()
 			operator = "GOTOF"
-			temp_quad = Quadruple(operator, res, None, None)
+			temp_quad = Quadruple(operator, res, '_', '_')
 			Quadruples.push_quad(temp_quad)
 			Quadruples.push_jump(-1)
 			Quadruples.jump_stack.print()
@@ -122,7 +123,7 @@ def p_updateJumpQuad(t):
 	Quadruples.jump_stack.print()
 	tmp_end = Quadruples.pop_jump()
 	tmp_count = Quadruples.next_id
-	tmp_quad = Quadruples.update_jump_quad(tmp_end, tmp_count)
+	Quadruples.update_jump_quad(tmp_end, tmp_count)
 
 def p_ifElse(t):
 	'''ifElse : ELSE createJumpQuadElse LEFTBRACE statement RIGHTBRACE
@@ -131,7 +132,7 @@ def p_ifElse(t):
 def p_createJumpQuadElse(t):
 	'createJumpQuadElse : '
 	operator = "GOTO"
-	tmp_quad = Quadruple(operator, None, None, None)
+	tmp_quad = Quadruple(operator, '_', '_', '_')
 	Quadruples.push_quad(tmp_quad)
 
 	tmp_false = Quadruples.pop_jump()
@@ -277,9 +278,14 @@ def p_opConsumeHyperExp(t):
 			rType = types.pop()
 			lType = types.pop()
 			resType = semanticCube[(lType, rType, oper)]
-			if resType != "error":
+			if resType == "int":
 				result = 0
-				if operators.peek() == "|": 
+				lOp = int(lOp)
+				rOp = int(rOp)
+				if (lOp != 0 and lOp != 1) or (rOp != 0 and rOp != 1):
+					print("Error: type mismatch between '%s' and '%s' in line %d" % (lOp, rOp, t.lexer.lineno))
+					exit(0)
+				if oper == "|":
 					result = lOp or rOp
 				else: 
 					result = lOp and rOp
@@ -309,7 +315,7 @@ def p_opConsumeSuperExp(t):
 	'superExpA1 : '
 	global temp
 	if operators.size() != 0:
-		if operators.peek() == ">" or operators.peek() == "<" or operators.peek() == "<>" or operators.peek == "==":
+		if operators.peek() == ">" or operators.peek() == "<" or operators.peek() == "<>" or operators.peek() == "==":
 			rOp = operands.pop()
 			lOp = operands.pop()
 			oper = operators.pop()
@@ -319,13 +325,14 @@ def p_opConsumeSuperExp(t):
 			if resType != "error":
 				result = 0
 				if oper == ">": 
-					result = lOp > rOp
+					result = float(lOp) > float(rOp)
 				if oper == "<": 
-					result = lOp < rOp
+					result = float(lOp) < float(rOp)
 				if oper == "<>": 
-					result = lOp != rOp
+					result = float(lOp) != float(rOp)
 				if oper == "==": 
-					result = lOp == rOp
+					result = float(lOp) == float(rOp)
+				result = int(result)
 				temp_quad = Quadruple(oper, lOp, rOp, result)
 				Quadruples.push_quad(temp_quad)
 				operands.push(result)
@@ -359,9 +366,11 @@ def p_opConsumeExp(t):
 			if resType != "error":
 				result = 0
 				if oper == "+": 
-					result = lOp + rOp
+					result = float(lOp) + float(rOp)
 				if oper == "-": 
-					result = lOp - rOp
+					result = float(lOp) - float(rOp)
+				if result % 1 == 0:
+					result = int(result)
 				temp_quad = Quadruple(oper, lOp, rOp, result)
 				Quadruples.push_quad(temp_quad)
 				operands.push(result)
@@ -392,9 +401,11 @@ def p_opConsumeTerm(t):
 			resType = semanticCube[(lType, rType, oper)]
 			if resType != "error":
 				if oper == "*": 
-					result = lOp * rOp
+					result = float(lOp) * float(rOp)
 				if oper == "/": 
-					result = lOp / rOp
+					result = float(lOp) / float(rOp)
+				if result % 1 == 0:
+					result = int(result)
 				temp_quad = Quadruple(oper, lOp, rOp, result)
 				Quadruples.push_quad(temp_quad)
 				operands.push(result)
@@ -414,13 +425,31 @@ def p_addOperator(t):
 
 def p_factor(t):
 	'''factor : LEFTPAR hyperExpression RIGHTPAR
-			  | cst_prim addOperand
+			  | cst_prim addOperandCst
 			  | module
-			  | ID addOperand addTypeId'''
+			  | ID addOperandId addTypeId'''
 
-def p_addOperand(t):
-	'addOperand : '
+def p_addOperandCst(t):
+	'addOperandCst : '
 	operands.push(t[-1])
+
+def p_addOperandId(t):
+	'addOperandId : '
+	if t[-1] in variableTable[currentScope]:
+		if "value" in variableTable[currentScope][t[-1]]:
+			operands.push(variableTable[currentScope][t[-1]]["value"])
+		else:
+			print("Error: variable '%s' in line %d has not been assigned a value" %(t[-1], t.lexer.lineno))
+			exit(0)
+	elif t[-1] in variableTable["global"]:
+		if "value" in variableTable["global"][t[-1]]:
+			operands.push(variableTable["global"][t[-1]]["value"])
+		else:
+			print("Error: variable '%s' in line %d has not been assigned a value" %(t[-1], t.lexer.lineno))
+			exit(0)
+	else:
+		print("Error: undefined variable '%s' in line %d" % (t[-1], t.lexer.lineno))
+		exit(0)
 
 def p_addTypeId(t):
 	'addTypeId : '
@@ -440,7 +469,7 @@ def p_id_list(t):
 def p_addRead(t):
 	'addRead : '
 	if t[-1] in variableTable[currentScope] or t[-1] in variableTable["global"]:
-		temp_quad = Quadruple("read", None, None, t[-1])
+		temp_quad = Quadruple("read", '_', '_', t[-1])
 		Quadruples.push_quad(temp_quad)
 	else:
 		print("Error: undefined '%s' used in line %d" % (t[-1], t.lexer.lineno))
@@ -458,7 +487,7 @@ def p_printFunction(t):
 
 def p_addPrint(t):
 	'addPrint : '
-	temp_quad = Quadruple("print", None, None, operands.pop())
+	temp_quad = Quadruple("print", '_', '_', operands.pop())
 	Quadruples.push_quad(temp_quad)
 	types.pop()
 
@@ -471,7 +500,7 @@ def p_print_param(t):
 
 def p_addPrintString(t):
 	'addPrintString : '
-	temp_quad = Quadruple("print", None, None, t[-1])
+	temp_quad = Quadruple("print", '_', '_', t[-1])
 	Quadruples.push_quad(temp_quad)
 
 def p_statement(t):

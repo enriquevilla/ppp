@@ -3,8 +3,16 @@ var int i[1][1], j[1], k;
 
 main() {
     var int c;
+    c = 4;
+    var float k;
     k = 1 + 2 - 3 * 4 / c;
-    read(c);
-    print(c, k, 1+1, "hola", 2+2);
+    if (1 > 2) then {
+        read(c);
+    } else {
+        read(k);
+    }
+    c = 2 < 1;
+    c = 1 | 0;
+    read(i);
     hola();
 }
