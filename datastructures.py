@@ -46,7 +46,7 @@ for i in ty:
                 semanticCube[(ty[i], ty[j], k)] = ty[i]
             else:
                 semanticCube[(ty[i], ty[j], k)] = ty[j]
-            if k != "+" and (i == 2 or j == 2):
+            if i == 2 or j == 2:
                 semanticCube[(ty[i], ty[j], k)] = "error"
             if k == ">" or k == "<" or k == "<>" or k == "==" or k == "|" or k == "&":
                 if (i == 0 or i == 1) and (j == 0 or j == 1):
@@ -56,6 +56,9 @@ for i in ty:
             if k == "<>" or k == "==":
                 if i == 2 and j == 2:
                     semanticCube[(ty[i], ty[j], k)] = "int"
+            if k == "/":
+                if i != 2 and j != 2:
+                    semanticCube[(ty[i], ty[j], k)] = "float"
             # print("%s %s %s = %s" % (ty[i], k, ty[j], semanticCube[(ty[i], ty[j], k)]))
 
 # functionDir visual example

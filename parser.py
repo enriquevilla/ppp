@@ -22,7 +22,6 @@ def p_program(t):
 	operators.print()
 	print ("QUADS")
 	Quadruples.print_all()
-	print ("QUADS ORIGINAL")
 	variableTable.clear()
 
 # global scope varTable
@@ -108,7 +107,7 @@ def p_createJumpQuadIf(t):
 			res = operands.pop()
 			operator = "GOTOF"
 			temp_quad = Quadruple(operator, res, None, None)
-			Quadruples.push(temp_quad)
+			Quadruples.push_quad(temp_quad)
 			Quadruples.push_jump(-1)
 			Quadruples.jump_stack.print()
 		else: 
