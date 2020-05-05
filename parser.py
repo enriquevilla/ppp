@@ -144,7 +144,39 @@ def p_comment(t):
 	'comment : COMMENT_TEXT'
 
 def p_while(t):
-	'while : WHILE LEFTPAR hyperExpression RIGHTPAR LEFTBRACE statement RIGHTBRACE'
+	'while : WHILE pushLoopJump LEFTPAR hyperExpression RIGHTPAR beginLoopAction LEFTBRACE statement RIGHTBRACE endLoopAction'
+
+def p_pushLoopJump(t):
+	'pushLoopJump : '
+	Quadruples.push_jump(1)
+
+def p_beginLoopAction(t):
+	'beginLoopAction : '
+	result_type = types.pop()
+	if result_type == "int":
+		if operands.peek() == 1 or operands.peek() == 0:
+			res = operands.pop()
+			operator = "GOTOF"
+			# Generate Quadruple and push it to the list
+			tmp_quad = Quadruple(operator, res, "_", "_")
+			Quadruples.push_quad(tmp_quad)
+			#Push into jump stack
+			Quadruples.push_jump(-1)
+		else:
+			print("Error: type mismatch for '%s' in line %d" % (t[1], t.lexer.lineno - 1))
+			exit(0)	
+	else :
+		print("Error: type mismatch for '%s' in line %d" % (t[1], t.lexer.lineno - 1))
+		exit(0)	
+
+def p_endLoopAction(t):
+	'endLoopAction : '
+	false_jump = Quadruples.pop_jump()
+	return_jump = Quadruples.pop_jump()
+	tmp_quad = Quadruple("GOTO", "_", "_", return_jump-1)
+	Quadruples.push_quad(tmp_quad)
+	next_id = Quadruples.next_id
+	Quadruples.update_jump_quad(false_jump, next_id)
 
 def p_for(t):
 	'for : FOR forAssignment TO insertJumpFor hyperExpression createQuadFor LEFTBRACE statement RIGHTBRACE updateQuadFor'
@@ -180,7 +212,7 @@ def p_updateQuadFor(t):
 	Quadruples.update_jump_quad(tmp_end, tmp_count)
 
 def p_forAssignment(t):
-	'forAssignment : ID EQUAL CST_INT cstprimA1'
+	'forAssignment : ID EQUAL CST_INT addTypeInt'
 	if t[1] in variableTable[currentScope]:
 		if types.pop() == variableTable[currentScope][t[1]]["type"]:
 			temp_quad = Quadruple("=", t[3], '_', t[1])
@@ -202,11 +234,11 @@ def p_forAssignment(t):
 		exit(0)
 
 def p_vars(t):
-	'vars : ID varsA1 varsArray varsComa'
+	'vars : ID addVarsToTable varsArray varsComa'
 
 # add vars to varTable
-def p_addToTable(t):
-	'varsA1 : '
+def p_addVarsToTable(t):
+	'addVarsToTable : '
 	# If current ID (t[-1]) exists in scope or global, throw error
 	if t[-1] in variableTable[currentScope]:
 		print("Error: redefinition of variable '%s' in line %d." % (t[-1], t.lexer.lineno))
@@ -228,8 +260,8 @@ def p_varsMatrix(t):
 				  | '''
 
 def p_function(t):
-	'''function : functionType ID functionA1 LEFTPAR param RIGHTPAR SEMICOLON LEFTBRACE statement RIGHTBRACE
-				| functionType ID functionA1 LEFTPAR RIGHTPAR SEMICOLON LEFTBRACE statement RIGHTBRACE '''
+	'''function : functionType ID addFuncToDir LEFTPAR param RIGHTPAR SEMICOLON LEFTBRACE statement RIGHTBRACE
+				| functionType ID addFuncToDir LEFTPAR RIGHTPAR SEMICOLON LEFTBRACE statement RIGHTBRACE '''
 	# When exiting function scope, reset scope to global and delete variableTable and reference to it in functionDir
 	global currentScope
 	# del variableTable[currentScope]
@@ -237,8 +269,8 @@ def p_function(t):
 	currentScope = "global"
 
 # add function to dir
-def p_addToDir(t):
-	'functionA1 : '
+def p_addFuncToDir(t):
+	'addFuncToDir : '
 	# If function exists in global scope, throw an error
 	if t[-1] in functionDir["global"] or t[-1] in variableTable["global"]:
 		print("Error: redefinition of '%s' in line %d." % (t[-1], t.lexer.lineno))
@@ -259,23 +291,23 @@ def p_addToDir(t):
 
 def p_functionType(t):
 	'''functionType : FUNCTION primitive
-					| FUNCTION VOID functionTypeA1'''
+					| FUNCTION VOID setVoidType '''
 
 # set void as current type
-def p_setVoid(t):
-	'functionTypeA1 : '
+def p_setVoidType(t):
+	'setVoidType : '
 	# Set void as currentType
 	global currentType
 	currentType = t[-1]
 
 def p_param(t):
-	'param : primitive ID paramA1 functionParam'
+	'param : primitive ID addFuncParams functionParam'
 
 # add function params to table
 def p_addFuncParams(t):
-	'paramA1 : '
+	'addFuncParams : '
 	# If function param exists in scope or globally, throw error
-	if t[-1] in variableTable[currentScope] or t[-1] in variableTable["global"]:
+	if t[-1] in variableTable[currentScope]:
 		print("Error: redefinition of variable '%s' in line %d." % (t[-1], t.lexer.lineno))
 		exit(0)
 	else:
@@ -287,37 +319,37 @@ def p_functionParam(t):
 					 | '''
 
 def p_cst_prim(t):
-	'''cst_prim : CST_INT cstprimA1
-				| CST_FLOAT cstprimA2
-				| CST_CHAR cstprimA3'''
+	'''cst_prim : CST_INT addTypeInt
+				| CST_FLOAT addTypeFloat
+				| CST_CHAR addTypeChar'''
 	t[0] = t[1]
 
 # add type int
-def p_addTypeI(t):
-	'cstprimA1 : '
+def p_addTypeInt(t):
+	'addTypeInt : '
 	types.push("int")
 
 # add type float
-def p_addTypeF(t):
-	'cstprimA2 : '
+def p_addTypeFloat(t):
+	'addTypeFloat : '
 	types.push("float")
 
 # add type char
-def p_addTypeC(t):
-	'cstprimA3 : '
+def p_addTypeChar(t):
+	'addTypeChar : '
 	types.push("char")
 
 def p_hyperExpression(t):
-	'''hyperExpression : superExpression hyperExpA1 opHyperExpression hyperExpressionNested
+	'''hyperExpression : superExpression evaluateHE opHyperExpression hyperExpressionNested
 					   | superExpression opMatrix 
-					   | superExpression hyperExpA1'''
+					   | superExpression evaluateHE'''
 
 def p_hyperExpressionNested(t):
-	'''hyperExpressionNested : superExpression hyperExpA1 opHyperExpression hyperExpressionNested
-							 | superExpression hyperExpA1'''
+	'''hyperExpressionNested : superExpression evaluateHE opHyperExpression hyperExpressionNested
+							 | superExpression evaluateHE'''
 
-def p_opConsumeHyperExp(t):
-	'hyperExpA1 : '
+def p_evaluateHE(t):
+	'evaluateHE : '
 	global temp
 	if operators.size() != 0:
 		if operators.peek() == "|" or operators.peek() == "&":
@@ -357,11 +389,11 @@ def p_opHyperExpression(t):
 						 | OR addOperator '''
 
 def p_superExpression(t):
-	'''superExpression : exp superExpA1 opSuperExpression exp superExpA1
-					   | exp superExpA1 '''
+	'''superExpression : exp evaluateSE opSuperExpression exp evaluateSE
+					   | exp evaluateSE '''
 
-def p_opConsumeSuperExp(t):
-	'superExpA1 : '
+def p_evaluateSE(t):
+	'evaluateSE : '
 	global temp
 	if operators.size() != 0:
 		if operators.peek() == ">" or operators.peek() == "<" or operators.peek() == "<>" or operators.peek() == "==":
@@ -398,11 +430,11 @@ def p_opSuperExpression(t):
 						 | ISEQUAL addOperator'''
 
 def p_exp(t):
-	'''exp : term termA1 expFunction
-		   | term termA1 '''
+	'''exp : term evaluateTerm expFunction
+		   | term evaluateTerm '''
 
-def p_opConsumeExp(t):
-	'termA1 : '
+def p_evaluateTerm(t):
+	'evaluateTerm : '
 	global temp
 	if operators.size() != 0:
 		if operators.peek() == "+" or operators.peek() == "-":
@@ -434,11 +466,11 @@ def p_expFunction(t):
 				   | MINUS addOperator exp '''
 
 def p_term(t):
-	'''term : factor factorA1 termFunction
-			| factor factorA1 '''
+	'''term : factor evaluateFactor termFunction
+			| factor evaluateFactor '''
 
-def p_opConsumeTerm(t):
-	'factorA1 : '
+def p_evaluateFactor(t):
+	'evaluateFactor : '
 	global temp
 	if operators.size() != 0:
 		if operators.peek() == "*" or operators.peek() == "/":
