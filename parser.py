@@ -212,23 +212,15 @@ def p_updateQuadFor(t):
 	Quadruples.update_jump_quad(tmp_end, tmp_count)
 
 def p_forAssignment(t):
-	'forAssignment : ID EQUAL CST_INT addTypeInt'
+	'forAssignment : ID EQUAL CST_INT'
 	if t[1] in variableTable[currentScope]:
-		if types.pop() == variableTable[currentScope][t[1]]["type"]:
-			temp_quad = Quadruple("=", t[3], '_', t[1])
-			Quadruples.push_quad(temp_quad)
-			variableTable[currentScope][t[1]]["value"] = t[3]
-		else:
-			print("Error: type mismatch in assignment for '%s' in line %d" % (t[1], t.lexer.lineno - 1))
-			exit(0)
+		temp_quad = Quadruple("=", t[3], '_', t[1])
+		Quadruples.push_quad(temp_quad)
+		variableTable[currentScope][t[1]]["value"] = t[3]
 	elif t[1] in variableTable["global"]:
-		if types.pop() == variableTable["global"][t[1]]["type"]:
-			temp_quad = Quadruple("=", t[3], '_', t[1])
-			Quadruples.push_quad(temp_quad)
-			variableTable["global"][t[1]]["value"] = t[3]
-		else:
-			print("Error: type mismatch in assignment for '%s' in line %d" % (t[1], t.lexer.lineno - 1))
-			exit(0)
+		temp_quad = Quadruple("=", t[3], '_', t[1])
+		Quadruples.push_quad(temp_quad)
+		variableTable["global"][t[1]]["value"] = t[3]
 	else:
 		print("Error: use of undefined variable '%s' in line %d" % (t[1], t.lexer.lineno - 1))
 		exit(0)
