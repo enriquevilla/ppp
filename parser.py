@@ -144,11 +144,43 @@ def p_comment(t):
 	'comment : COMMENT_TEXT'
 
 def p_while(t):
-	'while : WHILE LEFTPAR hyperExpression RIGHTPAR LEFTBRACE statement RIGHTBRACE'
+	'while : WHILE pushLoopJump LEFTPAR hyperExpression RIGHTPAR beginLoopAction LEFTBRACE statement RIGHTBRACE endLoopAction'
 
 def p_for(t):
 	'for : FOR forDeclaration TO hyperExpression LEFTBRACE statement RIGHTBRACE'
 
+def p_pushLoopJump(t):
+	'pushLoopJump : '
+	Quadruples.push_jump(1)
+
+def p_beginLoopAction(t):
+	'beginLoopAction : '
+	result_type = types.pop()
+	if result_type == "int":
+		if operands.peek() == 1 or operands.peek() == 0:
+			res = operands.pop()
+			operator = "GOTOF"
+			# Generate Quadruple and push it to the list
+			tmp_quad = Quadruple(operator, res, None, None)
+			Quadruples.push_quad(tmp_quad)
+			#Push into jump stack
+			Quadruples.push_jump(-1)
+		else:
+			print("Error: type mismatch in assignment for '%s' in line %d" % (t[1], t.lexer.lineno - 1))
+			exit(0)	
+	else :
+		print("Error: type mismatch in assignment for '%s' in line %d" % (t[1], t.lexer.lineno - 1))
+		exit(0)	
+
+def p_endLoopAction(t):
+	'endLoopAction : '
+	false_jump = Quadruples.pop_jump()
+	return_jump = Quadruples.pop_jump()
+	tmp_quad = Quadruple("GOTO", None, None, return_jump-1)
+	Quadruples.push_quad(tmp_quad)
+	next_id = Quadruples.next_id
+	Quadruples.update_jump_quad(false_jump, next_id)
+	
 def p_forDeclaration(t):
 	'forDeclaration : ID EQUAL CST_INT'
 
