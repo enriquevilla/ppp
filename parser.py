@@ -20,7 +20,6 @@ def p_program(t):
 	operands.print()
 	types.print()
 	operators.print()
-	print ("QUADS")
 	Quadruples.print_all()
 	variableTable.clear()
 
@@ -78,6 +77,9 @@ def p_assignment(t):
 		else:
 			print("Error: type mismatch in assignment for '%s' in line %d" % (t[1], t.lexer.lineno - 1))
 			exit(0)
+	else:
+		print("Error: use of undefined variable '%s' in line %d" % (t[1], t.lexer.lineno - 1))
+		exit(0)
 
 def p_declaration(t):
 	'declaration : VAR declarationPrim'
@@ -110,17 +112,15 @@ def p_createJumpQuadIf(t):
 			temp_quad = Quadruple(operator, res, '_', '_')
 			Quadruples.push_quad(temp_quad)
 			Quadruples.push_jump(-1)
-			Quadruples.jump_stack.print()
 		else: 
-			print("Error: type mismatch in assignment for '%s' in line %d" % (t[1], t.lexer.lineno - 1))
+			print("Error: type mismatch for '%s' in line %d" % (t[1], t.lexer.lineno - 1))
 			exit(0)
 	else: 
-		print("Error: type mismatch in assignment for '%s' in line %d" % (t[1], t.lexer.lineno - 1))
-		exit(0)	   
+		print("Error: type mismatch for '%s' in line %d" % (t[1], t.lexer.lineno - 1))
+		exit(0)
 
 def p_updateJumpQuad(t):
 	'updateJumpQuad : '
-	Quadruples.jump_stack.print()
 	tmp_end = Quadruples.pop_jump()
 	tmp_count = Quadruples.next_id
 	Quadruples.update_jump_quad(tmp_end, tmp_count)
@@ -137,7 +137,7 @@ def p_createJumpQuadElse(t):
 
 	tmp_false = Quadruples.pop_jump()
 	tmp_count = Quadruples.next_id
-	tmp_quad = Quadruples.update_jump_quad(tmp_false, tmp_count)
+	Quadruples.update_jump_quad(tmp_false, tmp_count)
 	Quadruples.push_jump(-1)
 
 def p_comment(t):
@@ -147,10 +147,59 @@ def p_while(t):
 	'while : WHILE LEFTPAR hyperExpression RIGHTPAR LEFTBRACE statement RIGHTBRACE'
 
 def p_for(t):
-	'for : FOR forDeclaration TO hyperExpression LEFTBRACE statement RIGHTBRACE'
+	'for : FOR forAssignment TO insertJumpFor hyperExpression createQuadFor LEFTBRACE statement RIGHTBRACE updateQuadFor'
 
-def p_forDeclaration(t):
-	'forDeclaration : ID EQUAL CST_INT'
+def p_insertJumpFor(t):
+	'insertJumpFor : '
+	Quadruples.push_jump(0)
+
+def p_createQuadFor(t):
+	'createQuadFor : '
+	result_type = types.pop()
+	if result_type == "int":
+		if operands.peek() == 1 or operands.peek() == 0:
+			res = operands.pop()
+			operator = "GOTOF"
+			temp_quad = Quadruple(operator, res, '_', '_')
+			Quadruples.push_quad(temp_quad)
+			Quadruples.push_jump(-1)
+		else: 
+			print("Error: type mismatch in assignment for '%s' in line %d" % (t[1], t.lexer.lineno - 1))
+			exit(0)
+	else: 
+		print("Error: type mismatch in assignment for '%s' in line %d" % (t[1], t.lexer.lineno - 1))
+		exit(0)
+
+def p_updateQuadFor(t):
+	'updateQuadFor : '
+	tmp_end = Quadruples.jump_stack.pop()
+	tmp_rtn = Quadruples.jump_stack.pop()
+	tmp_quad = Quadruple("GOTO", "_", "_", tmp_rtn)
+	Quadruples.push_quad(tmp_quad)
+	tmp_count = Quadruples.next_id
+	Quadruples.update_jump_quad(tmp_end, tmp_count)
+
+def p_forAssignment(t):
+	'forAssignment : ID EQUAL CST_INT cstprimA1'
+	if t[1] in variableTable[currentScope]:
+		if types.pop() == variableTable[currentScope][t[1]]["type"]:
+			temp_quad = Quadruple("=", t[3], '_', t[1])
+			Quadruples.push_quad(temp_quad)
+			variableTable[currentScope][t[1]]["value"] = t[3]
+		else:
+			print("Error: type mismatch in assignment for '%s' in line %d" % (t[1], t.lexer.lineno - 1))
+			exit(0)
+	elif t[1] in variableTable["global"]:
+		if types.pop() == variableTable["global"][t[1]]["type"]:
+			temp_quad = Quadruple("=", t[3], '_', t[1])
+			Quadruples.push_quad(temp_quad)
+			variableTable["global"][t[1]]["value"] = t[3]
+		else:
+			print("Error: type mismatch in assignment for '%s' in line %d" % (t[1], t.lexer.lineno - 1))
+			exit(0)
+	else:
+		print("Error: use of undefined variable '%s' in line %d" % (t[1], t.lexer.lineno - 1))
+		exit(0)
 
 def p_vars(t):
 	'vars : ID varsA1 varsArray varsComa'
@@ -448,7 +497,7 @@ def p_addOperandId(t):
 			print("Error: variable '%s' in line %d has not been assigned a value" %(t[-1], t.lexer.lineno))
 			exit(0)
 	else:
-		print("Error: undefined variable '%s' in line %d" % (t[-1], t.lexer.lineno))
+		print("Error: use of undefined variable '%s' in line %d" % (t[-1], t.lexer.lineno))
 		exit(0)
 
 def p_addTypeId(t):
@@ -458,7 +507,7 @@ def p_addTypeId(t):
 	elif t[-2] in variableTable["global"]:
 		types.push(variableTable["global"][t[-2]]["type"])
 	else:
-		print("Error: undefined '%s' used in line %d" % (t[-1], t.lexer.lineno))
+		print("Error: use of undefined variable '%s' in line %d" % (t[-1], t.lexer.lineno))
 
 def p_read(t):
 	'read : READ LEFTPAR id_list RIGHTPAR SEMICOLON'
@@ -472,7 +521,7 @@ def p_addRead(t):
 		temp_quad = Quadruple("read", '_', '_', t[-1])
 		Quadruples.push_quad(temp_quad)
 	else:
-		print("Error: undefined '%s' used in line %d" % (t[-1], t.lexer.lineno))
+		print("Error: use of undefined variable '%s' in line %d" % (t[-1], t.lexer.lineno))
 
 def p_id_listFunction(t):
 	'''id_listFunction : COMA id_list

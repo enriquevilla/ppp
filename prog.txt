@@ -11,6 +11,9 @@ main() {
     } else {
         read(k);
     }
+    for c = 1 to c < 10 {
+        read(j);
+    }
     c = 2 < 1;
     c = 1 | 0;
     read(i);
