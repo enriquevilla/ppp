@@ -7,7 +7,7 @@ from quadruples import *
 tokens = lexer.tokens
 
 def p_program(t):
-	'program : PROGRAM ID programA1 SEMICOLON programVars programFunc main'
+	'program : PROGRAM ID globalTable SEMICOLON programVars programFunc main'
 	print("Code valid")
 	# show variable table and function directory
 	# print()
@@ -25,7 +25,7 @@ def p_program(t):
 
 # global scope varTable
 def p_globalTable(t):
-	'programA1 : '
+	'globalTable : '
 	# Initialize variableTable for global and set program name and type
 	variableTable[currentScope] = {}
 	variableTable[currentScope][t[-1]] = {"type": "program"}
@@ -44,11 +44,11 @@ def p_programFunc(t):
 				   | '''
 
 def p_main(t):
-	'main : mainA1 MAIN LEFTPAR RIGHTPAR LEFTBRACE statement RIGHTBRACE'
+	'main : mainTable MAIN LEFTPAR RIGHTPAR LEFTBRACE statement RIGHTBRACE'
 
 # main scope varTable
 def p_mainTable(t):
-	'mainA1 : '
+	'mainTable : '
 	global currentScope
 	variableTable[currentScope]["main"] = {"type": "void"}
 	currentScope = "main"
@@ -252,8 +252,7 @@ def p_varsMatrix(t):
 				  | '''
 
 def p_function(t):
-	'''function : functionType ID addFuncToDir LEFTPAR param RIGHTPAR SEMICOLON LEFTBRACE statement RIGHTBRACE
-				| functionType ID addFuncToDir LEFTPAR RIGHTPAR SEMICOLON LEFTBRACE statement RIGHTBRACE '''
+	'function : functionType ID addFuncToDir LEFTPAR param RIGHTPAR SEMICOLON LEFTBRACE statement RIGHTBRACE'
 	# When exiting function scope, reset scope to global and delete variableTable and reference to it in functionDir
 	global currentScope
 	# del variableTable[currentScope]
@@ -264,14 +263,14 @@ def p_function(t):
 def p_addFuncToDir(t):
 	'addFuncToDir : '
 	# If function exists in global scope, throw an error
-	if t[-1] in functionDir["global"] or t[-1] in variableTable["global"]:
+	if t[-1] in variableTable["global"]:
 		print("Error: redefinition of '%s' in line %d." % (t[-1], t.lexer.lineno))
 		exit(0)
 	else:
 		global currentScope
 		global currentType
 		# Add function to variableTable of currentScope
-		variableTable[currentScope][t[-1]] = {"type": currentType}
+		variableTable["global"][t[-1]] = {"type": currentType}
 		# Change scope to new function id
 		currentScope = t[-1]
 		# Initialize variableTable and functionDir for new function id
@@ -293,7 +292,8 @@ def p_setVoidType(t):
 	currentType = t[-1]
 
 def p_param(t):
-	'param : primitive ID addFuncParams functionParam'
+	'''param : primitive ID addFuncParams functionParam
+			 | '''
 
 # add function params to table
 def p_addFuncParams(t):
