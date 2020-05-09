@@ -1,6 +1,6 @@
 import lexer as lexer
 import ply.yacc as yacc
-from datastructures import types, operands, operators, variableTable
+from datastructures import types, operands, operators, variableTable, Queue
 from datastructures import functionDir, temp, currentScope, currentType, semanticCube
 from quadruples import *
 
@@ -12,10 +12,15 @@ def p_program(t):
 	# show variable table and function directory
 	# print()
 	# for i in functionDir:
-	#	 print("\tfunction name: %s" % i)
-	#	 print("\t\ttype: %s" % functionDir[i]["type"])
-	#	 print("\t\tvars: %s" % functionDir[i]["vars"])
-	#	 print()
+	# 	print("\tfunction name: %s" % i)
+	# 	print("\t\ttype: %s" % functionDir[i]["type"])
+	# 	print("\t\tvars: %s" % functionDir[i]["vars"])
+	# 	if "params" in functionDir[i]:
+	# 		print("\t\tparams: %s" % functionDir[i]["params"].values())
+	# 		print("\t\tparamsLength: %d" % functionDir[i]["paramsLength"])
+	# 		print("\t\tstart: %d" % functionDir[i]["start"])
+	# 		print("\t\tvarLength: %d" % functionDir[i]["varLength"])
+	# 	print()
 	
 	operands.print()
 	types.print()
@@ -36,20 +41,24 @@ def p_globalTable(t):
 	functionDir[currentScope]["vars"] = variableTable[currentScope]
 
 def p_programVars(t):
-	'''programVars : declaration
+	'''programVars : globalDeclaration
 				   | '''
+	
+def p_globalDeclaration(t):
+	'globalDeclaration : VAR declarationPrim'
 
 def p_programFunc(t):
 	'''programFunc : function programFunc
 				   | '''
 
 def p_main(t):
-	'main : mainTable MAIN LEFTPAR RIGHTPAR LEFTBRACE statement RIGHTBRACE'
+	'main : mainTable MAIN LEFTPAR RIGHTPAR LEFTBRACE declaration statement RIGHTBRACE'
 
 # main scope varTable
 def p_mainTable(t):
 	'mainTable : '
 	global currentScope
+	# Add main to current scope varTable
 	variableTable[currentScope]["main"] = {"type": "void"}
 	currentScope = "main"
 	# Initialize variableTable and functionDir for main scope
@@ -83,6 +92,7 @@ def p_assignment(t):
 
 def p_declaration(t):
 	'declaration : VAR declarationPrim'
+	functionDir[currentScope]["start"] = Quadruples.next_id
 
 def p_declarationPrim(t):
 	'''declarationPrim : primitive vars SEMICOLON declarationPrim
@@ -252,11 +262,17 @@ def p_varsMatrix(t):
 				  | '''
 
 def p_function(t):
-	'function : functionType ID addFuncToDir LEFTPAR param RIGHTPAR SEMICOLON LEFTBRACE statement RIGHTBRACE'
+	'function : functionType ID addFuncToDir LEFTPAR param RIGHTPAR setParamLength LEFTBRACE declaration statement RIGHTBRACE'
 	# When exiting function scope, reset scope to global and delete variableTable and reference to it in functionDir
 	global currentScope
 	# del variableTable[currentScope]
 	# del functionDir[currentScope]["vars"]
+	# Create endfunc quadruple for function end
+	temp_quad = Quadruple("ENDFUNC", "_", "_", "_")
+	Quadruples.push_quad(temp_quad)
+	# Temporary variables = function quad length as maximum and reset func_quads
+	functionDir[currentScope]["varLength"] = Quadruples.func_quads
+	Quadruples.func_quads = 0
 	currentScope = "global"
 
 # add function to dir
@@ -298,13 +314,21 @@ def p_param(t):
 # add function params to table
 def p_addFuncParams(t):
 	'addFuncParams : '
-	# If function param exists in scope or globally, throw error
+	# If function param exists in scope, throw error
 	if t[-1] in variableTable[currentScope]:
 		print("Error: redefinition of variable '%s' in line %d." % (t[-1], t.lexer.lineno))
 		exit(0)
 	else:
 		# Add function param to variableTable of currentScope
 		variableTable[currentScope][t[-1]] = {"type": currentType}
+		if "params" not in functionDir[currentScope]:
+			functionDir[currentScope]["params"] = Queue()
+		# Insert currentTypes into params Queue
+		functionDir[currentScope]["params"].enqueue(currentType)
+
+def p_setParamLength(t):
+	'setParamLength : '
+	functionDir[currentScope]["paramsLength"] = functionDir[currentScope]["params"].size()
 
 def p_functionParam(t):
 	'''functionParam : COMA param
@@ -583,7 +607,6 @@ def p_statement(t):
 				 | read statement
 				 | print statement
 				 | assignment statement
-				 | declaration statement
 				 | module statement
 				 | for statement
 				 | while statement 

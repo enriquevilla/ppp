@@ -21,6 +21,31 @@ class Stack:
     def print(self):
         print(self.items)
 
+class Queue:
+    def __init__(self):
+        self.items = []
+
+    def isEmpty(self):
+        return self.items == []
+
+    def enqueue(self, item):
+        self.items.insert(0, item)
+
+    def dequeue(self):
+        return self.items.pop()
+
+    def peek(self):
+        return self.items[-1]
+
+    def size(self):
+        return len(self.items)
+
+    def print(self):
+        print(self.items)
+
+    def values(self):
+        return self.items
+
 currentScope = "global"
 currentType = "program"
 
@@ -78,6 +103,15 @@ for i in ty:
                                               "value": "h"
                                          }
                                          ...
+    }
+    "uno": {
+        "type": "int",
+        "params": Queue[int, int, float]
+        "paramsLength": len(params)
+        "vars": variableTable["uno"] -> "x": {
+                                            "type": "int"
+                                            "value": 1
+                                        }
     }
 '''
 

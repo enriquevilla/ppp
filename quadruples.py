@@ -36,6 +36,7 @@ class Quadruples(object):
 	quadruples = []
 	jump_stack = Stack()
 	next_id = 0
+	func_quads = 0
 	__shared_state = {}
 	def __init__(self):
 		self.__dict__ = self.__shared_state
@@ -53,6 +54,7 @@ class Quadruples(object):
 		quad.id = cls.next_id
 		cls.quadruples.append(quad)
 		cls.next_id = len(cls.quadruples)
+		cls.func_quads += 1
 
 	@classmethod
 	def pop_quad(cls):
