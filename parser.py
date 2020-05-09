@@ -70,6 +70,7 @@ def p_mainTable(t):
 
 def p_assignment(t):
 	'assignment : ID EQUAL hyperExpression SEMICOLON'
+	# If id is in currentScope, generate quadruple and set its value in varTable
 	if t[1] in variableTable[currentScope]:
 		if types.pop() == variableTable[currentScope][t[1]]["type"]:
 			temp_quad = Quadruple("=", operands.peek(), '_', t[1])
@@ -78,6 +79,7 @@ def p_assignment(t):
 		else:
 			print("Error: type mismatch in assignment for '%s' in line %d" % (t[1], t.lexer.lineno - 1))
 			exit(0)
+	# If id is in global scope, generate quadruple and set its value in varTable
 	elif t[1] in variableTable["global"]:
 		if types.pop() == variableTable["global"][t[1]]["type"]:
 			temp_quad = Quadruple("=", operands.peek(), '_', t[1])
@@ -92,6 +94,7 @@ def p_assignment(t):
 
 def p_declaration(t):
 	'declaration : VAR declarationPrim'
+	# Set start quadruple start for function
 	functionDir[currentScope]["start"] = Quadruples.next_id
 
 def p_declarationPrim(t):
@@ -115,6 +118,7 @@ def p_if(t):
 def p_createJumpQuadIf(t):
 	'createJumpQuadIf : '
 	result_type = types.pop()
+	# Check type and value for the evaluated expression and generate quadruple
 	if result_type == "int":
 		if operands.peek() == 1 or operands.peek() == 0:
 			res = operands.pop()
@@ -131,6 +135,7 @@ def p_createJumpQuadIf(t):
 
 def p_updateJumpQuad(t):
 	'updateJumpQuad : '
+	# Update gotof quadruples
 	tmp_end = Quadruples.pop_jump()
 	tmp_count = Quadruples.next_id
 	Quadruples.update_jump_quad(tmp_end, tmp_count)
@@ -141,6 +146,7 @@ def p_ifElse(t):
 
 def p_createJumpQuadElse(t):
 	'createJumpQuadElse : '
+	# Create quadruple for else
 	operator = "GOTO"
 	tmp_quad = Quadruple(operator, '_', '_', '_')
 	Quadruples.push_quad(tmp_quad)
@@ -163,6 +169,7 @@ def p_pushLoopJump(t):
 def p_beginLoopAction(t):
 	'beginLoopAction : '
 	result_type = types.pop()
+	# Check expression type and value and add quadruple to stack
 	if result_type == "int":
 		if operands.peek() == 1 or operands.peek() == 0:
 			res = operands.pop()
@@ -170,7 +177,7 @@ def p_beginLoopAction(t):
 			# Generate Quadruple and push it to the list
 			tmp_quad = Quadruple(operator, res, "_", "_")
 			Quadruples.push_quad(tmp_quad)
-			#Push into jump stack
+			# Push into jump stack
 			Quadruples.push_jump(-1)
 		else:
 			print("Error: type mismatch for '%s' in line %d" % (t[1], t.lexer.lineno - 1))
@@ -181,6 +188,7 @@ def p_beginLoopAction(t):
 
 def p_endLoopAction(t):
 	'endLoopAction : '
+	# Generate quadruple when while finishes and update gotof
 	false_jump = Quadruples.pop_jump()
 	return_jump = Quadruples.pop_jump()
 	tmp_quad = Quadruple("GOTO", "_", "_", return_jump-1)
@@ -198,6 +206,7 @@ def p_insertJumpFor(t):
 def p_createQuadFor(t):
 	'createQuadFor : '
 	result_type = types.pop()
+	# Check expression type and value and add quadruple to stack
 	if result_type == "int":
 		if operands.peek() == 1 or operands.peek() == 0:
 			res = operands.pop()
@@ -214,6 +223,7 @@ def p_createQuadFor(t):
 
 def p_updateQuadFor(t):
 	'updateQuadFor : '
+	# Update gotof quadruple when for finishes
 	tmp_end = Quadruples.jump_stack.pop()
 	tmp_rtn = Quadruples.jump_stack.pop()
 	tmp_quad = Quadruple("GOTO", "_", "_", tmp_rtn)
@@ -223,10 +233,12 @@ def p_updateQuadFor(t):
 
 def p_forAssignment(t):
 	'forAssignment : ID EQUAL CST_INT'
+	# Check if id exists in currentScope and set its value
 	if t[1] in variableTable[currentScope]:
 		temp_quad = Quadruple("=", t[3], '_', t[1])
 		Quadruples.push_quad(temp_quad)
 		variableTable[currentScope][t[1]]["value"] = t[3]
+	# Check if id exists in global scope and set its value
 	elif t[1] in variableTable["global"]:
 		temp_quad = Quadruple("=", t[3], '_', t[1])
 		Quadruples.push_quad(temp_quad)
@@ -238,7 +250,6 @@ def p_forAssignment(t):
 def p_vars(t):
 	'vars : ID addVarsToTable varsArray varsComa'
 
-# add vars to varTable
 def p_addVarsToTable(t):
 	'addVarsToTable : '
 	# If current ID (t[-1]) exists in scope or global, throw error
@@ -275,7 +286,6 @@ def p_function(t):
 	Quadruples.func_quads = 0
 	currentScope = "global"
 
-# add function to dir
 def p_addFuncToDir(t):
 	'addFuncToDir : '
 	# If function exists in global scope, throw an error
@@ -300,7 +310,6 @@ def p_functionType(t):
 	'''functionType : FUNCTION primitive
 					| FUNCTION VOID setVoidType '''
 
-# set void as current type
 def p_setVoidType(t):
 	'setVoidType : '
 	# Set void as currentType
@@ -311,7 +320,6 @@ def p_param(t):
 	'''param : primitive ID addFuncParams functionParam
 			 | '''
 
-# add function params to table
 def p_addFuncParams(t):
 	'addFuncParams : '
 	# If function param exists in scope, throw error
@@ -328,6 +336,7 @@ def p_addFuncParams(t):
 
 def p_setParamLength(t):
 	'setParamLength : '
+	# Set the function param number to the size of params Queue
 	functionDir[currentScope]["paramsLength"] = functionDir[currentScope]["params"].size()
 
 def p_functionParam(t):
@@ -340,17 +349,14 @@ def p_cst_prim(t):
 				| CST_CHAR addTypeChar'''
 	t[0] = t[1]
 
-# add type int
 def p_addTypeInt(t):
 	'addTypeInt : '
 	types.push("int")
 
-# add type float
 def p_addTypeFloat(t):
 	'addTypeFloat : '
 	types.push("float")
 
-# add type char
 def p_addTypeChar(t):
 	'addTypeChar : '
 	types.push("char")
@@ -368,13 +374,19 @@ def p_evaluateHE(t):
 	'evaluateHE : '
 	global temp
 	if operators.size() != 0:
+		# Generate quadruple for or/and expressions
 		if operators.peek() == "|" or operators.peek() == "&":
+			# Pop operands
 			rOp = operands.pop()
 			lOp = operands.pop()
+			# Pop operators
 			oper = operators.pop()
+			# Pop types
 			rType = types.pop()
 			lType = types.pop()
+			# Check semanticCube with types and operator
 			resType = semanticCube[(lType, rType, oper)]
+			# Check type and value
 			if resType == "int":
 				result = 0
 				lOp = int(lOp)
@@ -382,6 +394,7 @@ def p_evaluateHE(t):
 				if (lOp != 0 and lOp != 1) or (rOp != 0 and rOp != 1):
 					print("Error: type mismatch between '%s' and '%s' in line %d" % (lOp, rOp, t.lexer.lineno))
 					exit(0)
+				# Evaluate expression and push quadruple
 				if oper == "|":
 					result = lOp or rOp
 				else: 
@@ -412,13 +425,19 @@ def p_evaluateSE(t):
 	'evaluateSE : '
 	global temp
 	if operators.size() != 0:
+		# Generate quadruple for comparison operators
 		if operators.peek() == ">" or operators.peek() == "<" or operators.peek() == "<>" or operators.peek() == "==":
+			# Pop operands
 			rOp = operands.pop()
 			lOp = operands.pop()
+			# Pop operator
 			oper = operators.pop()
+			# Pop types
 			rType = types.pop()
 			lType = types.pop()
+			# Check semanticCube for types and operator
 			resType = semanticCube[(lType, rType, oper)]
+			# Check result type and evaluate expression
 			if resType != "error":
 				result = 0
 				if oper == ">": 
@@ -430,6 +449,7 @@ def p_evaluateSE(t):
 				if oper == "==": 
 					result = float(lOp) == float(rOp)
 				result = int(result)
+				# Generate quadruple for expression
 				temp_quad = Quadruple(oper, lOp, rOp, result)
 				Quadruples.push_quad(temp_quad)
 				operands.push(result)
@@ -453,13 +473,19 @@ def p_evaluateTerm(t):
 	'evaluateTerm : '
 	global temp
 	if operators.size() != 0:
+		# Generate quadruple for add/subtract operators
 		if operators.peek() == "+" or operators.peek() == "-":
+			# Pop operands
 			rOp = operands.pop()
 			lOp = operands.pop()
+			# Pop operator
 			oper = operators.pop()
+			# Pop types
 			rType = types.pop()
 			lType = types.pop()
+			# Check semanticCube with types and operator
 			resType = semanticCube[(lType, rType, oper)]
+			# Check result type and evaluate expression
 			if resType != "error":
 				result = 0
 				if oper == "+": 
@@ -468,6 +494,7 @@ def p_evaluateTerm(t):
 					result = float(lOp) - float(rOp)
 				if result % 1 == 0:
 					result = int(result)
+				# Generate quadruple for expression
 				temp_quad = Quadruple(oper, lOp, rOp, result)
 				Quadruples.push_quad(temp_quad)
 				operands.push(result)
@@ -489,13 +516,19 @@ def p_evaluateFactor(t):
 	'evaluateFactor : '
 	global temp
 	if operators.size() != 0:
+		# Generate quadruple for multiplication/division operators
 		if operators.peek() == "*" or operators.peek() == "/":
+			# Pop operands
 			rOp = operands.pop()
 			lOp = operands.pop()
+			# Pop operator
 			oper = operators.pop()
+			# Pop types
 			rType = types.pop()
 			lType = types.pop()
+			# Check semanticCube with types and operator
 			resType = semanticCube[(lType, rType, oper)]
+			# Check result type and evaluate expression
 			if resType != "error":
 				if oper == "*": 
 					result = float(lOp) * float(rOp)
@@ -503,6 +536,7 @@ def p_evaluateFactor(t):
 					result = float(lOp) / float(rOp)
 				if result % 1 == 0:
 					result = int(result)
+				# Generate quadruple for expression
 				temp_quad = Quadruple(oper, lOp, rOp, result)
 				Quadruples.push_quad(temp_quad)
 				operands.push(result)
@@ -532,12 +566,14 @@ def p_addOperandCst(t):
 
 def p_addOperandId(t):
 	'addOperandId : '
+	# Add currentScope operand value to operand stack
 	if t[-1] in variableTable[currentScope]:
 		if "value" in variableTable[currentScope][t[-1]]:
 			operands.push(variableTable[currentScope][t[-1]]["value"])
 		else:
 			print("Error: variable '%s' in line %d has not been assigned a value" %(t[-1], t.lexer.lineno))
 			exit(0)
+	# Add global scope operand value to operand stack
 	elif t[-1] in variableTable["global"]:
 		if "value" in variableTable["global"][t[-1]]:
 			operands.push(variableTable["global"][t[-1]]["value"])
@@ -550,6 +586,7 @@ def p_addOperandId(t):
 
 def p_addTypeId(t):
 	'addTypeId : '
+	# Push types to types stack
 	if t[-2] in variableTable[currentScope]:
 		types.push(variableTable[currentScope][t[-2]]["type"])
 	elif t[-2] in variableTable["global"]:
@@ -565,6 +602,7 @@ def p_id_list(t):
 
 def p_addRead(t):
 	'addRead : '
+	# Generate read quadruple
 	if t[-1] in variableTable[currentScope] or t[-1] in variableTable["global"]:
 		temp_quad = Quadruple("read", '_', '_', t[-1])
 		Quadruples.push_quad(temp_quad)
@@ -584,6 +622,7 @@ def p_printFunction(t):
 
 def p_addPrint(t):
 	'addPrint : '
+	# Generate print quadruple
 	temp_quad = Quadruple("print", '_', '_', operands.pop())
 	Quadruples.push_quad(temp_quad)
 	types.pop()
@@ -597,6 +636,7 @@ def p_print_param(t):
 
 def p_addPrintString(t):
 	'addPrintString : '
+	# Add string to print quadruple
 	temp_quad = Quadruple("print", '_', '_', t[-1])
 	Quadruples.push_quad(temp_quad)
 
