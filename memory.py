@@ -4,9 +4,9 @@ memoryTable = {}
 globalInt = 0
 globalFloat = 1000
 globalChar = 2000
-globalIntTemp = 3000
-globalFloatTemp = 4000
-globalCharTemp = 5000
+# globalIntTemp = 3000
+# globalFloatTemp = 4000
+# globalCharTemp = 5000
 
 # local int, float and chars 1000 memory spaces each
 localInt = 6000

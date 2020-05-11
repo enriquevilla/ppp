@@ -33,4 +33,6 @@ main() {
     c = 1 | 0;
     read(i);
     hola();
+    uno(1, 2);
+    dos(3, 4);
 }

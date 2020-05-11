@@ -653,12 +653,63 @@ def p_statement(t):
 				 | '''
 
 def p_module(t):
-	'module : ID LEFTPAR moduleFunction RIGHTPAR SEMICOLON'
+	'module : ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub SEMICOLON'
+
+def p_checkFuncExists(t):
+	'checkFuncExists : '
+	if t[-1] not in functionDir:
+		print("Error: use of undefined module '%s' in line %d" % (t[-1], t.lexer.lineno))
+		exit(0)
+	global funcName
+	funcName = t[-1]
+
+def p_genERASize(t):
+	'genERASize : '
+	#Generate ERA size pending
+	global funcName
+	tmp_quad = Quadruple("ERA", funcName, "_", "_")
+	Quadruples.push_quad(tmp_quad)
+	global k
+	k = 1
+
+def p_nullParam(t):
+	'nullParam : '
+	global k
+	global funcName
+	if k < len(functionDir[funcName]["params"].values()):
+		print("Error: unexpected number of arguments in module '%s' call in line %d." % (funcName, t.lexer.lineno))
+		exit(0)
+
+def p_genGosub(t):
+	'genGosub : '
+	tmp_quad = Quadruple("GOSUB", funcName, "_", functionDir[funcName]["start"])
+	Quadruples.push_quad(tmp_quad)
 
 def p_moduleFunction(t):
-	'''moduleFunction : hyperExpression COMA moduleFunction
-					  | hyperExpression RIGHTPAR
+	'''moduleFunction : hyperExpression genParam nextParam COMA moduleFunction
+					  | hyperExpression genParam 
 					  | '''
+
+def p_genParam(t):
+	'genParam : '
+	global k
+	arg = operands.pop()
+	argType = types.pop()
+	paramList = functionDir[funcName]["params"].values()
+	if k > len(paramList):
+		print("Error: unexpected number of arguments in module '%s' call in line %d." % (funcName, t.lexer.lineno))
+		exit(0)
+	if argType == paramList[-k]:
+		tmp_quad = Quadruple("PARAM", arg, '_', "param%d" % k)
+		Quadruples.push_quad(tmp_quad)
+	else:
+		print("Error: type mismatch in module '%s' call in line %d." % (funcName, t.lexer.lineno))
+		exit(0)
+
+def p_nextParam(t):
+	'nextParam : '
+	global k
+	k += 1
 
 def p_error(t):
 	print("Syntax error: Unexpected token '%s' in line %d" % (t.value, t.lexer.lineno))
