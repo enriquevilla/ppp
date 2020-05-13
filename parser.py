@@ -88,7 +88,7 @@ def p_assignment(t):
 		else:
 			Error.type_mismatch(t[1],t.lexer.lineno - 1)
 	else:
-		Error.undeclared_variable(t[1], t.lexer.lineno - 1)
+		Error.undefined_variable(t[1], t.lexer.lineno - 1)
 
 
 def p_declaration(t):
@@ -237,7 +237,7 @@ def p_forAssignment(t):
 		Quadruples.push_quad(temp_quad)
 		variableTable["global"][t[1]]["value"] = t[3]
 	else:
-		Error.undeclared_variable(t[1], t.lexer.lineno)
+		Error.undefined_variable(t[1], t.lexer.lineno)
 
 def p_vars(t):
 	'vars : ID addVarsToTable varsArray varsComa'
@@ -565,7 +565,7 @@ def p_addOperandId(t):
 		else:
 			Error.variable_has_no_assigned_value(t[-1], t.lexer.lineno)
 	else:
-		Error.undeclared_variable(t[-1], t.lexer.lineno)
+		Error.undefined_variable(t[-1], t.lexer.lineno)
 
 def p_addTypeId(t):
 	'addTypeId : '
@@ -575,7 +575,7 @@ def p_addTypeId(t):
 	elif t[-2] in variableTable["global"]:
 		types.push(variableTable["global"][t[-2]]["type"])
 	else:
-		Error.undeclared_variable(t[-1], t.lexer.lineno)
+		Error.undefined_variable(t[-1], t.lexer.lineno)
 
 def p_read(t):
 	'read : READ LEFTPAR id_list RIGHTPAR SEMICOLON'
@@ -590,7 +590,7 @@ def p_addRead(t):
 		temp_quad = Quadruple("read", '_', '_', t[-1])
 		Quadruples.push_quad(temp_quad)
 	else:
-		Error.undeclared_variable(t[-1], t.lexer.lineno)
+		Error.undefined_variable(t[-1], t.lexer.lineno)
 
 def p_id_listFunction(t):
 	'''id_listFunction : COMA id_list
@@ -641,8 +641,7 @@ def p_module(t):
 def p_checkFuncExists(t):
 	'checkFuncExists : '
 	if t[-1] not in functionDir:
-		print("Error: use of undefined module '%s' in line %d" % (t[-1], t.lexer.lineno))
-		exit(0)
+		Error.undefined_module(t[-1], t.lexer.lineno)
 	global funcName
 	funcName = t[-1]
 
@@ -660,8 +659,7 @@ def p_nullParam(t):
 	global k
 	global funcName
 	if k < len(functionDir[funcName]["params"].values()):
-		print("Error: unexpected number of arguments in module '%s' call in line %d." % (funcName, t.lexer.lineno))
-		exit(0)
+		Error.unexpected_number_of_arguments(funcName, t.lexer.lineno)
 
 def p_genGosub(t):
 	'genGosub : '
@@ -680,14 +678,12 @@ def p_genParam(t):
 	argType = types.pop()
 	paramList = functionDir[funcName]["params"].values()
 	if k > len(paramList):
-		print("Error: unexpected number of arguments in module '%s' call in line %d." % (funcName, t.lexer.lineno))
-		exit(0)
+		Error.unexpected_number_of_arguments(funcName, t.lexer.lineno)
 	if argType == paramList[-k]:
 		tmp_quad = Quadruple("PARAM", arg, '_', "param%d" % k)
 		Quadruples.push_quad(tmp_quad)
 	else:
-		print("Error: type mismatch in module '%s' call in line %d." % (funcName, t.lexer.lineno))
-		exit(0)
+		Error.type_mismatch(funcName, t.lexer.lineno)
 
 def p_nextParam(t):
 	'nextParam : '
@@ -695,8 +691,7 @@ def p_nextParam(t):
 	k += 1
 
 def p_error(t):
-	print("Syntax error: Unexpected token '%s' in line %d" % (t.value, t.lexer.lineno))
-	exit(0)
+	Error.syntax(t.value, t.lexer.lineno)
 
 f = open('prog.txt', 'r')
 program = f.read()
