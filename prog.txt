@@ -32,7 +32,6 @@ main() {
     c = 2 < 1;
     c = 1 | 0;
     read(i);
-    hola();
-    uno(1, 2);
+    uno(1, "a");
     dos(3, 4);
 }

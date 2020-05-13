@@ -683,7 +683,7 @@ def p_genParam(t):
 		tmp_quad = Quadruple("PARAM", arg, '_', "param%d" % k)
 		Quadruples.push_quad(tmp_quad)
 	else:
-		Error.type_mismatch(funcName, t.lexer.lineno)
+		Error.type_mismatch_module(funcName, t.lexer.lineno)
 
 def p_nextParam(t):
 	'nextParam : '

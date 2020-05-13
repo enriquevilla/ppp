@@ -52,3 +52,8 @@ class Error:
 		" wrong number of arguments error"
 		print("Error: unexpected number of arguments in module '%s' call in line %d." % (t, lineno))
 		exit(0)
+
+	@staticmethod
+	def type_mismatch_module(t, lineno):
+		print("Error: type mismatch in module '%s' call in line %d." % (t, lineno))
+		exit(0)
