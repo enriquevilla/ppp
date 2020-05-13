@@ -87,7 +87,6 @@ def p_assignment(t):
 			variableTable["global"][t[1]]["value"] = operands.pop()
 		else:
 			Error.type_mismatch(t[1],t.lexer.lineno - 1)
-
 	else:
 		Error.undeclared_variable(t[1], t.lexer.lineno - 1)
 
@@ -127,9 +126,9 @@ def p_createJumpQuadIf(t):
 			Quadruples.push_quad(temp_quad)
 			Quadruples.push_jump(-1)
 		else: 
-			Error.type_mismatch(t[1],t.lexer.lineno - 1)
+			Error.type_mismatch(t[1],t.lexer.lineno)
 	else: 
-		Error.type_mismatch(t[1],t.lexer.lineno - 1)
+		Error.type_mismatch(t[1],t.lexer.lineno)
 
 def p_updateJumpQuad(t):
 	'updateJumpQuad : '
@@ -178,9 +177,9 @@ def p_beginLoopAction(t):
 			# Push into jump stack
 			Quadruples.push_jump(-1)
 		else:
-			Error.type_mismatch(t[1],t.lexer.lineno - 1)
+			Error.type_mismatch(t[1],t.lexer.lineno)
 	else :
-		Error.type_mismatch(t[1],t.lexer.lineno - 1)
+		Error.type_mismatch(t[1],t.lexer.lineno)
 
 def p_endLoopAction(t):
 	'endLoopAction : '
@@ -211,9 +210,9 @@ def p_createQuadFor(t):
 			Quadruples.push_quad(temp_quad)
 			Quadruples.push_jump(-1)
 		else: 
-			Error.type_mismatch(t[1],t.lexer.lineno - 1)
+			Error.type_mismatch(t[1],t.lexer.lineno)
 	else: 
-		Error.type_mismatch(t[1],t.lexer.lineno - 1)
+		Error.type_mismatch(t[1],t.lexer.lineno)
 
 def p_updateQuadFor(t):
 	'updateQuadFor : '
@@ -238,7 +237,7 @@ def p_forAssignment(t):
 		Quadruples.push_quad(temp_quad)
 		variableTable["global"][t[1]]["value"] = t[3]
 	else:
-		Error.undeclared_variable(t[1], t.lexer.lineno - 1)
+		Error.undeclared_variable(t[1], t.lexer.lineno)
 
 def p_vars(t):
 	'vars : ID addVarsToTable varsArray varsComa'
