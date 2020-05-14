@@ -17,7 +17,7 @@ main() {
     var int c;
         float k;
     c = 4;
-    k = 1 + 2 - 3 * 4 / c;
+    k = 1 + 2 - (3 * 4) / c;
     if (1 > 2) then {
         read(c);
     } else {
@@ -32,6 +32,6 @@ main() {
     c = 2 < 1;
     c = 1 | 0;
     read(i);
-    uno(1, "a");
+    uno(1, 2);
     dos(3, 4);
 }

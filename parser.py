@@ -488,7 +488,7 @@ def p_evaluateTerm(t):
 				types.push(resType)
 				temp += 1
 			else:
-				Error.operation_type_mismatch(lOp, rOp,t.lexer.lineno)
+				Error.operation_type_mismatch(lOp, rOp, t.lexer.lineno)
 
 def p_expFunction(t):
 	'''expFunction : PLUS addOperator exp
@@ -540,10 +540,18 @@ def p_addOperator(t):
 	operators.push(t[-1])
 
 def p_factor(t):
-	'''factor : LEFTPAR hyperExpression RIGHTPAR
+	'''factor : LEFTPAR addFF hyperExpression RIGHTPAR removeFF
 			  | cst_prim addOperandCst
 			  | module
 			  | ID addOperandId addTypeId'''
+
+def p_addFF(t):
+	'addFF : '
+	operators.push("(")
+
+def p_removeFF(t):
+	'removeFF : '
+	operators.pop()
 
 def p_addOperandCst(t):
 	'addOperandCst : '
