@@ -250,18 +250,30 @@ def p_addVarsToTable(t):
 	else:
 		# Add current ID (t[-1]) to variableTable[scope]
 		variableTable[currentScope][t[-1]] = {"type": currentType}
+		global arrMatId
+		arrMatId = t[-1]
 
 def p_varsComa(t):
 	'''varsComa : COMA vars
 				| '''
 
 def p_varsArray(t):
-	'''varsArray : LEFTBRACK CST_INT RIGHTBRACK varsMatrix
+	'''varsArray : LEFTBRACK CST_INT RIGHTBRACK setRows varsMatrix 
 				 | '''
+	
+def p_setRows(t):
+	'setRows : '
+	global arrMatId
+	variableTable[currentScope][arrMatId]["rows"] = t[-2]
 
 def p_varsMatrix(t):
-	'''varsMatrix : LEFTBRACK CST_INT RIGHTBRACK
+	'''varsMatrix : LEFTBRACK CST_INT RIGHTBRACK setCols
 				  | '''
+
+def p_setCols(t):
+	'setCols : '
+	global arrMatId
+	variableTable[currentScope][arrMatId]["cols"] = t[-2]
 
 def p_function(t):
 	'function : functionType ID addFuncToDir LEFTPAR param RIGHTPAR setParamLength LEFTBRACE declaration statement RIGHTBRACE'
