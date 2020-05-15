@@ -8,13 +8,13 @@ class Error:
 	@staticmethod
 	def syntax(t, lineno):
 		" syntax error "
-		print("Syntax error: Unexpected token '%s' in line %d" % (t.value, t.lexer.lineno))
+		print("Syntax error: Unexpected token '%s' in line %d." % (t, lineno))
 		exit(0)
 
 	@staticmethod
 	def type_mismatch(t, lineno):
 		" type mismatch error "
-		print("Error: type mismatch in assignment for '%s' in line %d" % (t, lineno))
+		print("Error: type mismatch in assignment for '%s' in line %d." % (t, lineno))
 		exit(0)
 		
 	@staticmethod
