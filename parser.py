@@ -594,15 +594,14 @@ def p_addOperandId(t):
 	'addOperandId : '
 	# Add currentScope operand value to operand stack
 	if t[-1] in variableTable[currentScope]:
-		if "address" in variableTable[currentScope][t[-1]]:
+		if "value" in variableTable[currentScope][t[-1]]:
 			operands.push(variableTable[currentScope][t[-1]]["address"])
 		else:
 			Error.variable_has_no_assigned_value(t[-1], t.lexer.lineno)
-
 	# Add global scope operand value to operand stack
 	elif t[-1] in variableTable["global"]:
 		if "value" in variableTable["global"][t[-1]]:
-			operands.push(variableTable["global"][t[-1]]["value"])
+			operands.push(variableTable["global"][t[-1]]["address"])
 		else:
 			Error.variable_has_no_assigned_value(t[-1], t.lexer.lineno)
 	else:
@@ -628,10 +627,12 @@ def p_addRead(t):
 	'addRead : '
 	# Generate read quadruple
 	if t[-1] in variableTable[currentScope]:
+		variableTable[currentScope][t[-1]]["value"] = "readValue"
 		address = variableTable[currentScope][t[-1]]["address"]
 		temp_quad = Quadruple("read", '_', '_', address)
 		Quadruples.push_quad(temp_quad)
 	elif t[-1] in variableTable["global"]:
+		variableTable["global"][t[-1]]["value"] = "readValue"
 		address = variableTable["global"][t[-1]]["address"]
 		temp_quad = Quadruple("read", '_', '_', address)
 		Quadruples.push_quad(temp_quad)

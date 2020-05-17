@@ -68,6 +68,18 @@ def executeInstruction(quad):
         read(quad)
     elif quad.operator == "print":
         printScreen(quad)
+    elif quad.operator == "ENDFUNC":
+        endFunc(quad)
+    elif quad.operator == "GOTOF":
+        gotof(quad)
+    elif quad.operator == "GOTO":
+        goto(quad)
+    elif quad.operator == "GOSUB":
+        gosub(quad)
+    elif quad.operator == "ERA":
+        era(quad)
+    elif quad.operator == "PARAM":
+        param(quad)
 
 def assign(quad):
     add_type = quad.result // 1000
@@ -313,3 +325,22 @@ def printScreen(quad):
         print(cstMemMap[quad.result])
     else:
         print(getValueFromAddress(quad.result))
+
+def endFunc(quad):
+    pass
+
+def gotof(quad):
+    pass
+
+def goto(quad):
+    pass
+
+def gosub(quad):
+    pass
+
+def era(quad):
+    pass
+
+def param(quad):
+    pass
+    
