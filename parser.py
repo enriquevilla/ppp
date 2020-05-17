@@ -1,14 +1,14 @@
 import lexer as lexer
 import ply.yacc as yacc
-from datastructures import types, operands, operators, variableTable, Queue
-from datastructures import functionDir, temp, currentScope, currentType, semanticCube
+from datastructures import *
 from quadruples import *
 from error import Error
+from virtualmachine import runner_duckie
 
 tokens = lexer.tokens
 
 def p_program(t):
-	'program : PROGRAM ID globalTable SEMICOLON programVars programFunc main'
+	'program : PROGRAM ID globalTable SEMICOLON declaration programFunc main'
 	print("Code valid")
 	# show variable table and function directory
 	# print()
@@ -23,15 +23,16 @@ def p_program(t):
 	# 		print("\t\tvarLength: %d" % functionDir[i]["varLength"])
 	# 	print()
 	
-	operands.print()
-	types.print()
-	operators.print()
-	Quadruples.print_all()
-	variableTable.clear()
+	# operands.print()
+	# types.print()
+	# operators.print()
+	# Quadruples.print_all()
+	# variableTable.clear()
 
 # global scope varTable
 def p_globalTable(t):
 	'globalTable : '
+	variableTable["constants"] = {}
 	# Initialize variableTable for global and set program name and type
 	variableTable[currentScope] = {}
 	variableTable[currentScope][t[-1]] = {"type": "program"}
@@ -40,13 +41,6 @@ def p_globalTable(t):
 	# Set type and vars as reference to variableTable["global"]
 	functionDir[currentScope]["type"] = "void"
 	functionDir[currentScope]["vars"] = variableTable[currentScope]
-
-def p_programVars(t):
-	'''programVars : globalDeclaration
-				   | '''
-	
-def p_globalDeclaration(t):
-	'globalDeclaration : VAR declarationPrim'
 
 def p_programFunc(t):
 	'''programFunc : function programFunc
@@ -74,7 +68,8 @@ def p_assignment(t):
 	# If id is in currentScope, generate quadruple and set its value in varTable
 	if t[1] in variableTable[currentScope]:
 		if types.pop() == variableTable[currentScope][t[1]]["type"]:
-			temp_quad = Quadruple("=", operands.peek(), '_', t[1])
+			address = variableTable[currentScope][t[1]]["address"]
+			temp_quad = Quadruple("=", operands.peek(), '_', address)
 			Quadruples.push_quad(temp_quad)
 			variableTable[currentScope][t[1]]["value"] = operands.pop()
 		else:
@@ -82,7 +77,8 @@ def p_assignment(t):
 	# If id is in global scope, generate quadruple and set its value in varTable
 	elif t[1] in variableTable["global"]:
 		if types.pop() == variableTable["global"][t[1]]["type"]:
-			temp_quad = Quadruple("=", operands.peek(), '_', t[1])
+			address = variableTable["global"][t[1]]["address"]
+			temp_quad = Quadruple("=", operands.peek(), '_', address)
 			Quadruples.push_quad(temp_quad)
 			variableTable["global"][t[1]]["value"] = operands.pop()
 		else:
@@ -90,9 +86,9 @@ def p_assignment(t):
 	else:
 		Error.undefined_variable(t[1], t.lexer.lineno - 1)
 
-
 def p_declaration(t):
-	'declaration : VAR declarationPrim'
+	'''declaration : VAR declarationPrim
+				   | '''
 	# Set start quadruple start for function
 	functionDir[currentScope]["start"] = Quadruples.next_id
 
@@ -119,16 +115,16 @@ def p_createJumpQuadIf(t):
 	result_type = types.pop()
 	# Check type and value for the evaluated expression and generate quadruple
 	if result_type == "int":
-		if operands.peek() == 1 or operands.peek() == 0:
-			res = operands.pop()
-			operator = "GOTOF"
-			temp_quad = Quadruple(operator, res, '_', '_')
-			Quadruples.push_quad(temp_quad)
-			Quadruples.push_jump(-1)
-		else: 
-			Error.type_mismatch(t[1],t.lexer.lineno)
+		# if operands.peek() == 1 or operands.peek() == 0:
+		res = operands.pop()
+		operator = "GOTOF"
+		temp_quad = Quadruple(operator, res, '_', '_')
+		Quadruples.push_quad(temp_quad)
+		Quadruples.push_jump(-1)
+		# else: 
+		# 	Error.condition_type_mismatch(t.lexer.lineno)
 	else: 
-		Error.type_mismatch(t[1],t.lexer.lineno)
+		Error.condition_type_mismatch(t.lexer.lineno)
 
 def p_updateJumpQuad(t):
 	'updateJumpQuad : '
@@ -168,18 +164,18 @@ def p_beginLoopAction(t):
 	result_type = types.pop()
 	# Check expression type and value and add quadruple to stack
 	if result_type == "int":
-		if operands.peek() == 1 or operands.peek() == 0:
-			res = operands.pop()
-			operator = "GOTOF"
-			# Generate Quadruple and push it to the list
-			tmp_quad = Quadruple(operator, res, "_", "_")
-			Quadruples.push_quad(tmp_quad)
-			# Push into jump stack
-			Quadruples.push_jump(-1)
-		else:
-			Error.type_mismatch(t[1],t.lexer.lineno)
+		# if operands.peek() == 1 or operands.peek() == 0:
+		res = operands.pop()
+		operator = "GOTOF"
+		# Generate Quadruple and push it to the list
+		tmp_quad = Quadruple(operator, res, "_", "_")
+		Quadruples.push_quad(tmp_quad)
+		# Push into jump stack
+		Quadruples.push_jump(-1)
+		# else:
+		# 	Error.condition_type_mismatch(t.lexer.lineno)
 	else :
-		Error.type_mismatch(t[1],t.lexer.lineno)
+		Error.condition_type_mismatch(t.lexer.lineno)
 
 def p_endLoopAction(t):
 	'endLoopAction : '
@@ -203,16 +199,16 @@ def p_createQuadFor(t):
 	result_type = types.pop()
 	# Check expression type and value and add quadruple to stack
 	if result_type == "int":
-		if operands.peek() == 1 or operands.peek() == 0:
-			res = operands.pop()
-			operator = "GOTOF"
-			temp_quad = Quadruple(operator, res, '_', '_')
-			Quadruples.push_quad(temp_quad)
-			Quadruples.push_jump(-1)
-		else: 
-			Error.type_mismatch(t[1],t.lexer.lineno)
+		# if operands.peek() == 1 or operands.peek() == 0:
+		res = operands.pop()
+		operator = "GOTOF"
+		temp_quad = Quadruple(operator, res, '_', '_')
+		Quadruples.push_quad(temp_quad)
+		Quadruples.push_jump(-1)
+		# else: 
+		# 	Error.condition_type_mismatch(t.lexer.lineno)
 	else: 
-		Error.type_mismatch(t[1],t.lexer.lineno)
+		Error.condition_type_mismatch(t.lexer.lineno)
 
 def p_updateQuadFor(t):
 	'updateQuadFor : '
@@ -226,14 +222,24 @@ def p_updateQuadFor(t):
 
 def p_forAssignment(t):
 	'forAssignment : ID EQUAL CST_INT'
+	address_type = "cInt"
+	cstAddress = 0
+	if t[3] not in variableTable["constants"]:
+		variableTable["constants"][t[3]] = {"value": t[3], "address": addresses[address_type]}
+		cstAddress = addresses[address_type]
+		addresses[address_type] += 1
+	else:
+		cstAddress = variableTable["constants"][t[3]]["address"]
 	# Check if id exists in currentScope and set its value
 	if t[1] in variableTable[currentScope]:
-		temp_quad = Quadruple("=", t[3], '_', t[1])
+		address = variableTable[currentScope][t[1]]["address"]
+		temp_quad = Quadruple("=", cstAddress, '_', address)
 		Quadruples.push_quad(temp_quad)
 		variableTable[currentScope][t[1]]["value"] = t[3]
 	# Check if id exists in global scope and set its value
 	elif t[1] in variableTable["global"]:
-		temp_quad = Quadruple("=", t[3], '_', t[1])
+		address = variableTable["global"][t[1]]["address"]
+		temp_quad = Quadruple("=", t[3], '_', address)
 		Quadruples.push_quad(temp_quad)
 		variableTable["global"][t[1]]["value"] = t[3]
 	else:
@@ -250,6 +256,17 @@ def p_addVarsToTable(t):
 	else:
 		# Add current ID (t[-1]) to variableTable[scope]
 		variableTable[currentScope][t[-1]] = {"type": currentType}
+		address_type = "g"
+		if currentScope != "global":
+			address_type = "l"
+		if currentType == "int":
+			address_type += "Int"
+		elif currentType == "float":
+			address_type += "Float"
+		else:
+			address_type += "Char"
+		variableTable[currentScope][t[-1]]["address"] = addresses[address_type]
+		addresses[address_type] += 1
 		global arrMatId
 		arrMatId = t[-1]
 
@@ -353,14 +370,35 @@ def p_cst_prim(t):
 def p_addTypeInt(t):
 	'addTypeInt : '
 	types.push("int")
+	address_type = "cInt"
+	if t[-1] not in variableTable["constants"]:
+		variableTable["constants"][t[-1]] = {"address": addresses[address_type], "type": "int"}
+		operands.push(variableTable["constants"][t[-1]]["address"])
+		addresses[address_type] += 1
+	else:
+		operands.push(variableTable["constants"][t[-1]]["address"])
 
 def p_addTypeFloat(t):
 	'addTypeFloat : '
 	types.push("float")
+	address_type = "cFloat"
+	if t[-1] not in variableTable["constants"]:
+		variableTable["constants"][t[-1]] = {"address": addresses[address_type], "type": "float"}
+		operands.push(variableTable["constants"][t[-1]]["address"])
+		addresses[address_type] += 1
+	else:
+		operands.push(variableTable["constants"][t[-1]]["address"])
 
 def p_addTypeChar(t):
 	'addTypeChar : '
 	types.push("char")
+	address_type = "cChar"
+	if t[-1] not in variableTable["constants"]:
+		variableTable["constants"][t[-1]] = {"address": addresses[address_type]}
+		operands.push(variableTable["constants"][t[-1]]["address"])
+		addresses[address_type] += 1
+	else:
+		operands.push(variableTable["constants"][t[-1]]["address"])
 
 def p_hyperExpression(t):
 	'''hyperExpression : superExpression evaluateHE opHyperExpression hyperExpressionNested
@@ -373,7 +411,6 @@ def p_hyperExpressionNested(t):
 
 def p_evaluateHE(t):
 	'evaluateHE : '
-	global temp
 	if operators.size() != 0:
 		# Generate quadruple for or/and expressions
 		if operators.peek() == "|" or operators.peek() == "&":
@@ -388,23 +425,19 @@ def p_evaluateHE(t):
 			# Check semanticCube with types and operator
 			resType = semanticCube[(lType, rType, oper)]
 			# Check type and value
-			if resType == "int":
-				result = 0
-				lOp = int(lOp)
-				rOp = int(rOp)
-				if (lOp != 0 and lOp != 1) or (rOp != 0 and rOp != 1):
-					Error.operation_type_mismatch(lOp, rOp,t.lexer.lineno)
-
-				# Evaluate expression and push quadruple
-				if oper == "|":
-					result = lOp or rOp
-				else: 
-					result = lOp and rOp
-				temp_quad = Quadruple(oper, lOp, rOp, result)
+			if resType != "error":
+				address_type = "t"
+				if resType == "int":
+					address_type += "Int"
+				elif resType == "float":
+					address_type += "Float"
+				else:
+					address_type += "Char"
+				temp_quad = Quadruple(oper, lOp, rOp, addresses[address_type])
 				Quadruples.push_quad(temp_quad)
-				operands.push(result)
+				operands.push(addresses[address_type])
+				addresses[address_type] += 1
 				types.push(resType)
-				temp += 1
 			else:
 				Error.operation_type_mismatch(lOp, rOp,t.lexer.lineno)
 
@@ -423,7 +456,6 @@ def p_superExpression(t):
 
 def p_evaluateSE(t):
 	'evaluateSE : '
-	global temp
 	if operators.size() != 0:
 		# Generate quadruple for comparison operators
 		if operators.peek() == ">" or operators.peek() == "<" or operators.peek() == "<>" or operators.peek() == "==":
@@ -439,24 +471,20 @@ def p_evaluateSE(t):
 			resType = semanticCube[(lType, rType, oper)]
 			# Check result type and evaluate expression
 			if resType != "error":
-				result = 0
-				if oper == ">": 
-					result = float(lOp) > float(rOp)
-				if oper == "<": 
-					result = float(lOp) < float(rOp)
-				if oper == "<>": 
-					result = float(lOp) != float(rOp)
-				if oper == "==": 
-					result = float(lOp) == float(rOp)
-				result = int(result)
-				# Generate quadruple for expression
-				temp_quad = Quadruple(oper, lOp, rOp, result)
+				address_type = "t"
+				if resType == "int":
+					address_type += "Int"
+				elif resType == "float":
+					address_type += "Float"
+				else:
+					address_type += "Char"
+				temp_quad = Quadruple(oper, lOp, rOp, addresses[address_type])
 				Quadruples.push_quad(temp_quad)
-				operands.push(result)
+				operands.push(addresses[address_type])
+				addresses[address_type] += 1
 				types.push(resType)
-				temp += 1
 			else:
-				Error.operation_type_mismatch(lOp, rOp,t.lexer.lineno)
+				Error.operation_type_mismatch(lOp, rOp, t.lexer.lineno)
 
 def p_opSuperExpression(t):
 	'''opSuperExpression : GT addOperator
@@ -470,7 +498,6 @@ def p_exp(t):
 
 def p_evaluateTerm(t):
 	'evaluateTerm : '
-	global temp
 	if operators.size() != 0:
 		# Generate quadruple for add/subtract operators
 		if operators.peek() == "+" or operators.peek() == "-":
@@ -486,19 +513,18 @@ def p_evaluateTerm(t):
 			resType = semanticCube[(lType, rType, oper)]
 			# Check result type and evaluate expression
 			if resType != "error":
-				result = 0
-				if oper == "+": 
-					result = float(lOp) + float(rOp)
-				if oper == "-": 
-					result = float(lOp) - float(rOp)
-				if result % 1 == 0:
-					result = int(result)
-				# Generate quadruple for expression
-				temp_quad = Quadruple(oper, lOp, rOp, result)
+				address_type = "t"
+				if resType == "int":
+					address_type += "Int"
+				elif resType == "float":
+					address_type += "Float"
+				else:
+					address_type += "Char"
+				temp_quad = Quadruple(oper, lOp, rOp, addresses[address_type])
 				Quadruples.push_quad(temp_quad)
-				operands.push(result)
+				operands.push(addresses[address_type])
+				addresses[address_type] += 1
 				types.push(resType)
-				temp += 1
 			else:
 				Error.operation_type_mismatch(lOp, rOp, t.lexer.lineno)
 
@@ -512,7 +538,6 @@ def p_term(t):
 
 def p_evaluateFactor(t):
 	'evaluateFactor : '
-	global temp
 	if operators.size() != 0:
 		# Generate quadruple for multiplication/division operators
 		if operators.peek() == "*" or operators.peek() == "/":
@@ -528,18 +553,18 @@ def p_evaluateFactor(t):
 			resType = semanticCube[(lType, rType, oper)]
 			# Check result type and evaluate expression
 			if resType != "error":
-				if oper == "*": 
-					result = float(lOp) * float(rOp)
-				if oper == "/": 
-					result = float(lOp) / float(rOp)
-				if result % 1 == 0:
-					result = int(result)
-				# Generate quadruple for expression
-				temp_quad = Quadruple(oper, lOp, rOp, result)
+				address_type = "t"
+				if resType == "int":
+					address_type += "Int"
+				elif resType == "float":
+					address_type += "Float"
+				else:
+					address_type += "Char"
+				temp_quad = Quadruple(oper, lOp, rOp, addresses[address_type])
 				Quadruples.push_quad(temp_quad)
-				operands.push(result)
+				operands.push(addresses[address_type])
+				addresses[address_type] += 1
 				types.push(resType)
-				temp += 1
 			else:
 				Error.operation_type_mismatch(lOp, rOp,t.lexer.lineno)
 
@@ -553,7 +578,7 @@ def p_addOperator(t):
 
 def p_factor(t):
 	'''factor : LEFTPAR addFF hyperExpression RIGHTPAR removeFF
-			  | cst_prim addOperandCst
+			  | cst_prim
 			  | module
 			  | ID addOperandId addTypeId'''
 
@@ -565,16 +590,12 @@ def p_removeFF(t):
 	'removeFF : '
 	operators.pop()
 
-def p_addOperandCst(t):
-	'addOperandCst : '
-	operands.push(t[-1])
-
 def p_addOperandId(t):
 	'addOperandId : '
 	# Add currentScope operand value to operand stack
 	if t[-1] in variableTable[currentScope]:
-		if "value" in variableTable[currentScope][t[-1]]:
-			operands.push(variableTable[currentScope][t[-1]]["value"])
+		if "address" in variableTable[currentScope][t[-1]]:
+			operands.push(variableTable[currentScope][t[-1]]["address"])
 		else:
 			Error.variable_has_no_assigned_value(t[-1], t.lexer.lineno)
 
@@ -606,8 +627,13 @@ def p_id_list(t):
 def p_addRead(t):
 	'addRead : '
 	# Generate read quadruple
-	if t[-1] in variableTable[currentScope] or t[-1] in variableTable["global"]:
-		temp_quad = Quadruple("read", '_', '_', t[-1])
+	if t[-1] in variableTable[currentScope]:
+		address = variableTable[currentScope][t[-1]]["address"]
+		temp_quad = Quadruple("read", '_', '_', address)
+		Quadruples.push_quad(temp_quad)
+	elif t[-1] in variableTable["global"]:
+		address = variableTable["global"][t[-1]]["address"]
+		temp_quad = Quadruple("read", '_', '_', address)
 		Quadruples.push_quad(temp_quad)
 	else:
 		Error.undefined_variable(t[-1], t.lexer.lineno)
@@ -640,7 +666,14 @@ def p_print_param(t):
 def p_addPrintString(t):
 	'addPrintString : '
 	# Add string to print quadruple
-	temp_quad = Quadruple("print", '_', '_', t[-1])
+	address = 0
+	if t[-1] not in variableTable["constants"]:
+		variableTable["constants"][t[-1]] = {"address": addresses["cChar"]}
+		address = variableTable["constants"][t[-1]]["address"]
+		addresses["cChar"] += 1
+	else:
+		address = variableTable["constants"][t[-1]]["address"]
+	temp_quad = Quadruple("print", '_', '_', address)
 	Quadruples.push_quad(temp_quad)
 
 def p_statement(t):
@@ -719,3 +752,5 @@ program = f.read()
 parser = yacc.yacc()
 
 parser.parse(program)
+
+runner_duckie()

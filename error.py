@@ -16,6 +16,12 @@ class Error:
 		" type mismatch error "
 		print("Error: type mismatch in assignment for '%s' in line %d." % (t, lineno))
 		exit(0)
+
+	@staticmethod
+	def condition_type_mismatch(lineno):
+		"if expression type mismatch error"
+		print("Error: type mismatch in condition expression in line %d." % lineno)
+		exit(0)
 		
 	@staticmethod
 	def operation_type_mismatch(lOp, rOp, lineno):
