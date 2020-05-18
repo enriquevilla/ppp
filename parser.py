@@ -744,6 +744,17 @@ def p_nextParam(t):
 	global k
 	k += 1
 
+def p_dimensionedID(t):
+	'dimensionedID : ID dimArray'
+
+def p_dim1(t):
+	'''dimArray : LEFTBRACK CST_INT RIGHTBRACK dimMatrix
+				| '''
+
+def p_dim2(t):
+	'''dimMatrix : LEFTBRACK CST_INT RIGHTBRACK
+				 | '''
+
 def p_error(t):
 	Error.syntax(t.value, t.lexer.lineno)
 
