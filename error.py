@@ -63,3 +63,13 @@ class Error:
 	def type_mismatch_module(t, lineno):
 		print("Error: type mismatch in module '%s' call in line %d." % (t, lineno))
 		exit(0)
+	
+	@staticmethod
+	def return_on_void_function(t, lineno):
+		print("Error: return statement on void function. Line: %d." % (lineno))
+		exit(0)
+
+	@staticmethod
+	def no_return_on_function(t, lineno):
+		print("Error: no return statement on function with return type. Line: %d." % (lineno))
+		exit(0)

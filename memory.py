@@ -9,6 +9,8 @@ class Memory:
         if len(self.ints) > real_address:
             self.ints[real_address] = val
         else:
+            while len(self.ints) < real_address:
+                self.ints.append(0)
             self.ints.append(val)
 
     def insertFloat(self, val, vir_address):
@@ -16,6 +18,8 @@ class Memory:
         if len(self.floats) > real_address:
             self.floats[real_address] = val
         else:
+            while len(self.floats) < real_address:
+                self.floats.append(0.0)
             self.floats.append(val)
 
     def insertChar(self, val, vir_address):
@@ -23,6 +27,8 @@ class Memory:
         if len(self.chars) > real_address:
             self.chars[real_address] = val
         else:
+            while len(self.chars) < real_address:
+                self.chars.append("")
             self.chars.append(val)
 
     def getInt(self, vir_address):
@@ -39,3 +45,22 @@ class Memory:
 
     def printInts(self):
         print(self.ints)
+
+    def printChars(self):
+        print(self.chars)
+
+    def adjustIntArrSize(self, supLim):
+        realSup = supLim % 1000
+        while len(self.ints) <= realSup:
+            self.ints.append(0)
+
+    def adjustFloatArrSize(self, supLim):
+        realSup = supLim % 1000
+        while len(self.floats) <= realSup:
+            self.floats.append(0.0)
+
+    def adjustCharArrSize(self, supLim):
+        realSup = supLim % 1000
+        while len(self.chars) <= realSup:
+            self.chars.append("")
+

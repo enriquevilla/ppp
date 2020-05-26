@@ -4,7 +4,7 @@ import sys
 class Quadruple(object):
 	"""Quadruple class
 	
-	Quadrupe
+	Quadruple
 	"""
 	def __init__(self, operator, left_operand, right_operand, result):
 		"""Build quadruple

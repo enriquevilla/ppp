@@ -67,7 +67,8 @@ addresses = {
     "tChar": 8000,
     "cInt": 9000,
     "cFloat": 10000,
-    "cChar": 11000
+    "cChar": 11000,
+    "tPoint": 12000
 }
 ty = {
     0: "int",
