@@ -184,8 +184,6 @@ def assign(quad):
         elif lOp == 2:
             localMem.insertChar(globalMem.getChar(quad.left_operand), quad.result)
     if add_type == 6:
-        # localMem.printInts()
-        # print(getValueFromAddress(quad.left_operand))
         if lOp != 12:
             tempMem.insertInt(getValueFromAddress(quad.left_operand), quad.result)
         if lOp == 12:
@@ -389,14 +387,12 @@ def read(quad):
             localMem.insertChar(input_val, quad.result)
     
 def printScreen(quad):
-    # localMem.printInts()
     if quad.result >= 12000:
         print(getValueFromAddress(getValueFromAddress(quad.result)))
     else:
         print(getValueFromAddress(quad.result))
 
 def endFunc(quad):
-    global localMemStack
     global localMem
     currentFunctionStack.pop()
     localMem = localMemStack.pop()
@@ -415,28 +411,29 @@ def goto4(quad):
     return quad.result
 
 def gosub(quad):
+    global newMem
+    global localMem
+    localMem = newMem
     functionReturnStack.append(quad.id + 1)
     return quad.result
 
 def era(quad):
-    global localMem
     localMemStack.append(localMem)
+    global newMem
+    newMem = Memory()
     currentFunctionStack.append(quad.left_operand)
-    localMem = Memory()
 
 def param(quad):
-    global localMem
     address = quad.result // 1000
     lOp = getValueFromAddress(quad.left_operand)
     if address == 3:
-        localMem.insertInt(lOp, quad.result)
+        newMem.insertInt(lOp, quad.result)
     if address == 4:
-        localMem.insertFloat(lOp, quad.result)
+        newMem.insertFloat(lOp, quad.result)
     if address == 5:
-        localMem.insertChar(lOp, quad.result)
+        newMem.insertChar(lOp, quad.result)    
 
 def rtn(quad):
-    global tempMem
     address = quad.result // 1000
     rtn_address = Quadruples.quadruples[functionReturnStack[len(functionReturnStack) - 1]].result
     rtnVal = getValueFromAddress(quad.result)
@@ -449,9 +446,13 @@ def rtn(quad):
     else:
         tempMem.insertChar(rtnVal, rtn_address)
         globalMem.insertChar(rtnVal, currentFunctionStack[len(currentFunctionStack) - 1])
+    newIndex = quad.id + 1
+    if Quadruples.quadruples[newIndex].operator != "ENDFUNC":
+        while Quadruples.quadruples[newIndex].operator != "ENDFUNC":
+            newIndex += 1
+        return newIndex
 
 def verify(quad):
-    global tempMem
     arrType = quad.result // 1000
     check = getValueFromAddress(quad.left_operand)
     # print(check)
