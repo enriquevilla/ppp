@@ -351,9 +351,9 @@ def andOp(quad):
     if res_address == 6:
         tempMem.insertInt(result, quad.result)
     if res_address == 7:
-        tempMem.insertFloat(result, quad)
+        tempMem.insertFloat(result, quad.result)
     if res_address == 8:
-        tempMem.insertChar(result, res_address)
+        tempMem.insertChar(result, quad.result)
 
 def read(quad):
     address = quad.result // 1000
