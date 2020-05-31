@@ -50,6 +50,7 @@ def runner_duckie():
             cstMemMap[variableTable["constants"][cst]["address"]] = cst
     index = 0
     print(cstMemMap)
+    # Quadruples.print_all()
     while len(Quadruples.quadruples) > index:    
         quad = Quadruples.quadruples[index]
         # quad.print()
@@ -61,20 +62,6 @@ def runner_duckie():
                 index += 1                    
         else:
             index += 1
-            # if Quadruples.quadruples[index].operator == "UPDATEMAT":
-            #     index += 1
-            #     auxIndex = index
-            #     while Quadruples.quadruples[index].operator != "+":
-            #         index += 1
-            #     Quadruples.quadruples[index].right_operand = newIndex
-            #     index = auxIndex
-            if Quadruples.quadruples[index].operator != "VERIFY":
-                regOperators = ["+", "-", "*", "/", "="]
-                if Quadruples.quadruples[index].operator != "print":
-                    if Quadruples.quadruples[index].operator not in regOperators:
-                        Quadruples.quadruples[index].result = newIndex
-            else:
-                Quadruples.quadruples[index].left_operand = newIndex
 
 def executeInstruction(quad):
     if quad.operator == "=":
@@ -121,10 +108,6 @@ def executeInstruction(quad):
         return rtn(quad)
     elif quad.operator == "VERIFY":
         return verify(quad)
-    elif quad.operator == "+ADD":
-        return plusAdd(quad)
-    elif quad.operator == "UPDATEMAT":
-        return updateMatAdd(quad)
 
 def assign(quad):
     add_type = quad.result // 1000
@@ -220,6 +203,9 @@ def add(quad):
         tempMem.insertInt(result, quad.result)
     elif res_address == 7:
         tempMem.insertFloat(result, quad.result)
+    # Address addition for array and matrix (base address + access index)
+    elif res_address == 12:
+        pointerMemStack.append(lOp + rOp)
 
 def subtract(quad):
     res_address = quad.result // 1000
@@ -399,7 +385,11 @@ def endFunc(quad):
     return functionReturnStack.pop()
 
 def gotof(quad):
-    if getValueFromAddress(quad.left_operand) == 0:
+    if quad.left_operand >= 12000:
+        lOp = getValueFromAddress(getValueFromAddress(quad.left_operand))
+    else:
+        lOp = getValueFromAddress(quad.left_operand)
+    if lOp == 0:
         return quad.result
 
 def goto(quad):
@@ -425,7 +415,10 @@ def era(quad):
 
 def param(quad):
     address = quad.result // 1000
-    lOp = getValueFromAddress(quad.left_operand)
+    if quad.left_operand >= 12000:
+        lOp = getValueFromAddress(getValueFromAddress(quad.left_operand))
+    else:
+        lOp = getValueFromAddress(quad.left_operand)
     if address == 3:
         newMem.insertInt(lOp, quad.result)
     if address == 4:
@@ -436,7 +429,10 @@ def param(quad):
 def rtn(quad):
     address = quad.result // 1000
     rtn_address = Quadruples.quadruples[functionReturnStack[len(functionReturnStack) - 1]].result
-    rtnVal = getValueFromAddress(quad.result)
+    if quad.left_operand >= 12000:
+        rtnVal = getValueFromAddress(getValueFromAddress(quad.left_operand))
+    else:
+        rtnVal = getValueFromAddress(quad.left_operand)
     if address == 0 or address == 3 or address == 6 or address == 9:
         tempMem.insertInt(rtnVal, rtn_address)
         globalMem.insertInt(rtnVal, currentFunctionStack[len(currentFunctionStack) - 1])
@@ -454,8 +450,10 @@ def rtn(quad):
 
 def verify(quad):
     arrType = quad.result // 1000
-    check = getValueFromAddress(quad.left_operand)
-    # print(check)
+    if quad.left_operand >= 12000:
+        check = getValueFromAddress(getValueFromAddress(quad.left_operand))
+    else:
+        check = getValueFromAddress(quad.left_operand)
     if check > quad.result - quad.right_operand:
         print("Error: index out of bounds.")
         exit(0)
@@ -466,12 +464,3 @@ def verify(quad):
         localMem.adjustFloatArrSize(quad.result)
     elif arrType == 5:
         localMem.adjustCharArrSize(quad.result)
-
-def plusAdd(quad):
-    lOp = getValueFromAddress(quad.left_operand)
-    rOp = getValueFromAddress(quad.right_operand)
-    pointerMemStack.append(lOp + rOp)
-    return lOp + rOp
-
-def updateMatAdd(quad):
-    pass 

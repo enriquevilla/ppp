@@ -899,7 +899,7 @@ def p_dimMatrix(t):
 		address_type += "Char"
 	baseAdd = variableTable[currentScope][arrMatId.peek()]["address"]
 	addressCst = variableTable["constants"][baseAdd]["address"]
-	tmp_quad = Quadruple("+ADD", addressCst, operands.pop(), addresses["tPoint"])
+	tmp_quad = Quadruple("+", addressCst, operands.pop(), addresses["tPoint"])
 	Quadruples.push_quad(tmp_quad)
 	operands.push(addresses["tPoint"])
 	addresses["tPoint"] += 1
