@@ -24,9 +24,9 @@ class Error:
 		exit(0)
 		
 	@staticmethod
-	def operation_type_mismatch(lOp, rOp, lineno):
+	def operation_type_mismatch(lineno):
 		" operation type mismatch error "
-		print("Error: type mismatch between '%s' and '%s' in line %d." % (lOp, rOp, lineno))
+		print("Error: type mismatch in an operation in line %d." % (lineno))
 		exit(0)
 	
 	@staticmethod
@@ -73,3 +73,5 @@ class Error:
 	def no_return_on_function(t, lineno):
 		print("Error: no return statement on function with return type. Line: %d." % (lineno))
 		exit(0)
+
+	#TODO ADD MISSING ERRORS FROM PARSER AND VIRTUAL MACHINE
