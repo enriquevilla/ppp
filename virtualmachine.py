@@ -1,4 +1,4 @@
-from quadruples import Quadruples
+from quadruples import Quadruples, Quadruple
 from memory import Memory
 from datastructures import variableTable
 from error import *
@@ -53,7 +53,7 @@ def runner_duckie():
     # Quadruples.print_all()
     while len(Quadruples.quadruples) > index:    
         quad = Quadruples.quadruples[index]
-        # quad.print()
+        quad.print()
         newIndex = executeInstruction(quad)
         if quad.operator != "+ADD":
             if newIndex:
@@ -212,32 +212,8 @@ def assign(quad):
         elif lOp == 2:
             tempMem.insertChar(globalMem.getInt(quad.left_operand), quad.result)
     if add_type == 12:
-        if lOp == 12:
-            localMem.insertInt(getValueFromAddress(getValueFromAddress(quad.left_operand)), getValueFromAddress(quad.result))
-        elif lOp == 11:
-            localMem.insertChar(cstMemMap[quad.left_operand], getValueFromAddress(quad.result))
-        elif lOp == 10:
-            localMem.insertFloat(cstMemMap[quad.left_operand], getValueFromAddress(quad.result))
-        elif lOp == 9:
-            localMem.insertInt(cstMemMap[quad.left_operand], getValueFromAddress(quad.result))
-        elif lOp == 8:
-            tempMem.insertChar(tempMem.getChar(quad.left_operand), getValueFromAddress(quad.result))
-        elif lOp == 7:
-            tempMem.insertFloat(tempMem.getFloat(quad.left_operand), getValueFromAddress(quad.result))
-        elif lOp == 6:
-            tempMem.insertInt(tempMem.getInt(quad.left_operand), getValueFromAddress(quad.result))
-        elif lOp == 5:
-            tempMem.insertChar(localMem.getChar(quad.left_operand), getValueFromAddress(quad.result))
-        elif lOp == 4:
-            tempMem.insertFloat(localMem.getFloat(quad.left_operand), getValueFromAddress(quad.result))
-        elif lOp == 3:
-            tempMem.insertInt(localMem.getInt(quad.left_operand), getValueFromAddress(quad.result))
-        elif lOp == 2:
-            tempMem.insertChar(globalMem.getChar(quad.left_operand), getValueFromAddress(quad.result))
-        elif lOp == 1:
-            tempMem.insertFloat(globalMem.getFloat(quad.left_operand), getValueFromAddress(quad.result))
-        elif lOp == 0:
-            tempMem.insertInt(globalMem.getInt(quad.left_operand), getValueFromAddress(quad.result))
+        add_type = getValueFromAddress(quad.result)
+        assign(Quadruple(quad.operator, quad.left_operand, "_", add_type))
 
 def add(quad):
     res_address = quad.result // 1000
@@ -257,7 +233,7 @@ def add(quad):
         tempMem.insertFloat(result, quad.result)
     # Address addition for array and matrix (base address + access index)
     elif res_address == 12:
-        pointerMemStack.append(lOp + rOp)
+        pointerMemStack.insert(quad.result % 1000, lOp + rOp)
 
 def subtract(quad):
     res_address = quad.result // 1000
