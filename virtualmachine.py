@@ -113,7 +113,9 @@ def assign(quad):
     add_type = quad.result // 1000
     lOp = quad.left_operand // 1000
     if add_type == 0:
-        if lOp == 9:
+        if lOp == 12:
+            globalMem.insertInt(getValueFromAddress(getValueFromAddress(quad.left_operand)), quad.result)
+        elif lOp == 9:
             globalMem.insertInt(cstMemMap[quad.left_operand], quad.result)
         elif lOp == 6:
             globalMem.insertInt(tempMem.getInt(quad.left_operand), quad.result)
@@ -122,7 +124,9 @@ def assign(quad):
         elif lOp == 0:
             globalMem.insertInt(globalMem.getInt(quad.left_operand), quad.result)
     if add_type == 1:
-        if lOp == 10:
+        if lOp == 12:
+            globalMem.insertFloat(getValueFromAddress(getValueFromAddress(quad.left_operand)), quad.result)
+        elif lOp == 10:
             globalMem.insertFloat(cstMemMap[quad.left_operand], quad.result)
         elif lOp == 7:
             globalMem.insertFloat(tempMem.getFloat(quad.left_operand), quad.result)
@@ -131,7 +135,9 @@ def assign(quad):
         elif lOp == 1:
             globalMem.insertFloat(globalMem.getFloat(quad.left_operand), quad.result)
     if add_type == 2:
-        if lOp == 11:
+        if lOp == 12:
+            globalMem.insertChar(getValueFromAddress(getValueFromAddress(quad.left_operand)), quad.result)
+        elif lOp == 11:
             globalMem.insertChar(cstMemMap[quad.left_operand], quad.result)
         elif lOp == 8:
             globalMem.insertChar(tempMem.getChar(quad.left_operand), quad.result)
@@ -140,7 +146,9 @@ def assign(quad):
         elif lOp == 2:
             globalMem.insertChar(globalMem.getChar(quad.left_operand), quad.result)
     if add_type == 3:
-        if lOp == 9:
+        if lOp == 12:
+            localMem.insertInt(getValueFromAddress(getValueFromAddress(quad.left_operand)), quad.result)
+        elif lOp == 9:
             localMem.insertInt(cstMemMap[quad.left_operand], quad.result)
         elif lOp == 6:
             localMem.insertInt(tempMem.getInt(quad.left_operand), quad.result)
@@ -149,7 +157,9 @@ def assign(quad):
         elif lOp == 0:
             localMem.insertInt(globalMem.getInt(quad.left_operand), quad.result)
     if add_type == 4:
-        if lOp == 10:
+        if lOp == 12:
+            localMem.insertFloat(getValueFromAddress(getValueFromAddress(quad.left_operand)), quad.result)
+        elif lOp == 10:
             localMem.insertFloat(cstMemMap[quad.left_operand], quad.result)
         elif lOp == 7:
             localMem.insertFloat(tempMem.getFloat(quad.left_operand), quad.result)
@@ -158,7 +168,9 @@ def assign(quad):
         elif lOp == 1:
             localMem.insertFloat(globalMem.getFloat(quad.left_operand), quad.result)
     if add_type == 5:
-        if lOp == 11:
+        if lOp == 12:
+            localMem.insertChar(getValueFromAddress(getValueFromAddress(quad.left_operand)), quad.result)
+        elif lOp == 11:
             localMem.insertChar(cstMemMap[quad.left_operand], quad.result)
         elif lOp == 8:
             localMem.insertChar(tempMem.getChar(quad.left_operand), quad.result)
@@ -167,25 +179,65 @@ def assign(quad):
         elif lOp == 2:
             localMem.insertChar(globalMem.getChar(quad.left_operand), quad.result)
     if add_type == 6:
-        if lOp != 12:
-            tempMem.insertInt(getValueFromAddress(quad.left_operand), quad.result)
         if lOp == 12:
             tempMem.insertInt(getValueFromAddress(getValueFromAddress(quad.left_operand)), quad.result)
+        elif lOp == 9:
+            tempMem.insertInt(cstMemMap[quad.left_operand], quad.result)
+        elif lOp == 6:
+            tempMem.insertInt(tempMem.getInt(quad.left_operand), quad.result)
+        elif lOp == 3:
+            tempMem.insertInt(localMem.getInt(quad.left_operand), quad.result)
+        elif lOp == 0:
+            tempMem.insertInt(globalMem.getInt(quad.left_operand), quad.result)
     if add_type == 7:
-        if lOp != 12:
-            tempMem.insertFloat(getValueFromAddress(quad.left_operand), quad.result)
         if lOp == 12:
             tempMem.insertFloat(getValueFromAddress(getValueFromAddress(quad.left_operand)), quad.result)
+        elif lOp == 10:
+            tempMem.insertFloat(cstMemMap[quad.left_operand], quad.result)
+        elif lOp == 7:
+            tempMem.insertFloat(tempMem.getInt(quad.left_operand), quad.result)
+        elif lOp == 4:
+            tempMem.insertFloat(localMem.getInt(quad.left_operand), quad.result)
+        elif lOp == 1:
+            tempMem.insertFloat(globalMem.getInt(quad.left_operand), quad.result)
     if add_type == 8:
-        if lOp != 12:
-            tempMem.insertChar(getValueFromAddress(quad.left_operand), quad.result)
         if lOp == 12:
             tempMem.insertChar(getValueFromAddress(getValueFromAddress(quad.left_operand)), quad.result)
+        elif lOp == 11:
+            tempMem.insertChar(cstMemMap[quad.left_operand], quad.result)
+        elif lOp == 8:
+            tempMem.insertChar(tempMem.getInt(quad.left_operand), quad.result)
+        elif lOp == 5:
+            tempMem.insertChar(localMem.getInt(quad.left_operand), quad.result)
+        elif lOp == 2:
+            tempMem.insertChar(globalMem.getInt(quad.left_operand), quad.result)
     if add_type == 12:
-        if lOp != 12:
-            localMem.insertInt(getValueFromAddress(quad.left_operand), getValueFromAddress(quad.result))
         if lOp == 12:
             localMem.insertInt(getValueFromAddress(getValueFromAddress(quad.left_operand)), getValueFromAddress(quad.result))
+        elif lOp == 11:
+            localMem.insertChar(cstMemMap[quad.left_operand], getValueFromAddress(quad.result))
+        elif lOp == 10:
+            localMem.insertFloat(cstMemMap[quad.left_operand], getValueFromAddress(quad.result))
+        elif lOp == 9:
+            localMem.insertInt(cstMemMap[quad.left_operand], getValueFromAddress(quad.result))
+        elif lOp == 8:
+            tempMem.insertChar(tempMem.getChar(quad.left_operand), getValueFromAddress(quad.result))
+        elif lOp == 7:
+            tempMem.insertFloat(tempMem.getFloat(quad.left_operand), getValueFromAddress(quad.result))
+        elif lOp == 6:
+            tempMem.insertInt(tempMem.getInt(quad.left_operand), getValueFromAddress(quad.result))
+        elif lOp == 5:
+            tempMem.insertChar(localMem.getChar(quad.left_operand), getValueFromAddress(quad.result))
+        elif lOp == 4:
+            tempMem.insertFloat(localMem.getFloat(quad.left_operand), getValueFromAddress(quad.result))
+        elif lOp == 3:
+            tempMem.insertInt(localMem.getInt(quad.left_operand), getValueFromAddress(quad.result))
+        elif lOp == 2:
+            tempMem.insertChar(globalMem.getChar(quad.left_operand), getValueFromAddress(quad.result))
+        elif lOp == 1:
+            tempMem.insertFloat(globalMem.getFloat(quad.left_operand), getValueFromAddress(quad.result))
+        elif lOp == 0:
+            tempMem.insertInt(globalMem.getInt(quad.left_operand), getValueFromAddress(quad.result))
 
 def add(quad):
     res_address = quad.result // 1000
