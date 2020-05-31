@@ -429,10 +429,10 @@ def param(quad):
 def rtn(quad):
     address = quad.result // 1000
     rtn_address = Quadruples.quadruples[functionReturnStack[len(functionReturnStack) - 1]].result
-    if quad.left_operand >= 12000:
-        rtnVal = getValueFromAddress(getValueFromAddress(quad.left_operand))
+    if quad.result >= 12000:
+        rtnVal = getValueFromAddress(getValueFromAddress(quad.result))
     else:
-        rtnVal = getValueFromAddress(quad.left_operand)
+        rtnVal = getValueFromAddress(quad.result)
     if address == 0 or address == 3 or address == 6 or address == 9:
         tempMem.insertInt(rtnVal, rtn_address)
         globalMem.insertInt(rtnVal, currentFunctionStack[len(currentFunctionStack) - 1])
