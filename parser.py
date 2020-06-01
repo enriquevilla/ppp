@@ -563,18 +563,28 @@ def p_evaluateOpMatrix(t):
 					# Error class call
 			else:
 				arrOperand = arrMatOperands.pop()
-				if resType != "error":
-					address_type = "t"
-					if resType == "int":
-						address_type += "Int"
-					elif resType == "float":
-						address_type += "Float"
+				if arrOperand["rows"] == arrOperand["cols"]:
+					if resType != "error":
+						address_type = "t"
+						if resType == "int":
+							address_type += "Int"
+						elif resType == "float":
+							address_type += "Float"
+						else:
+							address_type += "Char"
+						temp_quad = Quadruple(oper, arrOperand, "_", addresses[address_type])
+						Quadruples.push_quad(temp_quad)
+						operands.push(addresses[address_type])
+						types.push(resType)
 					else:
-						address_type += "Char"
-					temp_quad = Quadruple(oper, arrOperand, "_", addresses[address_type])
-					Quadruples.push_quad(temp_quad)
-					operands.push(addresses[address_type])
-					types.push(resType)
+						print("Error: invalid operation in line %d." % (t.lexer.lineno))
+						exit(0)
+						# Error class call
+				else:
+					print("Error: invalid array dimensions for determinant calculation in line %d." % (t.lexer.lineno))
+					exit(0)
+					# Error class call
+
 
 def p_evaluateHE(t):
 	'evaluateHE : '

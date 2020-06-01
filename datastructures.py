@@ -114,7 +114,10 @@ for i in ty:
         if k == "!":
             semanticCube[(ty[i], ty[i], k)] = ty[i]
         if k == "?":
-            semanticCube[(ty[i], ty[i], k)] = ty[i]
+            if i == 2:
+                semanticCube[(ty[i], ty[i], k)] = "error"
+            else:
+                semanticCube[(ty[i], ty[i], k)] = ty[i]
 
 # for i in ty:
 #     for j in ty:
