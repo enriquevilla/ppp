@@ -490,9 +490,7 @@ def verify(quad):
     else:
         check = getValueFromAddress(quad.left_operand)
     if check > quad.result - quad.right_operand:
-        print("Error: index out of bounds.")
-        exit(0)
-        # Error.index_out_of_bounds()
+        Error.index_out_of_bounds()
     if arrType == 3:
         localMem.adjustIntArrSize(quad.result)
     elif arrType == 4:

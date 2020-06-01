@@ -74,4 +74,66 @@ class Error:
 		print("Error: no return statement on function with return type. Line: %d." % (lineno))
 		exit(0)
 
+	@staticmethod
+	def matrix_accessed_as_array(id, lineno):
+		print("Error: matrix '%s' accessed as an array in line %d." % (id, t.lexer.lineno))
+		exit(0)
+
+	@staticmethod
+	def type_mismatch_in_index(id, lineno):
+		print("Error: type mismatch in variable '%s' indexation in line %d." % (id, lineno))
+		exit(0)
+
+	@staticmethod
+	def variable_not_subscriptable_as_matrix(id, lineno):
+		print("Error: variable '%s' in line %d is not subscriptable as a matrix." % (id, lineno))
+		exit(0)
+
+	@staticmethod
+	def variable_not_subscriptable_as_array(id, lineno):
+		print("Error: variable '%s' in line %d is not subscriptable as an array." % (id, lineno))
+		exit(0)
+
+	@staticmethod
+	def array_parameter_in_module_call(lineno):
+		print("Error: array parameter in module call in line %d." % (lineno))
+		exit(0)
+
+
+	@staticmethod
+	def invalid_print_on_array_variable(lineno):
+		print("Error: invalid print on array variable in line %d." % (lineno))
+		exit(0)
+
+	@staticmethod	
+	def invalid_operator_on_arrays(lineno):
+		print("Error: invalid operator on arrays in line %d." % (lineno))
+		exit(0)
+
+	@staticmethod
+	def invalid_operation_in_line(lineno):
+		print("Error: invalid operation in line %d." % (lineno))
+		exit(0)
+
+	@staticmethod
+	def dimensions_do_not_match(lineno):
+		print("Error: operation between variables with dimensions that don't match in line %d." % (lineno))
+		exit(0)
+
+	@staticmethod
+	def invalid_assignment_to_array_variable(lineno):
+		print("Error: invalid assignment to array variable in line %d." % (lineno))
+		exit(0)
+
+	@staticmethod
+	def array_size_must_be_positive(id, lineno)
+		print("Error: array '%s' size in line %d must be positive." % (id, lineno))
+		exit(0)
+
+	@staticmethod
+	def index_out_of_bounds()
+        print("Error: index out of bounds.")
+        exit(0)
+
+	
 	#TODO ADD MISSING ERRORS FROM PARSER AND VIRTUAL MACHINE

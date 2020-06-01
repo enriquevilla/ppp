@@ -81,14 +81,11 @@ def p_assignment(t):
 		assign = arrMatOperands.pop()
 		address = arrMatOperands.pop()
 		if assign["rows"] != address["rows"] or assign["cols"] != address["cols"]:
-			print("Error: operation between variables with dimensions that don't match in line %d." % (t.lexer.lineno - 1))
-			exit(0)
-			# Error class call
+			Error.dimensions_do_not_match(t.lexer.lineno-1)
 		temp_quad = Quadruple("ARR=", assign, "_", address)
 		Quadruples.push_quad(temp_quad)
 	elif arrMatOperands.size() == 1:
-		print("Error: invalid assignment to array variable in line %d." % (t.lexer.lineno - 1))
-		exit(0)
+		Error.invalid_assignment_to_array_variable(t.lexer.lineno-1)
 		# Error class call
 	elif t[1] in variableTable[currentScope]:
 		if types.pop() == variableTable[currentScope][t[1]]["type"]:
@@ -271,9 +268,7 @@ def p_forAssignment(t):
 		else:
 			Error.undefined_variable(t[1], t.lexer.lineno)
 	else:
-		print("Error: invalid assignment to array variable in line %d." % (t.lexer.lineno))
-		exit(0)
-		# Error class call
+		Error.invalid_assignment_to_array_variable(t.lexer.lineno)
 
 def p_vars(t):
 	'vars : ID addVarsToTable varsArray varsComa'
@@ -344,9 +339,7 @@ def p_setRows(t):
 		operands.pop()
 		types.pop()
 	else:
-		print("Error: array '%s' size in line %d must be positive." % (arrMatId.peek(), t.lexer.lineno))
-		exit(0)
-		# Error.non_positive_sized_array(arrMatId.peek(), t.lexer.lineno)
+		Error.array_size_must_be_positive(arrMatId.peek(), t.lexer.lineno)
 
 def p_varsMatrix(t):
 	'''varsMatrix : LEFTBRACK CST_INT addTypeInt RIGHTBRACK setCols
@@ -360,9 +353,7 @@ def p_setCols(t):
 		operands.pop()
 		types.pop()
 	else:
-		print("Error: array '%s' size in line %d must be positive." % (arrMatId.peek(), t.lexer.lineno))
-		exit(0)
-		# Error.non_positive_sized_array(arrMatId.peek(), t.lexer.lineno)
+		Error.array_size_must_be_positive(arrMatId.peek(), t.lexer.lineno)
 
 def p_function(t):
 	'function : functionType ID addFuncToDir LEFTPAR param RIGHTPAR setParamLength LEFTBRACE declaration statement RIGHTBRACE'
@@ -554,13 +545,9 @@ def p_evaluateOpMatrix(t):
 							addresses[address_type] += arrOperand["rows"] * arrOperand["cols"]
 						types.push(resType)
 					else:
-						print("Error: invalid operation in line %d." % (t.lexer.lineno))
-						exit(0)
-						# Error class call
+						Error.invalid_operation_in_line(t.lexer.lineno)
 				else:
-					print("Error: invalid operation in line %d." % (t.lexer.lineno))
-					exit(0)
-					# Error class call
+					Error.invalid_operation_in_line(t.lexer.lineno)
 			else:
 				arrOperand = arrMatOperands.pop()
 				if resType != "error":
@@ -592,8 +579,7 @@ def p_evaluateHE(t):
 			# Check semanticCube with types and operator
 			resType = semanticCube[(lType, rType, oper)]
 			if arrMatOperands.size() > 0:
-				print("Error: invalid operation in line %d." % (t.lexer.lineno))
-				exit(0)
+				Error.invalid_operation_in_line(t.lexer.lineno)
 			# Check type and value
 			if resType != "error":
 				address_type = "t"
@@ -640,8 +626,7 @@ def p_evaluateSE(t):
 			# Check semanticCube for types and operator
 			resType = semanticCube[(lType, rType, oper)]
 			if arrMatOperands.size() > 0:
-				print("Error: invalid operation in line %d." % (t.lexer.lineno))
-				exit(0)
+				Error.invalid_operation_in_line(t.lexer.lineno)
 			# Check result type and evaluate expression
 			if resType != "error":
 				address_type = "t"
@@ -709,13 +694,9 @@ def p_evaluateTerm(t):
 						"cols": rId["cols"]
 					}
 				else:
-					print("Error: operation between variables with dimensions that don't match in line %d." % (t.lexer.lineno))
-					exit(0)
-					# Error class call
+					Error.dimensions_do_not_match(t.lexer.lineno)
 			elif arrMatOperands.size() == 1:
-				print("Error: invalid operation in line %d." % (t.lexer.lineno))
-				exit(0)
-				# Error class call
+				Error.invalid_operation_in_line(t.lexer.lineno)
 			# Check result type and evaluate expression
 			if resType != "error":
 				address_type = "t"
@@ -777,9 +758,7 @@ def p_evaluateFactor(t):
 					if oper == "*":
 						oper = "ARR*"
 					else:
-						print("Error: invalid operator on arrays in line %d." % (t.lexer.lineno))
-						exit(0)
-						# Error class call
+						Error.invalid_operator_on_arrays(t.lexer.lineno)
 					lOp = {
 						"address": lId["address"],
 						"rows": lId["rows"],
@@ -791,13 +770,9 @@ def p_evaluateFactor(t):
 						"cols": rId["cols"]
 					}
 				else:
-					print("Error: invalid operation in line %d." % (t.lexer.lineno))
-					exit(0)
-					# Error class call
+					Error.invalid_operation_in_line(t.lexer.lineno)
 			elif arrMatOperands.size() == 1:
-				print("Error: invalid operation in line %d." % (t.lexer.lineno))
-				exit(0)
-				# Error class call
+				Error.invalid_operation_in_line(t.lexer.lineno)
 			# Check result type and evaluate expression
 			if resType != "error":
 				address_type = "t"
@@ -888,8 +863,8 @@ def p_addPrint(t):
 	'addPrint : '
 	# Generate print quadruple
 	if arrMatOperands.size() > 0:
-		print("Error: invalid print on array variable in line %d." % (t.lexer.lineno))
-		exit(0)
+		Error.invalid_print_on_array_variable(t.lexer.lineno)
+
 	temp_quad = Quadruple("print", '_', '_', operands.pop())
 	Quadruples.push_quad(temp_quad)
 	types.pop()
@@ -992,8 +967,8 @@ def p_genParam(t):
 	global funcName
 	global paramNum
 	if arrMatOperands.size() > 0:
-		print("Error: array parameter in module call in in line %d." % (t.lexer.lineno))
-		exit(0)
+		Error.array_parameter_in_module_call(t.lexer.lineno)
+
 	arg = operands.pop()
 	argType = types.pop()
 	paramList = functionDir[funcName]["params"].values()
@@ -1058,16 +1033,12 @@ def p_readIDType(t):
 		Error.type_mismatch(arrMatId.peek(), t.lexer.lineno)
 	if "rows" not in variableTable[currentScope][arrMatId.peek()]:
 		if "rows" not in variableTable["global"][arrMatId.peek()]:
-			print("Error: variable '%s' in line %d is not subscriptable as an array." % (arrMatId.peek(), t.lexer.lineno))
-			exit(0)
-			# Error.not_subscriptable_array(arrMatId.peek(), t.lexer.lineno)
+			Error.variable_not_subscriptable_as_array(arrMatId.peek(), t.lexer.lineno)
 
 def p_verifyRows(t):
 	'verifyRows : '
 	if types.pop() != "int":
-		print("Error: type mismatch in variable '%s' indexation in line %d." % (arrMatId.peek(), t.lexer.lineno))
-		exit(0)
-		# Error.type_mismatch_indexation(arrMatId.peek(), t.lexer.lineno)
+		Error.type_mismatch_in_index(arrMatId.peek(), t.lexer.lineno)
 	baseAdd = variableTable[arrMatScope.peek()][arrMatId.peek()]["address"]
 	upperLim = baseAdd + variableTable[arrMatScope.peek()][arrMatId.peek()]["rows"] - 1
 	tmp_quad = Quadruple("VERIFY", operands.peek(), baseAdd, upperLim)
@@ -1095,14 +1066,11 @@ def p_dimMatrix(t):
 def p_verifyCols(t):
 	'verifyCols : '
 	if "cols" not in variableTable[arrMatScope.peek()][arrMatId.peek()]:
-		print("Error: variable '%s' in line %d is not subscriptable as a matrix." % (arrMatId, t.lexer.lineno))
-		exit(0)
-		# Error.not_subscriptable_matrix(arrMatId.peek(), t.lexer.lineno)
+		Error.variable_not_subscriptable_as_matrix(arrMatId, t.lexer.lineno)
+
 	#TODO TEST MIXING GLOBAL/LOCAL ARRAYS
 	if types.pop() != "int":
-		print("Error: type mismatch in variable '%s' indexation in line %d." % (arrMatId.peek(), t.lexer.lineno))
-		exit(0)
-		# Error.type_mismatch_indexation(arrMatId.peek(), t.lexer.lineno)
+		Error.type_mismatch_in_index(arrMatId.peek(),t.lexer.lineno)
 	# Address calculation formula for C-style array and matrix 
 	constant_value = str(variableTable[arrMatScope.peek()][arrMatId.peek()]["rows"])
 	cstIntAddr = variableTable["constants"][constant_value]["address"]
@@ -1131,9 +1099,7 @@ def p_checkMatAsArray(t):
 	'checkMatAsArray : '
 	global arrMatId
 	if "cols" in variableTable[currentScope][arrMatId.peek()]:
-		print("Error: matrix '%s' accessed as an array in line %d." % (arrMatId.peek(), t.lexer.lineno))
-		exit(0)
-		# Error.matrix_as_array(arrMatId.peek(), t.lexer.lineno)
+		Error.matrix_accessed_as_array(arrMatId.peek(), t.lexer.lineno)
 
 def p_error(t):
 	Error.syntax(t.value, t.lexer.lineno)
