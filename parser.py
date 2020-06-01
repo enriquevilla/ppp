@@ -564,14 +564,9 @@ def p_evaluateOpMatrix(t):
 						operands.push(addresses[address_type])
 						types.push(resType)
 					else:
-						print("Error: invalid operation in line %d." % (t.lexer.lineno))
-						exit(0)
-						# Error class call
+						Error.invalid_operation_in_line(t.lexer.lineno)
 				else:
-					print("Error: invalid array dimensions for determinant calculation in line %d." % (t.lexer.lineno))
-					exit(0)
-					# Error class call
-
+					Error.invalid_determinant_calculation(t.lexer.lineno)
 
 def p_evaluateHE(t):
 	'evaluateHE : '

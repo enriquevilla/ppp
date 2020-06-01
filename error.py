@@ -135,5 +135,11 @@ class Error:
         print("Error: index out of bounds.")
         exit(0)
 
+	@staticmethod
+	def invalid_determinant_calculation(lineno)
+        print("Error: invalid array dimensions for determinant calculation in line %d." % (lineno))
+        exit(0)
+
+
 	
 	#TODO ADD MISSING ERRORS FROM PARSER AND VIRTUAL MACHINE
