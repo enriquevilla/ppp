@@ -50,10 +50,10 @@ def runner_duckie():
             cstMemMap[variableTable["constants"][cst]["address"]] = cst
     index = 0
     print(cstMemMap)
-    Quadruples.print_all()
+    # Quadruples.print_all()
     while len(Quadruples.quadruples) > index:    
         quad = Quadruples.quadruples[index]
-        # quad.print()
+        quad.print()
         newIndex = executeInstruction(quad)
         if newIndex:
             index = newIndex
@@ -112,7 +112,8 @@ def executeInstruction(quad):
         return arrAdd(quad)
     elif quad.operator == "ARR-":
         return arrSubtract(quad)
-    
+    elif quad.operator == "ARR*":
+        return arrMultiply(quad)
 
 def assign(quad):
     add_type = quad.result // 1000
@@ -499,10 +500,89 @@ def verify(quad):
         localMem.adjustCharArrSize(quad.result)
 
 def arrAssign(quad):
-    pass
+    arrType = quad.result["address"] // 1000
+    spacesToAssign = quad.left_operand["rows"] * quad.left_operand["cols"]
+    leftOpAddress = quad.left_operand["address"]
+    for i in range(spacesToAssign):
+        leftOp = getValueFromAddress(leftOpAddress)
+        if arrType == 0:
+            globalMem.insertInt(leftOp, quad.result["address"] + i)
+        elif arrType == 1:
+            globalMem.insertFloat(leftOp, quad.result["address"] + i)
+        elif arrType == 2:
+            globalMem.insertChar(leftOp, quad.result["address"] + i)
+        elif arrType == 3:
+            localMem.insertInt(leftOp, quad.result["address"] + i)
+        elif arrType == 4:
+            localMem.insertFloat(leftOp, quad.result["address"] + i)
+        elif arrType == 5:
+            localMem.insertChar(leftOp, quad.result["address"] + i)
+        leftOpAddress += 1
+    localMem.printInts()
 
 def arrAdd(quad):
-    pass
+    arrType = quad.result // 1000
+    spacesToAdd = quad.left_operand["rows"] * quad.left_operand["cols"]
+    if quad.left_operand["address"] // 1000 == 3:
+        localMem.adjustIntArrSize(quad.left_operand["address"] + spacesToAdd)
+    elif quad.right_operand["address"] // 1000 == 4:
+        localMem.adjustFloatArrSize(quad.left_operand["address"] + spacesToAdd)
+    if quad.right_operand["address"] // 1000 == 3:
+        localMem.adjustIntArrSize(quad.right_operand["address"] + spacesToAdd)
+    elif quad.right_operand["address"] // 1000 == 4:
+        localMem.adjustFloatArrSize(quad.right_operand["address"] + spacesToAdd)
+    leftOpAddress = quad.left_operand["address"]
+    rightOpAddress = quad.right_operand["address"]
+    for i in range(spacesToAdd):
+        leftOp = getValueFromAddress(leftOpAddress)
+        rightOp = getValueFromAddress(rightOpAddress)
+        if arrType == 6:
+            tempMem.insertInt(leftOp + rightOp, quad.result + i)
+        elif arrType == 7:
+            tempMem.insertFloat(leftOp + rightOp, quad.result + i)
+        leftOpAddress += 1
+        rightOpAddress += 1
 
 def arrSubtract(quad):
-    pass
+    arrType = quad.result // 1000
+    spacesToSubtract = quad.left_operand["rows"] * quad.left_operand["cols"]
+    if arrType == 6:
+        localMem.adjustIntArrSize(quad.left_operand["address"] + spacesToSubtract)
+        localMem.adjustIntArrSize(quad.right_operand["address"] + spacesToSubtract)
+    elif arrType == 7:
+        localMem.adjustFloatArrSize(quad.left_operand["address"] + spacesToSubtract)
+        localMem.adjustFloatArrSize(quad.right_operand["address"] + spacesToSubtract)
+    leftOpAddress = quad.left_operand["address"]
+    rightOpAddress = quad.right_operand["address"]
+    for i in range(spacesToSubtract):
+        leftOp = getValueFromAddress(leftOpAddress)
+        rightOp = getValueFromAddress(rightOpAddress)
+        if arrType == 6:
+            tempMem.insertInt(leftOp - rightOp, quad.result + i)
+        elif arrType == 7:
+            tempMem.insertFloat(leftOp - rightOp, quad.result + i)
+        leftOpAddress += 1
+        rightOpAddress += 1
+
+def arrMultiply(quad):
+    arrType = quad.result // 1000
+    spacesToMultiply = quad.left_operand["rows"] * quad.left_operand["cols"]
+    if quad.left_operand["address"] // 1000 == 3:
+        localMem.adjustIntArrSize(quad.left_operand["address"] + spacesToMultiply)
+    elif quad.right_operand["address"] // 1000 == 4:
+        localMem.adjustFloatArrSize(quad.left_operand["address"] + spacesToMultiply)
+    if quad.right_operand["address"] // 1000 == 3:
+        localMem.adjustIntArrSize(quad.right_operand["address"] + spacesToMultiply)
+    elif quad.right_operand["address"] // 1000 == 4:
+        localMem.adjustFloatArrSize(quad.right_operand["address"] + spacesToMultiply)
+    leftOpAddress = quad.left_operand["address"]
+    rightOpAddress = quad.right_operand["address"]
+    for i in range(spacesToMultiply):
+        leftOp = getValueFromAddress(leftOpAddress)
+        rightOp = getValueFromAddress(rightOpAddress)
+        if arrType == 6:
+            tempMem.insertInt(leftOp * rightOp, quad.result + i)
+        elif arrType == 7:
+            tempMem.insertFloat(leftOp * rightOp, quad.result + i)
+        leftOpAddress += 1
+        rightOpAddress += 1

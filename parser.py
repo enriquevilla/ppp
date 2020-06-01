@@ -605,38 +605,11 @@ def p_evaluateTerm(t):
 			if arrMatOperands.size() > 1:
 				rId = arrMatOperands.pop()
 				lId = arrMatOperands.pop()
-				# rDimRow = 0
-				# rDimCol = 0
-				# lDimRow = 0
-				# lDimCol = 0
-				# if rOp >= 0 and rOp < 3000:
-				# 	rOpAdd = variableTable["global"][rId]["address"]
-				# 	if "rows" in variableTable["global"][rId]:
-				# 		rDimRow = variableTable["global"][rId]["rows"]
-				# 	if "cols" in variableTable["global"][rId]:
-				# 		rDimCol = variableTable["global"][rId]["cols"]
-				# elif rOp >= 3000 and rOp < 6000:
-				# 	rOpAdd = variableTable[currentScope][rId]["address"]
-				# 	if "rows" in variableTable[currentScope][rId]:
-				# 		rDimRow = variableTable[currentScope][rId]["rows"]
-				# 	if "cols" in variableTable[currentScope][rId]:
-				# 		rDimCol = variableTable[currentScope][rId]["cols"]
-				# if lOp >= 0 and lOp < 3000:
-				# 	lOpAdd = variableTable["global"][lId]["address"]
-				# 	if "rows" in variableTable["global"][lId]:
-				# 		lDimRow = variableTable["global"][lId]["rows"]
-				# 	if "cols" in variableTable["global"][lId]:
-				# 		lDimCol = variableTable["global"][lId]["cols"]
-				# elif lOp >= 3000 and lOp < 6000:
-				# 	lOpAdd = variableTable[currentScope][lId]["address"]
-				# 	if "rows" in variableTable[currentScope][lId]:
-				# 		lDimRow = variableTable[currentScope][lId]["rows"]
-				# 	if "cols" in variableTable[currentScope][lId]:
-				# 		lDimCol = variableTable[currentScope][lId]["cols"]
 				# Validate equal dimensions
-				if "cols" not in lId and "cols" not in rId:
-					lId["cols"] = 0
-					rId["cols"] = 0
+				if "cols" not in lId:
+					lId["cols"] = 1
+				if "cols" not in rId:
+					rId["cols"] = 1
 				if lId["rows"] == rId["rows"] and lId["cols"] == rId["cols"]:
 					if oper == "+":
 						oper = "ARR+"
@@ -678,7 +651,9 @@ def p_evaluateTerm(t):
 						"rows": lOp["rows"],
 						"cols": lOp["cols"]
 					})
-				addresses[address_type] += 1
+					addresses[address_type] += lOp["rows"] * lOp["cols"]
+				else:
+					addresses[address_type] += 1
 				types.push(resType)
 			else:
 				Error.operation_type_mismatch(t.lexer.lineno)
@@ -706,6 +681,40 @@ def p_evaluateFactor(t):
 			lType = types.pop()
 			# Check semanticCube with types and operator
 			resType = semanticCube[(lType, rType, oper)]
+			# Check and validate for array or matrix operands and sizes
+			if arrMatOperands.size() > 1:
+				rId = arrMatOperands.pop()
+				lId = arrMatOperands.pop()
+				# Validate equal dimensions
+				if "cols" not in lId:
+					lId["cols"] = 1
+				if "cols" not in rId:
+					rId["cols"] = 1
+				if lId["rows"] == rId["rows"] and lId["cols"] == rId["cols"]:
+					if oper == "*":
+						oper = "ARR*"
+					else:
+						print("Error: invalid operator on arrays in line %d." % (t.lexer.lineno))
+						exit(0)
+						# Error class call
+					lOp = {
+						"address": lId["address"],
+						"rows": lId["rows"],
+						"cols": lId["cols"]
+					}
+					rOp = {
+						"address": rId["address"],
+						"rows": rId["rows"],
+						"cols": rId["cols"]
+					}
+				else:
+					print("Error: operation between variables with dimensions that don't match in line %d." % (t.lexer.lineno))
+					exit(0)
+					# Error class call
+			elif arrMatOperands.size() == 1:
+				print("Error: invalid operation in line %d." % (t.lexer.lineno))
+				exit(0)
+				# Error class call
 			# Check result type and evaluate expression
 			if resType != "error":
 				address_type = "t"
@@ -718,7 +727,15 @@ def p_evaluateFactor(t):
 				temp_quad = Quadruple(oper, lOp, rOp, addresses[address_type])
 				Quadruples.push_quad(temp_quad)
 				operands.push(addresses[address_type])
-				addresses[address_type] += 1
+				if oper == "ARR*":
+					arrMatOperands.push({
+						"address": addresses[address_type],
+						"rows": lOp["rows"],
+						"cols": lOp["cols"]
+					})
+					addresses[address_type] += lOp["rows"] * lOp["cols"]
+				else:
+					addresses[address_type] += 1
 				types.push(resType)
 			else:
 				Error.operation_type_mismatch(t.lexer.lineno)
