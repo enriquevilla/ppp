@@ -76,7 +76,7 @@ ty = {
     1: "float",
     2: "char"
 }
-ops = ["+", "-", "*", "/", ">", "<", "<>", "==", "&", "|"]
+ops = ["+", "-", "*", "/", ">", "<", "<>", "==", "&", "|", "!", "?", "$"]
 
 # print("Semantic Cube: ")
 for i in ty:
@@ -103,7 +103,23 @@ for i in ty:
                 semanticCube[(ty[i], ty[j], k)] = ty[i]
             elif k == "&":
                 semanticCube[(ty[i], ty[j], k)] = ty[j]
-            # print("%s %s %s = %s" % (ty[i], k, ty[j], semanticCube[(ty[i], ty[j], k)]))
+
+for i in ty:
+    for j in ops:
+        if k == "$":
+            if i == 2:
+                semanticCube[(ty[i], ty[i], k)] = "error"
+            else:
+                semanticCube[(ty[i], ty[i], k)] = "float"
+        if k == "!":
+            semanticCube[(ty[i], ty[i], k)] = ty[i]
+        if k == "?":
+            semanticCube[(ty[i], ty[i], k)] = ty[i]
+
+# for i in ty:
+#     for j in ty:
+#         for k in ops:
+#             print("%s %s %s = %s" % (ty[i], k, ty[j], semanticCube[(ty[i], ty[j], k)]))
 
 # functionDir visual example
 '''
