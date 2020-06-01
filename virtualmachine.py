@@ -115,6 +115,12 @@ def executeInstruction(quad):
         return arrSubtract(quad)
     elif quad.operator == "ARR*":
         return arrMultiply(quad)
+    elif quad.operator == "ARR$":
+        return arrDeterminant(quad)
+    elif quad.operator == "ARR!":
+        return arrTranspose(quad)
+    elif quad.operator == "ARR?":
+        return arrInverse(quad)
 
 def assign(quad):
     add_type = quad.result // 1000
@@ -599,3 +605,25 @@ def arrMultiply(quad):
                 tempMem.insertInt(resultArray[j][arrayIterator], quad.result + memoryIterator)
                 memoryIterator += 1
         arrayIterator += 1
+
+def arrDeterminant(quad):
+    spaces = quad.left_operand["rows"] * quad.left_operand["cols"]
+    if quad.left_operand["address"] // 1000 == 3:
+        localMem.adjustIntArrSize(quad.left_operand["address"] + spaces)
+    elif quad.right_operand["address"] // 1000 == 4:
+        localMem.adjustFloatArrSize(quad.left_operand["address"] + spaces)
+    leftOpAddress = quad.left_operand["address"]
+    leftOpArray = np.zeros((quad.left_operand["rows"], quad.left_operand["cols"]))
+    memoryIterator = 0
+    for i in range(quad.left_operand["cols"]):
+        for j in range(quad.left_operand["rows"]):
+            leftOpArray[j][i] = getValueFromAddress(leftOpAddress + memoryIterator)
+            memoryIterator += 1
+    result = np.linalg.det(leftOpArray)
+    tempMem.insertFloat(result, quad.result)
+
+def arrTranspose(quad):
+    pass
+
+def arrInverse(quad):
+    pass
