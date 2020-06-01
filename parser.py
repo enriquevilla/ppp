@@ -462,7 +462,6 @@ def p_cst_prim(t):
 	'''cst_prim : CST_INT addTypeInt
 				| CST_FLOAT addTypeFloat
 				| CST_CHAR addTypeChar'''
-	t[0] = t[1]
 
 def p_addTypeInt(t):
 	'addTypeInt : '
@@ -817,9 +816,7 @@ def p_evaluateFactor(t):
 						"rows": lOp["rows"],
 						"cols": rOp["cols"]
 					})
-					addresses[address_type] += lOp["rows"] * lOp["cols"]
-				else:
-					addresses[address_type] += 1
+					addresses[address_type] += lOp["rows"] * rOp["cols"]
 				types.push(resType)
 			else:
 				Error.operation_type_mismatch(t.lexer.lineno)
