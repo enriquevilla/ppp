@@ -50,18 +50,16 @@ def runner_duckie():
             cstMemMap[variableTable["constants"][cst]["address"]] = cst
     index = 0
     print(cstMemMap)
-    # Quadruples.print_all()
+    Quadruples.print_all()
     while len(Quadruples.quadruples) > index:    
         quad = Quadruples.quadruples[index]
-        quad.print()
+        # quad.print()
         newIndex = executeInstruction(quad)
-        if quad.operator != "+ADD":
-            if newIndex:
-                index = newIndex
-            else:
-                index += 1                    
+        if newIndex:
+            index = newIndex
         else:
-            index += 1
+            index += 1                    
+
 
 def executeInstruction(quad):
     if quad.operator == "=":
@@ -108,6 +106,13 @@ def executeInstruction(quad):
         return rtn(quad)
     elif quad.operator == "VERIFY":
         return verify(quad)
+    elif quad.operator == "ARR=":
+        return arrAssign(quad)
+    elif quad.operator == "ARR+":
+        return arrAdd(quad)
+    elif quad.operator == "ARR-":
+        return arrSubtract(quad)
+    
 
 def assign(quad):
     add_type = quad.result // 1000
@@ -492,3 +497,12 @@ def verify(quad):
         localMem.adjustFloatArrSize(quad.result)
     elif arrType == 5:
         localMem.adjustCharArrSize(quad.result)
+
+def arrAssign(quad):
+    pass
+
+def arrAdd(quad):
+    pass
+
+def arrSubtract(quad):
+    pass

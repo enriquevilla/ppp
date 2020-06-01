@@ -31,6 +31,7 @@ def p_program(t):
 	# operators.print()
 	# Quadruples.print_all()
 	# variableTable.clear()
+	# arrMatOperands.print()
 
 # global scope varTable
 def p_globalTable(t):
@@ -73,7 +74,13 @@ def p_mainTable(t):
 def p_assignment(t):
 	'assignment : ID dimArray EQUAL hyperExpression SEMICOLON'
 	# If id is in currentScope, generate quadruple and set its value in varTable
-	if t[1] in variableTable[currentScope]:
+	if arrMatOperands.size() > 0:
+		types.pop()
+		assign = arrMatOperands.pop()
+		address = arrMatOperands.pop()
+		temp_quad = Quadruple("ARR=", assign, "_", address)
+		Quadruples.push_quad(temp_quad)
+	elif t[1] in variableTable[currentScope]:
 		if types.pop() == variableTable[currentScope][t[1]]["type"]:
 			if "rows" in variableTable[currentScope][t[1]]:
 				types.pop()
@@ -99,6 +106,7 @@ def p_assignment(t):
 				address = variableTable["global"][t[1]]["address"]
 				temp_quad = Quadruple("=", operands.pop(), '_', address)
 				operands.pop()
+			Quadruples.push_quad(temp_quad)
 		else:
 			Error.type_mismatch(t[1],t.lexer.lineno - 1)
 	else:
@@ -239,18 +247,23 @@ def p_forAssignment(t):
 		addresses[address_type] += 1
 	else:
 		cstAddress = variableTable["constants"][t[3]]["address"]
-	# Check if id exists in currentScope and set its value
-	if t[1] in variableTable[currentScope]:
-		address = variableTable[currentScope][t[1]]["address"]
-		temp_quad = Quadruple("=", cstAddress, '_', address)
-		Quadruples.push_quad(temp_quad)
-	# Check if id exists in global scope and set its value
-	elif t[1] in variableTable["global"]:
-		address = variableTable["global"][t[1]]["address"]
-		temp_quad = Quadruple("=", t[3], '_', address)
-		Quadruples.push_quad(temp_quad)
+	if "rows" not in variableTable[currentScope][t[1]]:
+		# Check if id exists in currentScope and set its value
+		if t[1] in variableTable[currentScope]:
+			address = variableTable[currentScope][t[1]]["address"]
+			temp_quad = Quadruple("=", cstAddress, '_', address)
+			Quadruples.push_quad(temp_quad)
+		# Check if id exists in global scope and set its value
+		elif t[1] in variableTable["global"]:
+			address = variableTable["global"][t[1]]["address"]
+			temp_quad = Quadruple("=", t[3], '_', address)
+			Quadruples.push_quad(temp_quad)
+		else:
+			Error.undefined_variable(t[1], t.lexer.lineno)
 	else:
-		Error.undefined_variable(t[1], t.lexer.lineno)
+		print("Error: invalid assignment to non-atomic variable in line %d." % (t.lexer.lineno))
+		exit(0)
+		# Error class call
 
 def p_vars(t):
 	'vars : ID addVarsToTable varsArray varsComa'
@@ -588,6 +601,65 @@ def p_evaluateTerm(t):
 			lType = types.pop()
 			# Check semanticCube with types and operator
 			resType = semanticCube[(lType, rType, oper)]
+			# Check and validate for array or matrix operands and sizes
+			if arrMatOperands.size() > 1:
+				rId = arrMatOperands.pop()
+				lId = arrMatOperands.pop()
+				# rDimRow = 0
+				# rDimCol = 0
+				# lDimRow = 0
+				# lDimCol = 0
+				# if rOp >= 0 and rOp < 3000:
+				# 	rOpAdd = variableTable["global"][rId]["address"]
+				# 	if "rows" in variableTable["global"][rId]:
+				# 		rDimRow = variableTable["global"][rId]["rows"]
+				# 	if "cols" in variableTable["global"][rId]:
+				# 		rDimCol = variableTable["global"][rId]["cols"]
+				# elif rOp >= 3000 and rOp < 6000:
+				# 	rOpAdd = variableTable[currentScope][rId]["address"]
+				# 	if "rows" in variableTable[currentScope][rId]:
+				# 		rDimRow = variableTable[currentScope][rId]["rows"]
+				# 	if "cols" in variableTable[currentScope][rId]:
+				# 		rDimCol = variableTable[currentScope][rId]["cols"]
+				# if lOp >= 0 and lOp < 3000:
+				# 	lOpAdd = variableTable["global"][lId]["address"]
+				# 	if "rows" in variableTable["global"][lId]:
+				# 		lDimRow = variableTable["global"][lId]["rows"]
+				# 	if "cols" in variableTable["global"][lId]:
+				# 		lDimCol = variableTable["global"][lId]["cols"]
+				# elif lOp >= 3000 and lOp < 6000:
+				# 	lOpAdd = variableTable[currentScope][lId]["address"]
+				# 	if "rows" in variableTable[currentScope][lId]:
+				# 		lDimRow = variableTable[currentScope][lId]["rows"]
+				# 	if "cols" in variableTable[currentScope][lId]:
+				# 		lDimCol = variableTable[currentScope][lId]["cols"]
+				# Validate equal dimensions
+				if "cols" not in lId and "cols" not in rId:
+					lId["cols"] = 0
+					rId["cols"] = 0
+				if lId["rows"] == rId["rows"] and lId["cols"] == rId["cols"]:
+					if oper == "+":
+						oper = "ARR+"
+					else:
+						oper = "ARR-"
+					lOp = {
+						"address": lId["address"],
+						"rows": lId["rows"],
+						"cols": lId["cols"]
+					}
+					rOp = {
+						"address": rId["address"],
+						"rows": rId["rows"],
+						"cols": rId["cols"]
+					}
+				else:
+					print("Error: operation between variables with dimensions that don't match in line %d." % (t.lexer.lineno))
+					exit(0)
+					# Error class call
+			elif arrMatOperands.size() == 1:
+				print("Error: invalid operation in line %d." % (t.lexer.lineno))
+				exit(0)
+				# Error class call
 			# Check result type and evaluate expression
 			if resType != "error":
 				address_type = "t"
@@ -600,6 +672,12 @@ def p_evaluateTerm(t):
 				temp_quad = Quadruple(oper, lOp, rOp, addresses[address_type])
 				Quadruples.push_quad(temp_quad)
 				operands.push(addresses[address_type])
+				if oper == "ARR+" or oper == "ARR-":
+					arrMatOperands.push({
+						"address": addresses[address_type],
+						"rows": lOp["rows"],
+						"cols": lOp["cols"]
+					})
 				addresses[address_type] += 1
 				types.push(resType)
 			else:
@@ -711,6 +789,9 @@ def p_print_param(t):
 def p_addPrint(t):
 	'addPrint : '
 	# Generate print quadruple
+	if arrMatOperands.size() > 0:
+		print("Error: invalid print on array variable in line %d." % (t.lexer.lineno))
+		exit(0)
 	temp_quad = Quadruple("print", '_', '_', operands.pop())
 	Quadruples.push_quad(temp_quad)
 	types.pop()
@@ -812,6 +893,9 @@ def p_genParam(t):
 	'genParam : '
 	global funcName
 	global paramNum
+	if arrMatOperands.size() > 0:
+		print("Error: array parameter in module call in in line %d." % (t.lexer.lineno))
+		exit(0)
 	arg = operands.pop()
 	argType = types.pop()
 	paramList = functionDir[funcName]["params"].values()
@@ -854,6 +938,8 @@ def p_addOperandId(t):
 		arrMatScope.push("global")
 	else:
 		Error.undefined_variable(arrMatId.peek(), t.lexer.lineno)
+	if "rows" in variableTable[arrMatScope.peek()][t[-1]]:
+		arrMatOperands.push(variableTable[arrMatScope.peek()][t[-1]])
 
 def p_addTypeId(t):
 	'addTypeId : '
@@ -869,6 +955,7 @@ def p_readIDType(t):
 	'readIDType : '
 	operands.pop()
 	operators.push("Mat")
+	arrMatOperands.pop()
 	if types.pop() != variableTable[currentScope][arrMatId.peek()]["type"]:
 		Error.type_mismatch(arrMatId.peek(), t.lexer.lineno)
 	if "rows" not in variableTable[currentScope][arrMatId.peek()]:
