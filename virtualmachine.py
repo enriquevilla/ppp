@@ -3,6 +3,7 @@ from memory import Memory
 from datastructures import variableTable
 from error import *
 import re
+import numpy as np
 cstMemMap = {}
 
 globalMem = Memory()
@@ -518,7 +519,6 @@ def arrAssign(quad):
         elif arrType == 5:
             localMem.insertChar(leftOp, quad.result["address"] + i)
         leftOpAddress += 1
-    localMem.printInts()
 
 def arrAdd(quad):
     arrType = quad.result // 1000
@@ -566,7 +566,7 @@ def arrSubtract(quad):
 
 def arrMultiply(quad):
     arrType = quad.result // 1000
-    spacesToMultiply = quad.left_operand["rows"] * quad.left_operand["cols"]
+    spacesToMultiply = quad.left_operand["rows"] * quad.left_operand["rows"]
     if quad.left_operand["address"] // 1000 == 3:
         localMem.adjustIntArrSize(quad.left_operand["address"] + spacesToMultiply)
     elif quad.right_operand["address"] // 1000 == 4:
@@ -577,12 +577,27 @@ def arrMultiply(quad):
         localMem.adjustFloatArrSize(quad.right_operand["address"] + spacesToMultiply)
     leftOpAddress = quad.left_operand["address"]
     rightOpAddress = quad.right_operand["address"]
-    for i in range(spacesToMultiply):
-        leftOp = getValueFromAddress(leftOpAddress)
-        rightOp = getValueFromAddress(rightOpAddress)
-        if arrType == 6:
-            tempMem.insertInt(leftOp * rightOp, quad.result + i)
-        elif arrType == 7:
-            tempMem.insertFloat(leftOp * rightOp, quad.result + i)
-        leftOpAddress += 1
-        rightOpAddress += 1
+    leftOpArray = np.zeros((quad.left_operand["rows"], quad.left_operand["cols"]))
+    memoryIterator = 0
+    for i in range(quad.left_operand["cols"]):
+        for j in range(quad.left_operand["rows"]):
+            leftOpArray[j][i] = getValueFromAddress(leftOpAddress + memoryIterator)
+            memoryIterator += 1
+    memoryIterator = 0
+    rightOpArray = np.zeros((quad.right_operand["rows"], quad.right_operand["cols"]))
+    for i in range(quad.right_operand["cols"]):
+        for j in range(quad.right_operand["rows"]):
+            rightOpArray[j][i] = getValueFromAddress(rightOpAddress + memoryIterator)
+            memoryIterator += 1
+    resultArray = np.dot(leftOpArray, rightOpArray)
+    memoryIterator = 0
+    arrayIterator = 0
+    for i in range(len(resultArray[0])):
+        for j in range(len(resultArray)):
+            if arrType == 6:
+                tempMem.insertInt(int(resultArray[j][arrayIterator]), quad.result + memoryIterator)
+                memoryIterator += 1
+            elif arrType == 7:
+                tempMem.insertInt(resultArray[j][arrayIterator], quad.result + memoryIterator)
+                memoryIterator += 1
+        arrayIterator += 1
