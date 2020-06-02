@@ -2,7 +2,7 @@ import sys
 
 class Error:
 	""" Error class
-	
+
 		Static class to centralize error displays.
 	"""
 	@staticmethod
@@ -22,15 +22,15 @@ class Error:
 		"if expression type mismatch error"
 		print("Error: type mismatch in condition expression in line %d." % lineno)
 		exit(0)
-		
+
 	@staticmethod
 	def operation_type_mismatch(lineno):
 		" operation type mismatch error "
 		print("Error: type mismatch in an operation in line %d." % (lineno))
 		exit(0)
-	
+
 	@staticmethod
-	def undefined_variable(t,lineno):
+	def undefined_variable(t, lineno):
 		" use of undeclared variable error "
 		print("Error: use of undefined variable '%s' in line %d." % (t, lineno))
 		exit(0)
@@ -44,7 +44,7 @@ class Error:
 	@staticmethod
 	def variable_has_no_assigned_value(t, lineno):
 		" variable no assigned value error "
-		print("Error: variable '%s' in line %d has not been assigned a value." %(t, lineno))
+		print("Error: variable '%s' in line %d has not been assigned a value." % (t, lineno))
 		exit(0)
 
 	@staticmethod
@@ -63,7 +63,7 @@ class Error:
 	def type_mismatch_module(t, lineno):
 		print("Error: type mismatch in module '%s' call in line %d." % (t, lineno))
 		exit(0)
-	
+
 	@staticmethod
 	def return_on_void_function(t, lineno):
 		print("Error: return statement on void function. Line: %d." % (lineno))
@@ -75,23 +75,23 @@ class Error:
 		exit(0)
 
 	@staticmethod
-	def matrix_accessed_as_array(id, lineno):
-		print("Error: matrix '%s' accessed as an array in line %d." % (id, t.lexer.lineno))
+	def matrix_accessed_as_array(t, lineno):
+		print("Error: matrix '%s' accessed as an array in line %d." % (t, lineno))
 		exit(0)
 
 	@staticmethod
-	def type_mismatch_in_index(id, lineno):
-		print("Error: type mismatch in variable '%s' indexation in line %d." % (id, lineno))
+	def type_mismatch_in_index(t, lineno):
+		print("Error: type mismatch in variable '%s' indexation in line %d." % (t, lineno))
 		exit(0)
 
 	@staticmethod
-	def variable_not_subscriptable_as_matrix(id, lineno):
-		print("Error: variable '%s' in line %d is not subscriptable as a matrix." % (id, lineno))
+	def variable_not_subscriptable_as_matrix(t, lineno):
+		print("Error: variable '%s' in line %d is not subscriptable as a matrix." % (t, lineno))
 		exit(0)
 
 	@staticmethod
-	def variable_not_subscriptable_as_array(id, lineno):
-		print("Error: variable '%s' in line %d is not subscriptable as an array." % (id, lineno))
+	def variable_not_subscriptable_as_array(t, lineno):
+		print("Error: variable '%s' in line %d is not subscriptable as an array." % (t, lineno))
 		exit(0)
 
 	@staticmethod
@@ -99,13 +99,12 @@ class Error:
 		print("Error: array parameter in module call in line %d." % (lineno))
 		exit(0)
 
-
 	@staticmethod
 	def invalid_print_on_array_variable(lineno):
 		print("Error: invalid print on array variable in line %d." % (lineno))
 		exit(0)
 
-	@staticmethod	
+	@staticmethod
 	def invalid_operator_on_arrays(lineno):
 		print("Error: invalid operator on arrays in line %d." % (lineno))
 		exit(0)
@@ -126,20 +125,33 @@ class Error:
 		exit(0)
 
 	@staticmethod
-	def array_size_must_be_positive(id, lineno)
-		print("Error: array '%s' size in line %d must be positive." % (id, lineno))
+	def array_size_must_be_positive(t, lineno):
+		print("Error: array '%s' size in line %d must be positive." % (t, lineno))
 		exit(0)
 
 	@staticmethod
-	def index_out_of_bounds()
-        print("Error: index out of bounds.")
-        exit(0)
+	def index_out_of_bounds():
+		print("Error: index out of bounds.")
+		exit(0)
 
 	@staticmethod
-	def invalid_determinant_calculation(lineno)
-        print("Error: invalid array dimensions for determinant calculation in line %d." % (lineno))
-        exit(0)
+	def invalid_determinant_calculation(lineno):
+		print("Error: invalid array dimensions for determinant calculation in line %d." % (lineno))
+		exit(0)
 
+	@staticmethod
+	def division_by_zero():
+		print("Error: division by zero.")
+		exit(0)
 
+	@staticmethod
+	def invalid_inverse_calculation(lineno):
+		print("Error: invalid array dimensions for inverse calculation in line %d." % (lineno))
+		exit(0)
+
+	@staticmethod
+	def type_mismatch_array_assignment(lineno):
+		print("Error: type mismatch in array assignment in line %d." % (lineno))
+		exit(0)
 	
-	#TODO ADD MISSING ERRORS FROM PARSER AND VIRTUAL MACHINE
+	# TODO ADD MISSING ERRORS FROM PARSER AND VIRTUAL MACHINE

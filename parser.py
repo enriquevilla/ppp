@@ -80,6 +80,8 @@ def p_assignment(t):
 		operands.pop()
 		assign = arrMatOperands.pop()
 		address = arrMatOperands.pop()
+		if assign["type"] != address["type"]:
+			Error.type_mismatch_array_assignment(t.lexer.lineno)
 		if assign["rows"] != address["rows"] or assign["cols"] != address["cols"]:
 			Error.dimensions_do_not_match(t.lexer.lineno-1)
 		temp_quad = Quadruple("ARR=", assign, "_", address)
@@ -512,40 +514,44 @@ def p_evaluateOpMatrix(t):
 			if oper == "ARR!" or oper == "ARR?":
 				if arrMatOperands.size() > 1:
 					arrOperand = arrMatOperands.pop()
-					print(arrOperand)
 					# $ return type => float
 					# ! return type => mat with inverted rows and cols
 					# ? return type => mat with same row and cols
 					if "cols" not in arrOperand:
 						arrOperand["cols"] = 1
-					if resType != "error":
-						address_type = "t"
-						if resType == "int":
-							address_type += "Int"
-						elif resType == "float":
-							address_type += "Float"
+					if (arrOperand["rows"] == arrOperand["cols"] and oper == "ARR?") or oper == "ARR!":
+						if resType != "error":
+							address_type = "t"
+							if resType == "int":
+								address_type += "Int"
+							elif resType == "float":
+								address_type += "Float"
+							else:
+								address_type += "Char"
+							temp_quad = Quadruple(oper, arrOperand, "_", addresses[address_type])
+							Quadruples.push_quad(temp_quad)
+							operands.push(addresses[address_type])
+							if oper == "ARR?":
+								arrMatOperands.push({
+									"address": addresses[address_type],
+									"rows": arrOperand["rows"],
+									"cols": arrOperand["cols"],
+									"type": "float"
+								})
+								addresses[address_type] += arrOperand["rows"] * arrOperand["cols"]
+							elif oper == "ARR!":
+								arrMatOperands.push({
+									"address": addresses[address_type],
+									"rows": arrOperand["cols"],
+									"cols": arrOperand["rows"],
+									"type": resType
+								})
+								addresses[address_type] += arrOperand["rows"] * arrOperand["cols"]
+							types.push(resType)
 						else:
-							address_type += "Char"
-						temp_quad = Quadruple(oper, arrOperand, "_", addresses[address_type])
-						Quadruples.push_quad(temp_quad)
-						operands.push(addresses[address_type])
-						if oper == "ARR?":
-							arrMatOperands.push({
-								"address": addresses[address_type],
-								"rows": arrOperand["rows"],
-								"cols": arrOperand["cols"]
-							})
-							addresses[address_type] += arrOperand["rows"] * arrOperand["cols"]
-						elif oper == "ARR!":
-							arrMatOperands.push({
-								"address": addresses[address_type],
-								"rows": arrOperand["cols"],
-								"cols": arrOperand["rows"]
-							})
-							addresses[address_type] += arrOperand["rows"] * arrOperand["cols"]
-						types.push(resType)
+							Error.invalid_operation_in_line(t.lexer.lineno)
 					else:
-						Error.invalid_operation_in_line(t.lexer.lineno)
+						Error.invalid_inverse_calculation(t.lexer.lineno)
 				else:
 					Error.invalid_operation_in_line(t.lexer.lineno)
 			else:
@@ -562,6 +568,7 @@ def p_evaluateOpMatrix(t):
 						temp_quad = Quadruple(oper, arrOperand, "_", addresses[address_type])
 						Quadruples.push_quad(temp_quad)
 						operands.push(addresses[address_type])
+						addresses[address_type] += 1
 						types.push(resType)
 					else:
 						Error.invalid_operation_in_line(t.lexer.lineno)
@@ -973,7 +980,6 @@ def p_genParam(t):
 	global paramNum
 	if arrMatOperands.size() > 0:
 		Error.array_parameter_in_module_call(t.lexer.lineno)
-
 	arg = operands.pop()
 	argType = types.pop()
 	paramList = functionDir[funcName]["params"].values()
@@ -1017,7 +1023,15 @@ def p_addOperandId(t):
 	else:
 		Error.undefined_variable(arrMatId.peek(), t.lexer.lineno)
 	if "rows" in variableTable[arrMatScope.peek()][t[-1]]:
-		arrMatOperands.push(variableTable[arrMatScope.peek()][t[-1]])
+		if "cols" not in variableTable[arrMatScope.peek()][t[-1]]:
+			variable = variableTable[arrMatScope.peek()][t[-1]]
+			arrMatOperands.push({
+				"address": variable["address"],
+				"rows": variable["rows"],
+				"cols": 1
+			})
+		else:
+			arrMatOperands.push(variableTable[arrMatScope.peek()][t[-1]])
 
 def p_addTypeId(t):
 	'addTypeId : '
