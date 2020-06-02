@@ -1123,7 +1123,12 @@ def p_checkMatAsArray(t):
 def p_error(t):
 	Error.syntax(t.value, t.lexer.lineno)
 
-f = open('prog.txt', 'r')
+import sys
+
+if len(sys.argv) > 1:
+	f = open(sys.argv[1], "r")
+else:
+	f = open("prog.txt", "r")
 program = f.read()
 
 parser = yacc.yacc()

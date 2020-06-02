@@ -61,7 +61,6 @@ def runner_duckie():
         else:
             index += 1                    
 
-
 def executeInstruction(quad):
     if quad.operator == "=":
         return assign(quad)
