@@ -50,11 +50,11 @@ def runner_duckie():
         else:
             cstMemMap[variableTable["constants"][cst]["address"]] = cst
     index = 0
-    print(cstMemMap)
+    # print(cstMemMap)
     # Quadruples.print_all()
     while len(Quadruples.quadruples) > index:    
         quad = Quadruples.quadruples[index]
-        quad.print()
+        # quad.print()
         newIndex = executeInstruction(quad)
         if newIndex:
             index = newIndex

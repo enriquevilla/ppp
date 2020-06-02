@@ -119,10 +119,10 @@ for i in ty:
             else:
                 semanticCube[(ty[i], ty[i], j)] = "float"
 
-for i in ty:
-    for j in ty:
-        for k in ops:
-            print("%s %s %s = %s" % (ty[i], k, ty[j], semanticCube[(ty[i], ty[j], k)]))
+# for i in ty:
+#     for j in ty:
+#         for k in ops:
+#             print("%s %s %s = %s" % (ty[i], k, ty[j], semanticCube[(ty[i], ty[j], k)]))
 
 # functionDir visual example
 '''
