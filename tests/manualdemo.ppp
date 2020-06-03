@@ -1,0 +1,18 @@
+program arrayfind;
+var int array1[3];
+
+main() {
+    var int matrix1[2][2];
+    
+    array1[0] = 2;
+    array1[1] = 8;
+    array1[2] = 5;
+
+    matrix1[0][0] = 1;
+    matrix1[1][0] = 3;
+    matrix1[1][1] = 2;
+    matrix1[0][1] = 6;
+
+    print(array1[4]);
+    print(matrix1[1][1]);
+}

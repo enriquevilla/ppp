@@ -1,0 +1,15 @@
+program fact;
+
+function int factorial(int a) {
+    if (a > 1) then {
+        return(a * factorial(a - 1));
+    }
+    return(1);
+}
+
+main() {
+    var int c;
+    c = factorial(5);
+    print(factorial(5));
+    print(c);
+}

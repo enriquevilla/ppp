@@ -1,0 +1,10 @@
+program fact;
+
+main() {
+    var int c, result;
+    result = 1;
+    for c = 1 to c < 7 {
+        result = result * c;
+    }
+    print(result);
+}

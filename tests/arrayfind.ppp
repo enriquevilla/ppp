@@ -1,0 +1,30 @@
+program arrayfind;
+var int array1[6];
+
+function int find(int a, int j) {
+    if (j < 0) then {
+        return(0 - 1);
+    }
+
+    if (array1[j] == a) then {
+        return(j);
+    }
+
+    return(find(a, j - 1));
+}
+
+main() {
+    var int result;
+    
+    %% assign array
+    array1[0] = 2;
+    array1[1] = 8;
+    array1[2] = 5;
+    array1[3] = 33;
+    array1[4] = 25;
+    array1[5] = 9;
+
+    result = find(25, 5);
+
+    print(result);
+}

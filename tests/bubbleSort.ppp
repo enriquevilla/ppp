@@ -1,0 +1,38 @@
+program bubblesort;
+var int array1[5];
+
+main() {
+    var int sorted, i, changed, aux;
+    sorted = 0;
+    i = 0;
+    changed = 0;
+
+    %% assign array
+    array1[0] = 2;
+    array1[1] = 8;
+    array1[2] = 5;
+    array1[3] = 33;
+    array1[4] = 25;
+
+    while (sorted == 0) {
+        if (array1[i] > array1[i + 1]) then {
+            aux = array1[i];
+            array1[i] = array1[i + 1];
+            array1[i + 1] = aux;
+            changed = 1;
+        }
+        if (i == 3) then {
+            if (changed == 1) then {
+                i = 0;
+                changed = 0;
+            } else {
+                sorted = 1;
+            }
+        }
+        i = i + 1;
+    }
+
+    for i = 0 to i < 5 {
+        print(array1[i]);
+    }
+}

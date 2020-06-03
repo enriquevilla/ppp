@@ -1,0 +1,21 @@
+program fibonacciCyclic;
+  
+main() {
+    var int nthTerm, first, second, result, i;
+    first = 0;
+    second = 1;
+
+    %% nthTerm = term of the fibonacci series
+    nthTerm = 9; 
+
+    %% adjust nthTerm for the cycle
+    nthTerm = nthTerm + 1;
+
+    for i = 2 to i < nthTerm {
+        result = first + second;
+        first = second;
+        second = result;
+    }
+
+    print(result);
+}

@@ -1,0 +1,21 @@
+program matrixdeterminant;
+
+main() {
+    var float result;
+        int i, j, matrix[3][3];
+        
+    %% assign matrix
+    matrix[0][0] = 2;
+    matrix[1][0] = 2;
+    matrix[2][0] = 1;
+    matrix[0][1] = 0 - 3;
+    matrix[1][1] = 0;
+    matrix[2][1] = 4;
+    matrix[0][2] = 1;
+    matrix[1][2] = 0 - 1;
+    matrix[2][2] = 5;
+
+    result = matrix$;
+
+    print(result);
+}

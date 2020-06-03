@@ -1,0 +1,4273 @@
+Created by PLY version 3.11 (http://www.dabeaz.com/ply)
+
+Grammar
+
+Rule 0     S' -> program
+Rule 1     program -> PROGRAM ID globalTable SEMICOLON declaration programFunc main
+Rule 2     globalTable -> <empty>
+Rule 3     programFunc -> function programFunc
+Rule 4     programFunc -> <empty>
+Rule 5     main -> mainTable MAIN LEFTPAR RIGHTPAR LEFTBRACE declaration statement RIGHTBRACE
+Rule 6     mainTable -> <empty>
+Rule 7     assignment -> ID dimArray EQUAL hyperExpression SEMICOLON
+Rule 8     declaration -> VAR declarationPrim
+Rule 9     declaration -> <empty>
+Rule 10    declarationPrim -> primitive vars SEMICOLON declarationPrim
+Rule 11    declarationPrim -> <empty>
+Rule 12    primitive -> INT
+Rule 13    primitive -> FLOAT
+Rule 14    primitive -> CHAR
+Rule 15    return -> RETURN LEFTPAR hyperExpression RIGHTPAR SEMICOLON
+Rule 16    if -> IF LEFTPAR hyperExpression RIGHTPAR createJumpQuadIf THEN LEFTBRACE statement RIGHTBRACE ifElse updateJumpQuad
+Rule 17    createJumpQuadIf -> <empty>
+Rule 18    updateJumpQuad -> <empty>
+Rule 19    ifElse -> ELSE createJumpQuadElse LEFTBRACE statement RIGHTBRACE
+Rule 20    ifElse -> <empty>
+Rule 21    createJumpQuadElse -> <empty>
+Rule 22    comment -> COMMENT_TEXT
+Rule 23    while -> WHILE pushLoopJump LEFTPAR hyperExpression RIGHTPAR beginLoopAction LEFTBRACE statement RIGHTBRACE endLoopAction
+Rule 24    pushLoopJump -> <empty>
+Rule 25    beginLoopAction -> <empty>
+Rule 26    endLoopAction -> <empty>
+Rule 27    for -> FOR forAssignment TO insertJumpFor hyperExpression createQuadFor LEFTBRACE statement RIGHTBRACE updateQuadFor
+Rule 28    insertJumpFor -> <empty>
+Rule 29    createQuadFor -> <empty>
+Rule 30    updateQuadFor -> <empty>
+Rule 31    forAssignment -> ID EQUAL CST_INT addTypeInt
+Rule 32    vars -> ID addVarsToTable varsArray varsComa
+Rule 33    addVarsToTable -> <empty>
+Rule 34    varsComa -> COMA vars
+Rule 35    varsComa -> <empty>
+Rule 36    varsArray -> LEFTBRACK CST_INT addTypeInt RIGHTBRACK setRows varsMatrix
+Rule 37    varsArray -> <empty>
+Rule 38    setRows -> <empty>
+Rule 39    varsMatrix -> LEFTBRACK CST_INT addTypeInt RIGHTBRACK setCols
+Rule 40    varsMatrix -> <empty>
+Rule 41    setCols -> <empty>
+Rule 42    function -> functionType ID addFuncToDir LEFTPAR param RIGHTPAR setParamLength LEFTBRACE declaration statement RIGHTBRACE
+Rule 43    addFuncToDir -> <empty>
+Rule 44    functionType -> FUNCTION primitive
+Rule 45    functionType -> FUNCTION VOID setVoidType
+Rule 46    setVoidType -> <empty>
+Rule 47    param -> primitive ID addFuncParams functionParam
+Rule 48    param -> <empty>
+Rule 49    addFuncParams -> <empty>
+Rule 50    setParamLength -> <empty>
+Rule 51    functionParam -> COMA param
+Rule 52    functionParam -> <empty>
+Rule 53    cst_prim -> CST_INT addTypeInt
+Rule 54    cst_prim -> CST_FLOAT addTypeFloat
+Rule 55    cst_prim -> CST_CHAR addTypeChar
+Rule 56    addTypeInt -> <empty>
+Rule 57    addTypeFloat -> <empty>
+Rule 58    addTypeChar -> <empty>
+Rule 59    hyperExpression -> superExpression evaluateHE opHyperExpression hyperExpressionNested
+Rule 60    hyperExpression -> superExpression opMatrix evaluateOpMatrix
+Rule 61    hyperExpression -> superExpression evaluateHE
+Rule 62    hyperExpressionNested -> superExpression evaluateHE opHyperExpression hyperExpressionNested
+Rule 63    hyperExpressionNested -> superExpression evaluateHE
+Rule 64    evaluateOpMatrix -> <empty>
+Rule 65    evaluateHE -> <empty>
+Rule 66    opMatrix -> EXCLAMATION addOperator
+Rule 67    opMatrix -> QUESTION addOperator
+Rule 68    opMatrix -> DOLLARSIGN addOperator
+Rule 69    opHyperExpression -> AND addOperator
+Rule 70    opHyperExpression -> OR addOperator
+Rule 71    superExpression -> exp evaluateSE opSuperExpression exp evaluateSE
+Rule 72    superExpression -> exp evaluateSE
+Rule 73    evaluateSE -> <empty>
+Rule 74    opSuperExpression -> GT addOperator
+Rule 75    opSuperExpression -> LT addOperator
+Rule 76    opSuperExpression -> NOTEQUAL addOperator
+Rule 77    opSuperExpression -> ISEQUAL addOperator
+Rule 78    exp -> term evaluateTerm expFunction
+Rule 79    exp -> term evaluateTerm
+Rule 80    evaluateTerm -> <empty>
+Rule 81    expFunction -> PLUS addOperator exp
+Rule 82    expFunction -> MINUS addOperator exp
+Rule 83    term -> factor evaluateFactor termFunction
+Rule 84    term -> factor evaluateFactor
+Rule 85    evaluateFactor -> <empty>
+Rule 86    termFunction -> MULTIPLY addOperator term
+Rule 87    termFunction -> DIVIDE addOperator term
+Rule 88    addOperator -> <empty>
+Rule 89    factor -> LEFTPAR addFF hyperExpression RIGHTPAR removeFF
+Rule 90    factor -> cst_prim
+Rule 91    factor -> module
+Rule 92    factor -> ID dimArray
+Rule 93    addFF -> <empty>
+Rule 94    removeFF -> <empty>
+Rule 95    read -> READ LEFTPAR id_list RIGHTPAR SEMICOLON
+Rule 96    id_list -> ID dimArray addRead id_listFunction
+Rule 97    addRead -> <empty>
+Rule 98    id_listFunction -> COMA id_list
+Rule 99    id_listFunction -> <empty>
+Rule 100   print -> PRINT LEFTPAR printFunction RIGHTPAR SEMICOLON
+Rule 101   printFunction -> print_param COMA printFunction2
+Rule 102   printFunction -> print_param
+Rule 103   printFunction2 -> printFunction
+Rule 104   print_param -> hyperExpression addPrint
+Rule 105   print_param -> CST_STRING addPrintString
+Rule 106   addPrint -> <empty>
+Rule 107   addPrintString -> <empty>
+Rule 108   statement -> return checkVoidType
+Rule 109   statement -> if statement
+Rule 110   statement -> comment statement
+Rule 111   statement -> read statement
+Rule 112   statement -> print statement
+Rule 113   statement -> assignment statement
+Rule 114   statement -> module SEMICOLON statement
+Rule 115   statement -> for statement
+Rule 116   statement -> while statement
+Rule 117   statement -> checkNonVoidType
+Rule 118   checkVoidType -> <empty>
+Rule 119   checkNonVoidType -> <empty>
+Rule 120   module -> ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+Rule 121   checkFuncExists -> <empty>
+Rule 122   genERASize -> <empty>
+Rule 123   nullParam -> <empty>
+Rule 124   genGosub -> <empty>
+Rule 125   moduleFunction -> hyperExpression genParam nextParam COMA moduleFunction
+Rule 126   moduleFunction -> hyperExpression genParam
+Rule 127   moduleFunction -> <empty>
+Rule 128   genParam -> <empty>
+Rule 129   nextParam -> <empty>
+Rule 130   dimArray -> addOperandId addTypeId LEFTBRACK readIDType hyperExpression verifyRows RIGHTBRACK dimMatrix
+Rule 131   dimArray -> addOperandId addTypeId
+Rule 132   addOperandId -> <empty>
+Rule 133   addTypeId -> <empty>
+Rule 134   readIDType -> <empty>
+Rule 135   verifyRows -> <empty>
+Rule 136   dimMatrix -> LEFTBRACK hyperExpression verifyCols RIGHTBRACK
+Rule 137   dimMatrix -> checkMatAsArray
+Rule 138   verifyCols -> <empty>
+Rule 139   checkMatAsArray -> <empty>
+
+Terminals, with rules where they appear
+
+AND                  : 69
+CHAR                 : 14
+COMA                 : 34 51 98 101 125
+COMMENT_TEXT         : 22
+CST_CHAR             : 55
+CST_FLOAT            : 54
+CST_INT              : 31 36 39 53
+CST_STRING           : 105
+DIVIDE               : 87
+DOLLARSIGN           : 68
+ELSE                 : 19
+EQUAL                : 7 31
+EXCLAMATION          : 66
+FLOAT                : 13
+FOR                  : 27
+FUNCTION             : 44 45
+GT                   : 74
+ID                   : 1 7 31 32 42 47 92 96 120
+IF                   : 16
+INT                  : 12
+ISEQUAL              : 77
+LEFTBRACE            : 5 16 19 23 27 42
+LEFTBRACK            : 36 39 130 136
+LEFTPAR              : 5 15 16 23 42 89 95 100 120
+LT                   : 75
+MAIN                 : 5
+MINUS                : 82
+MULTIPLY             : 86
+NOTEQUAL             : 76
+OR                   : 70
+PLUS                 : 81
+PRINT                : 100
+PROGRAM              : 1
+QUESTION             : 67
+READ                 : 95
+RETURN               : 15
+RIGHTBRACE           : 5 16 19 23 27 42
+RIGHTBRACK           : 36 39 130 136
+RIGHTPAR             : 5 15 16 23 42 89 95 100 120
+SEMICOLON            : 1 7 10 15 95 100 114
+THEN                 : 16
+TO                   : 27
+VAR                  : 8
+VOID                 : 45
+WHILE                : 23
+error                : 
+
+Nonterminals, with rules where they appear
+
+addFF                : 89
+addFuncParams        : 47
+addFuncToDir         : 42
+addOperandId         : 130 131
+addOperator          : 66 67 68 69 70 74 75 76 77 81 82 86 87
+addPrint             : 104
+addPrintString       : 105
+addRead              : 96
+addTypeChar          : 55
+addTypeFloat         : 54
+addTypeId            : 130 131
+addTypeInt           : 31 36 39 53
+addVarsToTable       : 32
+assignment           : 113
+beginLoopAction      : 23
+checkFuncExists      : 120
+checkMatAsArray      : 137
+checkNonVoidType     : 117
+checkVoidType        : 108
+comment              : 110
+createJumpQuadElse   : 19
+createJumpQuadIf     : 16
+createQuadFor        : 27
+cst_prim             : 90
+declaration          : 1 5 42
+declarationPrim      : 8 10
+dimArray             : 7 92 96
+dimMatrix            : 130
+endLoopAction        : 23
+evaluateFactor       : 83 84
+evaluateHE           : 59 61 62 63
+evaluateOpMatrix     : 60
+evaluateSE           : 71 71 72
+evaluateTerm         : 78 79
+exp                  : 71 71 72 81 82
+expFunction          : 78
+factor               : 83 84
+for                  : 115
+forAssignment        : 27
+function             : 3
+functionParam        : 47
+functionType         : 42
+genERASize           : 120
+genGosub             : 120
+genParam             : 125 126
+globalTable          : 1
+hyperExpression      : 7 15 16 23 27 89 104 125 126 130 136
+hyperExpressionNested : 59 62
+id_list              : 95 98
+id_listFunction      : 96
+if                   : 109
+ifElse               : 16
+insertJumpFor        : 27
+main                 : 1
+mainTable            : 5
+module               : 91 114
+moduleFunction       : 120 125
+nextParam            : 125
+nullParam            : 120
+opHyperExpression    : 59 62
+opMatrix             : 60
+opSuperExpression    : 71
+param                : 42 51
+primitive            : 10 44 47
+print                : 112
+printFunction        : 100 103
+printFunction2       : 101
+print_param          : 101 102
+program              : 0
+programFunc          : 1 3
+pushLoopJump         : 23
+read                 : 111
+readIDType           : 130
+removeFF             : 89
+return               : 108
+setCols              : 39
+setParamLength       : 42
+setRows              : 36
+setVoidType          : 45
+statement            : 5 16 19 23 27 42 109 110 111 112 113 114 115 116
+superExpression      : 59 60 61 62 63
+term                 : 78 79 86 87
+termFunction         : 83
+updateJumpQuad       : 16
+updateQuadFor        : 27
+vars                 : 10 34
+varsArray            : 32
+varsComa             : 32
+varsMatrix           : 36
+verifyCols           : 136
+verifyRows           : 130
+while                : 116
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . program
+    (1) program -> . PROGRAM ID globalTable SEMICOLON declaration programFunc main
+
+    PROGRAM         shift and go to state 2
+
+    program                        shift and go to state 1
+
+state 1
+
+    (0) S' -> program .
+
+
+
+state 2
+
+    (1) program -> PROGRAM . ID globalTable SEMICOLON declaration programFunc main
+
+    ID              shift and go to state 3
+
+
+state 3
+
+    (1) program -> PROGRAM ID . globalTable SEMICOLON declaration programFunc main
+    (2) globalTable -> .
+
+    SEMICOLON       reduce using rule 2 (globalTable -> .)
+
+    globalTable                    shift and go to state 4
+
+state 4
+
+    (1) program -> PROGRAM ID globalTable . SEMICOLON declaration programFunc main
+
+    SEMICOLON       shift and go to state 5
+
+
+state 5
+
+    (1) program -> PROGRAM ID globalTable SEMICOLON . declaration programFunc main
+    (8) declaration -> . VAR declarationPrim
+    (9) declaration -> .
+
+    VAR             shift and go to state 7
+    FUNCTION        reduce using rule 9 (declaration -> .)
+    MAIN            reduce using rule 9 (declaration -> .)
+
+    declaration                    shift and go to state 6
+
+state 6
+
+    (1) program -> PROGRAM ID globalTable SEMICOLON declaration . programFunc main
+    (3) programFunc -> . function programFunc
+    (4) programFunc -> .
+    (42) function -> . functionType ID addFuncToDir LEFTPAR param RIGHTPAR setParamLength LEFTBRACE declaration statement RIGHTBRACE
+    (44) functionType -> . FUNCTION primitive
+    (45) functionType -> . FUNCTION VOID setVoidType
+
+    MAIN            reduce using rule 4 (programFunc -> .)
+    FUNCTION        shift and go to state 11
+
+    programFunc                    shift and go to state 8
+    function                       shift and go to state 9
+    functionType                   shift and go to state 10
+
+state 7
+
+    (8) declaration -> VAR . declarationPrim
+    (10) declarationPrim -> . primitive vars SEMICOLON declarationPrim
+    (11) declarationPrim -> .
+    (12) primitive -> . INT
+    (13) primitive -> . FLOAT
+    (14) primitive -> . CHAR
+
+    FUNCTION        reduce using rule 11 (declarationPrim -> .)
+    MAIN            reduce using rule 11 (declarationPrim -> .)
+    RETURN          reduce using rule 11 (declarationPrim -> .)
+    IF              reduce using rule 11 (declarationPrim -> .)
+    COMMENT_TEXT    reduce using rule 11 (declarationPrim -> .)
+    READ            reduce using rule 11 (declarationPrim -> .)
+    PRINT           reduce using rule 11 (declarationPrim -> .)
+    ID              reduce using rule 11 (declarationPrim -> .)
+    FOR             reduce using rule 11 (declarationPrim -> .)
+    WHILE           reduce using rule 11 (declarationPrim -> .)
+    RIGHTBRACE      reduce using rule 11 (declarationPrim -> .)
+    INT             shift and go to state 14
+    FLOAT           shift and go to state 15
+    CHAR            shift and go to state 16
+
+    declarationPrim                shift and go to state 12
+    primitive                      shift and go to state 13
+
+state 8
+
+    (1) program -> PROGRAM ID globalTable SEMICOLON declaration programFunc . main
+    (5) main -> . mainTable MAIN LEFTPAR RIGHTPAR LEFTBRACE declaration statement RIGHTBRACE
+    (6) mainTable -> .
+
+    MAIN            reduce using rule 6 (mainTable -> .)
+
+    main                           shift and go to state 17
+    mainTable                      shift and go to state 18
+
+state 9
+
+    (3) programFunc -> function . programFunc
+    (3) programFunc -> . function programFunc
+    (4) programFunc -> .
+    (42) function -> . functionType ID addFuncToDir LEFTPAR param RIGHTPAR setParamLength LEFTBRACE declaration statement RIGHTBRACE
+    (44) functionType -> . FUNCTION primitive
+    (45) functionType -> . FUNCTION VOID setVoidType
+
+    MAIN            reduce using rule 4 (programFunc -> .)
+    FUNCTION        shift and go to state 11
+
+    function                       shift and go to state 9
+    programFunc                    shift and go to state 19
+    functionType                   shift and go to state 10
+
+state 10
+
+    (42) function -> functionType . ID addFuncToDir LEFTPAR param RIGHTPAR setParamLength LEFTBRACE declaration statement RIGHTBRACE
+
+    ID              shift and go to state 20
+
+
+state 11
+
+    (44) functionType -> FUNCTION . primitive
+    (45) functionType -> FUNCTION . VOID setVoidType
+    (12) primitive -> . INT
+    (13) primitive -> . FLOAT
+    (14) primitive -> . CHAR
+
+    VOID            shift and go to state 22
+    INT             shift and go to state 14
+    FLOAT           shift and go to state 15
+    CHAR            shift and go to state 16
+
+    primitive                      shift and go to state 21
+
+state 12
+
+    (8) declaration -> VAR declarationPrim .
+
+    FUNCTION        reduce using rule 8 (declaration -> VAR declarationPrim .)
+    MAIN            reduce using rule 8 (declaration -> VAR declarationPrim .)
+    RETURN          reduce using rule 8 (declaration -> VAR declarationPrim .)
+    IF              reduce using rule 8 (declaration -> VAR declarationPrim .)
+    COMMENT_TEXT    reduce using rule 8 (declaration -> VAR declarationPrim .)
+    READ            reduce using rule 8 (declaration -> VAR declarationPrim .)
+    PRINT           reduce using rule 8 (declaration -> VAR declarationPrim .)
+    ID              reduce using rule 8 (declaration -> VAR declarationPrim .)
+    FOR             reduce using rule 8 (declaration -> VAR declarationPrim .)
+    WHILE           reduce using rule 8 (declaration -> VAR declarationPrim .)
+    RIGHTBRACE      reduce using rule 8 (declaration -> VAR declarationPrim .)
+
+
+state 13
+
+    (10) declarationPrim -> primitive . vars SEMICOLON declarationPrim
+    (32) vars -> . ID addVarsToTable varsArray varsComa
+
+    ID              shift and go to state 24
+
+    vars                           shift and go to state 23
+
+state 14
+
+    (12) primitive -> INT .
+
+    ID              reduce using rule 12 (primitive -> INT .)
+
+
+state 15
+
+    (13) primitive -> FLOAT .
+
+    ID              reduce using rule 13 (primitive -> FLOAT .)
+
+
+state 16
+
+    (14) primitive -> CHAR .
+
+    ID              reduce using rule 14 (primitive -> CHAR .)
+
+
+state 17
+
+    (1) program -> PROGRAM ID globalTable SEMICOLON declaration programFunc main .
+
+    $end            reduce using rule 1 (program -> PROGRAM ID globalTable SEMICOLON declaration programFunc main .)
+
+
+state 18
+
+    (5) main -> mainTable . MAIN LEFTPAR RIGHTPAR LEFTBRACE declaration statement RIGHTBRACE
+
+    MAIN            shift and go to state 25
+
+
+state 19
+
+    (3) programFunc -> function programFunc .
+
+    MAIN            reduce using rule 3 (programFunc -> function programFunc .)
+
+
+state 20
+
+    (42) function -> functionType ID . addFuncToDir LEFTPAR param RIGHTPAR setParamLength LEFTBRACE declaration statement RIGHTBRACE
+    (43) addFuncToDir -> .
+
+    LEFTPAR         reduce using rule 43 (addFuncToDir -> .)
+
+    addFuncToDir                   shift and go to state 26
+
+state 21
+
+    (44) functionType -> FUNCTION primitive .
+
+    ID              reduce using rule 44 (functionType -> FUNCTION primitive .)
+
+
+state 22
+
+    (45) functionType -> FUNCTION VOID . setVoidType
+    (46) setVoidType -> .
+
+    ID              reduce using rule 46 (setVoidType -> .)
+
+    setVoidType                    shift and go to state 27
+
+state 23
+
+    (10) declarationPrim -> primitive vars . SEMICOLON declarationPrim
+
+    SEMICOLON       shift and go to state 28
+
+
+state 24
+
+    (32) vars -> ID . addVarsToTable varsArray varsComa
+    (33) addVarsToTable -> .
+
+    LEFTBRACK       reduce using rule 33 (addVarsToTable -> .)
+    COMA            reduce using rule 33 (addVarsToTable -> .)
+    SEMICOLON       reduce using rule 33 (addVarsToTable -> .)
+
+    addVarsToTable                 shift and go to state 29
+
+state 25
+
+    (5) main -> mainTable MAIN . LEFTPAR RIGHTPAR LEFTBRACE declaration statement RIGHTBRACE
+
+    LEFTPAR         shift and go to state 30
+
+
+state 26
+
+    (42) function -> functionType ID addFuncToDir . LEFTPAR param RIGHTPAR setParamLength LEFTBRACE declaration statement RIGHTBRACE
+
+    LEFTPAR         shift and go to state 31
+
+
+state 27
+
+    (45) functionType -> FUNCTION VOID setVoidType .
+
+    ID              reduce using rule 45 (functionType -> FUNCTION VOID setVoidType .)
+
+
+state 28
+
+    (10) declarationPrim -> primitive vars SEMICOLON . declarationPrim
+    (10) declarationPrim -> . primitive vars SEMICOLON declarationPrim
+    (11) declarationPrim -> .
+    (12) primitive -> . INT
+    (13) primitive -> . FLOAT
+    (14) primitive -> . CHAR
+
+    FUNCTION        reduce using rule 11 (declarationPrim -> .)
+    MAIN            reduce using rule 11 (declarationPrim -> .)
+    RETURN          reduce using rule 11 (declarationPrim -> .)
+    IF              reduce using rule 11 (declarationPrim -> .)
+    COMMENT_TEXT    reduce using rule 11 (declarationPrim -> .)
+    READ            reduce using rule 11 (declarationPrim -> .)
+    PRINT           reduce using rule 11 (declarationPrim -> .)
+    ID              reduce using rule 11 (declarationPrim -> .)
+    FOR             reduce using rule 11 (declarationPrim -> .)
+    WHILE           reduce using rule 11 (declarationPrim -> .)
+    RIGHTBRACE      reduce using rule 11 (declarationPrim -> .)
+    INT             shift and go to state 14
+    FLOAT           shift and go to state 15
+    CHAR            shift and go to state 16
+
+    primitive                      shift and go to state 13
+    declarationPrim                shift and go to state 32
+
+state 29
+
+    (32) vars -> ID addVarsToTable . varsArray varsComa
+    (36) varsArray -> . LEFTBRACK CST_INT addTypeInt RIGHTBRACK setRows varsMatrix
+    (37) varsArray -> .
+
+    LEFTBRACK       shift and go to state 34
+    COMA            reduce using rule 37 (varsArray -> .)
+    SEMICOLON       reduce using rule 37 (varsArray -> .)
+
+    varsArray                      shift and go to state 33
+
+state 30
+
+    (5) main -> mainTable MAIN LEFTPAR . RIGHTPAR LEFTBRACE declaration statement RIGHTBRACE
+
+    RIGHTPAR        shift and go to state 35
+
+
+state 31
+
+    (42) function -> functionType ID addFuncToDir LEFTPAR . param RIGHTPAR setParamLength LEFTBRACE declaration statement RIGHTBRACE
+    (47) param -> . primitive ID addFuncParams functionParam
+    (48) param -> .
+    (12) primitive -> . INT
+    (13) primitive -> . FLOAT
+    (14) primitive -> . CHAR
+
+    RIGHTPAR        reduce using rule 48 (param -> .)
+    INT             shift and go to state 14
+    FLOAT           shift and go to state 15
+    CHAR            shift and go to state 16
+
+    param                          shift and go to state 36
+    primitive                      shift and go to state 37
+
+state 32
+
+    (10) declarationPrim -> primitive vars SEMICOLON declarationPrim .
+
+    FUNCTION        reduce using rule 10 (declarationPrim -> primitive vars SEMICOLON declarationPrim .)
+    MAIN            reduce using rule 10 (declarationPrim -> primitive vars SEMICOLON declarationPrim .)
+    RETURN          reduce using rule 10 (declarationPrim -> primitive vars SEMICOLON declarationPrim .)
+    IF              reduce using rule 10 (declarationPrim -> primitive vars SEMICOLON declarationPrim .)
+    COMMENT_TEXT    reduce using rule 10 (declarationPrim -> primitive vars SEMICOLON declarationPrim .)
+    READ            reduce using rule 10 (declarationPrim -> primitive vars SEMICOLON declarationPrim .)
+    PRINT           reduce using rule 10 (declarationPrim -> primitive vars SEMICOLON declarationPrim .)
+    ID              reduce using rule 10 (declarationPrim -> primitive vars SEMICOLON declarationPrim .)
+    FOR             reduce using rule 10 (declarationPrim -> primitive vars SEMICOLON declarationPrim .)
+    WHILE           reduce using rule 10 (declarationPrim -> primitive vars SEMICOLON declarationPrim .)
+    RIGHTBRACE      reduce using rule 10 (declarationPrim -> primitive vars SEMICOLON declarationPrim .)
+
+
+state 33
+
+    (32) vars -> ID addVarsToTable varsArray . varsComa
+    (34) varsComa -> . COMA vars
+    (35) varsComa -> .
+
+    COMA            shift and go to state 39
+    SEMICOLON       reduce using rule 35 (varsComa -> .)
+
+    varsComa                       shift and go to state 38
+
+state 34
+
+    (36) varsArray -> LEFTBRACK . CST_INT addTypeInt RIGHTBRACK setRows varsMatrix
+
+    CST_INT         shift and go to state 40
+
+
+state 35
+
+    (5) main -> mainTable MAIN LEFTPAR RIGHTPAR . LEFTBRACE declaration statement RIGHTBRACE
+
+    LEFTBRACE       shift and go to state 41
+
+
+state 36
+
+    (42) function -> functionType ID addFuncToDir LEFTPAR param . RIGHTPAR setParamLength LEFTBRACE declaration statement RIGHTBRACE
+
+    RIGHTPAR        shift and go to state 42
+
+
+state 37
+
+    (47) param -> primitive . ID addFuncParams functionParam
+
+    ID              shift and go to state 43
+
+
+state 38
+
+    (32) vars -> ID addVarsToTable varsArray varsComa .
+
+    SEMICOLON       reduce using rule 32 (vars -> ID addVarsToTable varsArray varsComa .)
+
+
+state 39
+
+    (34) varsComa -> COMA . vars
+    (32) vars -> . ID addVarsToTable varsArray varsComa
+
+    ID              shift and go to state 24
+
+    vars                           shift and go to state 44
+
+state 40
+
+    (36) varsArray -> LEFTBRACK CST_INT . addTypeInt RIGHTBRACK setRows varsMatrix
+    (56) addTypeInt -> .
+
+    RIGHTBRACK      reduce using rule 56 (addTypeInt -> .)
+
+    addTypeInt                     shift and go to state 45
+
+state 41
+
+    (5) main -> mainTable MAIN LEFTPAR RIGHTPAR LEFTBRACE . declaration statement RIGHTBRACE
+    (8) declaration -> . VAR declarationPrim
+    (9) declaration -> .
+
+    VAR             shift and go to state 7
+    RETURN          reduce using rule 9 (declaration -> .)
+    IF              reduce using rule 9 (declaration -> .)
+    COMMENT_TEXT    reduce using rule 9 (declaration -> .)
+    READ            reduce using rule 9 (declaration -> .)
+    PRINT           reduce using rule 9 (declaration -> .)
+    ID              reduce using rule 9 (declaration -> .)
+    FOR             reduce using rule 9 (declaration -> .)
+    WHILE           reduce using rule 9 (declaration -> .)
+    RIGHTBRACE      reduce using rule 9 (declaration -> .)
+
+    declaration                    shift and go to state 46
+
+state 42
+
+    (42) function -> functionType ID addFuncToDir LEFTPAR param RIGHTPAR . setParamLength LEFTBRACE declaration statement RIGHTBRACE
+    (50) setParamLength -> .
+
+    LEFTBRACE       reduce using rule 50 (setParamLength -> .)
+
+    setParamLength                 shift and go to state 47
+
+state 43
+
+    (47) param -> primitive ID . addFuncParams functionParam
+    (49) addFuncParams -> .
+
+    COMA            reduce using rule 49 (addFuncParams -> .)
+    RIGHTPAR        reduce using rule 49 (addFuncParams -> .)
+
+    addFuncParams                  shift and go to state 48
+
+state 44
+
+    (34) varsComa -> COMA vars .
+
+    SEMICOLON       reduce using rule 34 (varsComa -> COMA vars .)
+
+
+state 45
+
+    (36) varsArray -> LEFTBRACK CST_INT addTypeInt . RIGHTBRACK setRows varsMatrix
+
+    RIGHTBRACK      shift and go to state 49
+
+
+state 46
+
+    (5) main -> mainTable MAIN LEFTPAR RIGHTPAR LEFTBRACE declaration . statement RIGHTBRACE
+    (108) statement -> . return checkVoidType
+    (109) statement -> . if statement
+    (110) statement -> . comment statement
+    (111) statement -> . read statement
+    (112) statement -> . print statement
+    (113) statement -> . assignment statement
+    (114) statement -> . module SEMICOLON statement
+    (115) statement -> . for statement
+    (116) statement -> . while statement
+    (117) statement -> . checkNonVoidType
+    (15) return -> . RETURN LEFTPAR hyperExpression RIGHTPAR SEMICOLON
+    (16) if -> . IF LEFTPAR hyperExpression RIGHTPAR createJumpQuadIf THEN LEFTBRACE statement RIGHTBRACE ifElse updateJumpQuad
+    (22) comment -> . COMMENT_TEXT
+    (95) read -> . READ LEFTPAR id_list RIGHTPAR SEMICOLON
+    (100) print -> . PRINT LEFTPAR printFunction RIGHTPAR SEMICOLON
+    (7) assignment -> . ID dimArray EQUAL hyperExpression SEMICOLON
+    (120) module -> . ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+    (27) for -> . FOR forAssignment TO insertJumpFor hyperExpression createQuadFor LEFTBRACE statement RIGHTBRACE updateQuadFor
+    (23) while -> . WHILE pushLoopJump LEFTPAR hyperExpression RIGHTPAR beginLoopAction LEFTBRACE statement RIGHTBRACE endLoopAction
+    (119) checkNonVoidType -> .
+
+    RETURN          shift and go to state 61
+    IF              shift and go to state 62
+    COMMENT_TEXT    shift and go to state 63
+    READ            shift and go to state 64
+    PRINT           shift and go to state 65
+    ID              shift and go to state 66
+    FOR             shift and go to state 67
+    WHILE           shift and go to state 68
+    RIGHTBRACE      reduce using rule 119 (checkNonVoidType -> .)
+
+    statement                      shift and go to state 50
+    return                         shift and go to state 51
+    if                             shift and go to state 52
+    comment                        shift and go to state 53
+    read                           shift and go to state 54
+    print                          shift and go to state 55
+    assignment                     shift and go to state 56
+    module                         shift and go to state 57
+    for                            shift and go to state 58
+    while                          shift and go to state 59
+    checkNonVoidType               shift and go to state 60
+
+state 47
+
+    (42) function -> functionType ID addFuncToDir LEFTPAR param RIGHTPAR setParamLength . LEFTBRACE declaration statement RIGHTBRACE
+
+    LEFTBRACE       shift and go to state 69
+
+
+state 48
+
+    (47) param -> primitive ID addFuncParams . functionParam
+    (51) functionParam -> . COMA param
+    (52) functionParam -> .
+
+    COMA            shift and go to state 71
+    RIGHTPAR        reduce using rule 52 (functionParam -> .)
+
+    functionParam                  shift and go to state 70
+
+state 49
+
+    (36) varsArray -> LEFTBRACK CST_INT addTypeInt RIGHTBRACK . setRows varsMatrix
+    (38) setRows -> .
+
+    LEFTBRACK       reduce using rule 38 (setRows -> .)
+    COMA            reduce using rule 38 (setRows -> .)
+    SEMICOLON       reduce using rule 38 (setRows -> .)
+
+    setRows                        shift and go to state 72
+
+state 50
+
+    (5) main -> mainTable MAIN LEFTPAR RIGHTPAR LEFTBRACE declaration statement . RIGHTBRACE
+
+    RIGHTBRACE      shift and go to state 73
+
+
+state 51
+
+    (108) statement -> return . checkVoidType
+    (118) checkVoidType -> .
+
+    RIGHTBRACE      reduce using rule 118 (checkVoidType -> .)
+
+    checkVoidType                  shift and go to state 74
+
+state 52
+
+    (109) statement -> if . statement
+    (108) statement -> . return checkVoidType
+    (109) statement -> . if statement
+    (110) statement -> . comment statement
+    (111) statement -> . read statement
+    (112) statement -> . print statement
+    (113) statement -> . assignment statement
+    (114) statement -> . module SEMICOLON statement
+    (115) statement -> . for statement
+    (116) statement -> . while statement
+    (117) statement -> . checkNonVoidType
+    (15) return -> . RETURN LEFTPAR hyperExpression RIGHTPAR SEMICOLON
+    (16) if -> . IF LEFTPAR hyperExpression RIGHTPAR createJumpQuadIf THEN LEFTBRACE statement RIGHTBRACE ifElse updateJumpQuad
+    (22) comment -> . COMMENT_TEXT
+    (95) read -> . READ LEFTPAR id_list RIGHTPAR SEMICOLON
+    (100) print -> . PRINT LEFTPAR printFunction RIGHTPAR SEMICOLON
+    (7) assignment -> . ID dimArray EQUAL hyperExpression SEMICOLON
+    (120) module -> . ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+    (27) for -> . FOR forAssignment TO insertJumpFor hyperExpression createQuadFor LEFTBRACE statement RIGHTBRACE updateQuadFor
+    (23) while -> . WHILE pushLoopJump LEFTPAR hyperExpression RIGHTPAR beginLoopAction LEFTBRACE statement RIGHTBRACE endLoopAction
+    (119) checkNonVoidType -> .
+
+    RETURN          shift and go to state 61
+    IF              shift and go to state 62
+    COMMENT_TEXT    shift and go to state 63
+    READ            shift and go to state 64
+    PRINT           shift and go to state 65
+    ID              shift and go to state 66
+    FOR             shift and go to state 67
+    WHILE           shift and go to state 68
+    RIGHTBRACE      reduce using rule 119 (checkNonVoidType -> .)
+
+    if                             shift and go to state 52
+    statement                      shift and go to state 75
+    return                         shift and go to state 51
+    comment                        shift and go to state 53
+    read                           shift and go to state 54
+    print                          shift and go to state 55
+    assignment                     shift and go to state 56
+    module                         shift and go to state 57
+    for                            shift and go to state 58
+    while                          shift and go to state 59
+    checkNonVoidType               shift and go to state 60
+
+state 53
+
+    (110) statement -> comment . statement
+    (108) statement -> . return checkVoidType
+    (109) statement -> . if statement
+    (110) statement -> . comment statement
+    (111) statement -> . read statement
+    (112) statement -> . print statement
+    (113) statement -> . assignment statement
+    (114) statement -> . module SEMICOLON statement
+    (115) statement -> . for statement
+    (116) statement -> . while statement
+    (117) statement -> . checkNonVoidType
+    (15) return -> . RETURN LEFTPAR hyperExpression RIGHTPAR SEMICOLON
+    (16) if -> . IF LEFTPAR hyperExpression RIGHTPAR createJumpQuadIf THEN LEFTBRACE statement RIGHTBRACE ifElse updateJumpQuad
+    (22) comment -> . COMMENT_TEXT
+    (95) read -> . READ LEFTPAR id_list RIGHTPAR SEMICOLON
+    (100) print -> . PRINT LEFTPAR printFunction RIGHTPAR SEMICOLON
+    (7) assignment -> . ID dimArray EQUAL hyperExpression SEMICOLON
+    (120) module -> . ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+    (27) for -> . FOR forAssignment TO insertJumpFor hyperExpression createQuadFor LEFTBRACE statement RIGHTBRACE updateQuadFor
+    (23) while -> . WHILE pushLoopJump LEFTPAR hyperExpression RIGHTPAR beginLoopAction LEFTBRACE statement RIGHTBRACE endLoopAction
+    (119) checkNonVoidType -> .
+
+    RETURN          shift and go to state 61
+    IF              shift and go to state 62
+    COMMENT_TEXT    shift and go to state 63
+    READ            shift and go to state 64
+    PRINT           shift and go to state 65
+    ID              shift and go to state 66
+    FOR             shift and go to state 67
+    WHILE           shift and go to state 68
+    RIGHTBRACE      reduce using rule 119 (checkNonVoidType -> .)
+
+    comment                        shift and go to state 53
+    statement                      shift and go to state 76
+    return                         shift and go to state 51
+    if                             shift and go to state 52
+    read                           shift and go to state 54
+    print                          shift and go to state 55
+    assignment                     shift and go to state 56
+    module                         shift and go to state 57
+    for                            shift and go to state 58
+    while                          shift and go to state 59
+    checkNonVoidType               shift and go to state 60
+
+state 54
+
+    (111) statement -> read . statement
+    (108) statement -> . return checkVoidType
+    (109) statement -> . if statement
+    (110) statement -> . comment statement
+    (111) statement -> . read statement
+    (112) statement -> . print statement
+    (113) statement -> . assignment statement
+    (114) statement -> . module SEMICOLON statement
+    (115) statement -> . for statement
+    (116) statement -> . while statement
+    (117) statement -> . checkNonVoidType
+    (15) return -> . RETURN LEFTPAR hyperExpression RIGHTPAR SEMICOLON
+    (16) if -> . IF LEFTPAR hyperExpression RIGHTPAR createJumpQuadIf THEN LEFTBRACE statement RIGHTBRACE ifElse updateJumpQuad
+    (22) comment -> . COMMENT_TEXT
+    (95) read -> . READ LEFTPAR id_list RIGHTPAR SEMICOLON
+    (100) print -> . PRINT LEFTPAR printFunction RIGHTPAR SEMICOLON
+    (7) assignment -> . ID dimArray EQUAL hyperExpression SEMICOLON
+    (120) module -> . ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+    (27) for -> . FOR forAssignment TO insertJumpFor hyperExpression createQuadFor LEFTBRACE statement RIGHTBRACE updateQuadFor
+    (23) while -> . WHILE pushLoopJump LEFTPAR hyperExpression RIGHTPAR beginLoopAction LEFTBRACE statement RIGHTBRACE endLoopAction
+    (119) checkNonVoidType -> .
+
+    RETURN          shift and go to state 61
+    IF              shift and go to state 62
+    COMMENT_TEXT    shift and go to state 63
+    READ            shift and go to state 64
+    PRINT           shift and go to state 65
+    ID              shift and go to state 66
+    FOR             shift and go to state 67
+    WHILE           shift and go to state 68
+    RIGHTBRACE      reduce using rule 119 (checkNonVoidType -> .)
+
+    read                           shift and go to state 54
+    statement                      shift and go to state 77
+    return                         shift and go to state 51
+    if                             shift and go to state 52
+    comment                        shift and go to state 53
+    print                          shift and go to state 55
+    assignment                     shift and go to state 56
+    module                         shift and go to state 57
+    for                            shift and go to state 58
+    while                          shift and go to state 59
+    checkNonVoidType               shift and go to state 60
+
+state 55
+
+    (112) statement -> print . statement
+    (108) statement -> . return checkVoidType
+    (109) statement -> . if statement
+    (110) statement -> . comment statement
+    (111) statement -> . read statement
+    (112) statement -> . print statement
+    (113) statement -> . assignment statement
+    (114) statement -> . module SEMICOLON statement
+    (115) statement -> . for statement
+    (116) statement -> . while statement
+    (117) statement -> . checkNonVoidType
+    (15) return -> . RETURN LEFTPAR hyperExpression RIGHTPAR SEMICOLON
+    (16) if -> . IF LEFTPAR hyperExpression RIGHTPAR createJumpQuadIf THEN LEFTBRACE statement RIGHTBRACE ifElse updateJumpQuad
+    (22) comment -> . COMMENT_TEXT
+    (95) read -> . READ LEFTPAR id_list RIGHTPAR SEMICOLON
+    (100) print -> . PRINT LEFTPAR printFunction RIGHTPAR SEMICOLON
+    (7) assignment -> . ID dimArray EQUAL hyperExpression SEMICOLON
+    (120) module -> . ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+    (27) for -> . FOR forAssignment TO insertJumpFor hyperExpression createQuadFor LEFTBRACE statement RIGHTBRACE updateQuadFor
+    (23) while -> . WHILE pushLoopJump LEFTPAR hyperExpression RIGHTPAR beginLoopAction LEFTBRACE statement RIGHTBRACE endLoopAction
+    (119) checkNonVoidType -> .
+
+    RETURN          shift and go to state 61
+    IF              shift and go to state 62
+    COMMENT_TEXT    shift and go to state 63
+    READ            shift and go to state 64
+    PRINT           shift and go to state 65
+    ID              shift and go to state 66
+    FOR             shift and go to state 67
+    WHILE           shift and go to state 68
+    RIGHTBRACE      reduce using rule 119 (checkNonVoidType -> .)
+
+    print                          shift and go to state 55
+    statement                      shift and go to state 78
+    return                         shift and go to state 51
+    if                             shift and go to state 52
+    comment                        shift and go to state 53
+    read                           shift and go to state 54
+    assignment                     shift and go to state 56
+    module                         shift and go to state 57
+    for                            shift and go to state 58
+    while                          shift and go to state 59
+    checkNonVoidType               shift and go to state 60
+
+state 56
+
+    (113) statement -> assignment . statement
+    (108) statement -> . return checkVoidType
+    (109) statement -> . if statement
+    (110) statement -> . comment statement
+    (111) statement -> . read statement
+    (112) statement -> . print statement
+    (113) statement -> . assignment statement
+    (114) statement -> . module SEMICOLON statement
+    (115) statement -> . for statement
+    (116) statement -> . while statement
+    (117) statement -> . checkNonVoidType
+    (15) return -> . RETURN LEFTPAR hyperExpression RIGHTPAR SEMICOLON
+    (16) if -> . IF LEFTPAR hyperExpression RIGHTPAR createJumpQuadIf THEN LEFTBRACE statement RIGHTBRACE ifElse updateJumpQuad
+    (22) comment -> . COMMENT_TEXT
+    (95) read -> . READ LEFTPAR id_list RIGHTPAR SEMICOLON
+    (100) print -> . PRINT LEFTPAR printFunction RIGHTPAR SEMICOLON
+    (7) assignment -> . ID dimArray EQUAL hyperExpression SEMICOLON
+    (120) module -> . ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+    (27) for -> . FOR forAssignment TO insertJumpFor hyperExpression createQuadFor LEFTBRACE statement RIGHTBRACE updateQuadFor
+    (23) while -> . WHILE pushLoopJump LEFTPAR hyperExpression RIGHTPAR beginLoopAction LEFTBRACE statement RIGHTBRACE endLoopAction
+    (119) checkNonVoidType -> .
+
+    RETURN          shift and go to state 61
+    IF              shift and go to state 62
+    COMMENT_TEXT    shift and go to state 63
+    READ            shift and go to state 64
+    PRINT           shift and go to state 65
+    ID              shift and go to state 66
+    FOR             shift and go to state 67
+    WHILE           shift and go to state 68
+    RIGHTBRACE      reduce using rule 119 (checkNonVoidType -> .)
+
+    assignment                     shift and go to state 56
+    statement                      shift and go to state 79
+    return                         shift and go to state 51
+    if                             shift and go to state 52
+    comment                        shift and go to state 53
+    read                           shift and go to state 54
+    print                          shift and go to state 55
+    module                         shift and go to state 57
+    for                            shift and go to state 58
+    while                          shift and go to state 59
+    checkNonVoidType               shift and go to state 60
+
+state 57
+
+    (114) statement -> module . SEMICOLON statement
+
+    SEMICOLON       shift and go to state 80
+
+
+state 58
+
+    (115) statement -> for . statement
+    (108) statement -> . return checkVoidType
+    (109) statement -> . if statement
+    (110) statement -> . comment statement
+    (111) statement -> . read statement
+    (112) statement -> . print statement
+    (113) statement -> . assignment statement
+    (114) statement -> . module SEMICOLON statement
+    (115) statement -> . for statement
+    (116) statement -> . while statement
+    (117) statement -> . checkNonVoidType
+    (15) return -> . RETURN LEFTPAR hyperExpression RIGHTPAR SEMICOLON
+    (16) if -> . IF LEFTPAR hyperExpression RIGHTPAR createJumpQuadIf THEN LEFTBRACE statement RIGHTBRACE ifElse updateJumpQuad
+    (22) comment -> . COMMENT_TEXT
+    (95) read -> . READ LEFTPAR id_list RIGHTPAR SEMICOLON
+    (100) print -> . PRINT LEFTPAR printFunction RIGHTPAR SEMICOLON
+    (7) assignment -> . ID dimArray EQUAL hyperExpression SEMICOLON
+    (120) module -> . ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+    (27) for -> . FOR forAssignment TO insertJumpFor hyperExpression createQuadFor LEFTBRACE statement RIGHTBRACE updateQuadFor
+    (23) while -> . WHILE pushLoopJump LEFTPAR hyperExpression RIGHTPAR beginLoopAction LEFTBRACE statement RIGHTBRACE endLoopAction
+    (119) checkNonVoidType -> .
+
+    RETURN          shift and go to state 61
+    IF              shift and go to state 62
+    COMMENT_TEXT    shift and go to state 63
+    READ            shift and go to state 64
+    PRINT           shift and go to state 65
+    ID              shift and go to state 66
+    FOR             shift and go to state 67
+    WHILE           shift and go to state 68
+    RIGHTBRACE      reduce using rule 119 (checkNonVoidType -> .)
+
+    for                            shift and go to state 58
+    statement                      shift and go to state 81
+    return                         shift and go to state 51
+    if                             shift and go to state 52
+    comment                        shift and go to state 53
+    read                           shift and go to state 54
+    print                          shift and go to state 55
+    assignment                     shift and go to state 56
+    module                         shift and go to state 57
+    while                          shift and go to state 59
+    checkNonVoidType               shift and go to state 60
+
+state 59
+
+    (116) statement -> while . statement
+    (108) statement -> . return checkVoidType
+    (109) statement -> . if statement
+    (110) statement -> . comment statement
+    (111) statement -> . read statement
+    (112) statement -> . print statement
+    (113) statement -> . assignment statement
+    (114) statement -> . module SEMICOLON statement
+    (115) statement -> . for statement
+    (116) statement -> . while statement
+    (117) statement -> . checkNonVoidType
+    (15) return -> . RETURN LEFTPAR hyperExpression RIGHTPAR SEMICOLON
+    (16) if -> . IF LEFTPAR hyperExpression RIGHTPAR createJumpQuadIf THEN LEFTBRACE statement RIGHTBRACE ifElse updateJumpQuad
+    (22) comment -> . COMMENT_TEXT
+    (95) read -> . READ LEFTPAR id_list RIGHTPAR SEMICOLON
+    (100) print -> . PRINT LEFTPAR printFunction RIGHTPAR SEMICOLON
+    (7) assignment -> . ID dimArray EQUAL hyperExpression SEMICOLON
+    (120) module -> . ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+    (27) for -> . FOR forAssignment TO insertJumpFor hyperExpression createQuadFor LEFTBRACE statement RIGHTBRACE updateQuadFor
+    (23) while -> . WHILE pushLoopJump LEFTPAR hyperExpression RIGHTPAR beginLoopAction LEFTBRACE statement RIGHTBRACE endLoopAction
+    (119) checkNonVoidType -> .
+
+    RETURN          shift and go to state 61
+    IF              shift and go to state 62
+    COMMENT_TEXT    shift and go to state 63
+    READ            shift and go to state 64
+    PRINT           shift and go to state 65
+    ID              shift and go to state 66
+    FOR             shift and go to state 67
+    WHILE           shift and go to state 68
+    RIGHTBRACE      reduce using rule 119 (checkNonVoidType -> .)
+
+    while                          shift and go to state 59
+    statement                      shift and go to state 82
+    return                         shift and go to state 51
+    if                             shift and go to state 52
+    comment                        shift and go to state 53
+    read                           shift and go to state 54
+    print                          shift and go to state 55
+    assignment                     shift and go to state 56
+    module                         shift and go to state 57
+    for                            shift and go to state 58
+    checkNonVoidType               shift and go to state 60
+
+state 60
+
+    (117) statement -> checkNonVoidType .
+
+    RIGHTBRACE      reduce using rule 117 (statement -> checkNonVoidType .)
+
+
+state 61
+
+    (15) return -> RETURN . LEFTPAR hyperExpression RIGHTPAR SEMICOLON
+
+    LEFTPAR         shift and go to state 83
+
+
+state 62
+
+    (16) if -> IF . LEFTPAR hyperExpression RIGHTPAR createJumpQuadIf THEN LEFTBRACE statement RIGHTBRACE ifElse updateJumpQuad
+
+    LEFTPAR         shift and go to state 84
+
+
+state 63
+
+    (22) comment -> COMMENT_TEXT .
+
+    RETURN          reduce using rule 22 (comment -> COMMENT_TEXT .)
+    IF              reduce using rule 22 (comment -> COMMENT_TEXT .)
+    COMMENT_TEXT    reduce using rule 22 (comment -> COMMENT_TEXT .)
+    READ            reduce using rule 22 (comment -> COMMENT_TEXT .)
+    PRINT           reduce using rule 22 (comment -> COMMENT_TEXT .)
+    ID              reduce using rule 22 (comment -> COMMENT_TEXT .)
+    FOR             reduce using rule 22 (comment -> COMMENT_TEXT .)
+    WHILE           reduce using rule 22 (comment -> COMMENT_TEXT .)
+    RIGHTBRACE      reduce using rule 22 (comment -> COMMENT_TEXT .)
+
+
+state 64
+
+    (95) read -> READ . LEFTPAR id_list RIGHTPAR SEMICOLON
+
+    LEFTPAR         shift and go to state 85
+
+
+state 65
+
+    (100) print -> PRINT . LEFTPAR printFunction RIGHTPAR SEMICOLON
+
+    LEFTPAR         shift and go to state 86
+
+
+state 66
+
+    (7) assignment -> ID . dimArray EQUAL hyperExpression SEMICOLON
+    (120) module -> ID . checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+    (130) dimArray -> . addOperandId addTypeId LEFTBRACK readIDType hyperExpression verifyRows RIGHTBRACK dimMatrix
+    (131) dimArray -> . addOperandId addTypeId
+    (121) checkFuncExists -> .
+    (132) addOperandId -> .
+
+    LEFTPAR         reduce using rule 121 (checkFuncExists -> .)
+    LEFTBRACK       reduce using rule 132 (addOperandId -> .)
+    EQUAL           reduce using rule 132 (addOperandId -> .)
+
+    dimArray                       shift and go to state 87
+    checkFuncExists                shift and go to state 88
+    addOperandId                   shift and go to state 89
+
+state 67
+
+    (27) for -> FOR . forAssignment TO insertJumpFor hyperExpression createQuadFor LEFTBRACE statement RIGHTBRACE updateQuadFor
+    (31) forAssignment -> . ID EQUAL CST_INT addTypeInt
+
+    ID              shift and go to state 91
+
+    forAssignment                  shift and go to state 90
+
+state 68
+
+    (23) while -> WHILE . pushLoopJump LEFTPAR hyperExpression RIGHTPAR beginLoopAction LEFTBRACE statement RIGHTBRACE endLoopAction
+    (24) pushLoopJump -> .
+
+    LEFTPAR         reduce using rule 24 (pushLoopJump -> .)
+
+    pushLoopJump                   shift and go to state 92
+
+state 69
+
+    (42) function -> functionType ID addFuncToDir LEFTPAR param RIGHTPAR setParamLength LEFTBRACE . declaration statement RIGHTBRACE
+    (8) declaration -> . VAR declarationPrim
+    (9) declaration -> .
+
+    VAR             shift and go to state 7
+    RETURN          reduce using rule 9 (declaration -> .)
+    IF              reduce using rule 9 (declaration -> .)
+    COMMENT_TEXT    reduce using rule 9 (declaration -> .)
+    READ            reduce using rule 9 (declaration -> .)
+    PRINT           reduce using rule 9 (declaration -> .)
+    ID              reduce using rule 9 (declaration -> .)
+    FOR             reduce using rule 9 (declaration -> .)
+    WHILE           reduce using rule 9 (declaration -> .)
+    RIGHTBRACE      reduce using rule 9 (declaration -> .)
+
+    declaration                    shift and go to state 93
+
+state 70
+
+    (47) param -> primitive ID addFuncParams functionParam .
+
+    RIGHTPAR        reduce using rule 47 (param -> primitive ID addFuncParams functionParam .)
+
+
+state 71
+
+    (51) functionParam -> COMA . param
+    (47) param -> . primitive ID addFuncParams functionParam
+    (48) param -> .
+    (12) primitive -> . INT
+    (13) primitive -> . FLOAT
+    (14) primitive -> . CHAR
+
+    RIGHTPAR        reduce using rule 48 (param -> .)
+    INT             shift and go to state 14
+    FLOAT           shift and go to state 15
+    CHAR            shift and go to state 16
+
+    param                          shift and go to state 94
+    primitive                      shift and go to state 37
+
+state 72
+
+    (36) varsArray -> LEFTBRACK CST_INT addTypeInt RIGHTBRACK setRows . varsMatrix
+    (39) varsMatrix -> . LEFTBRACK CST_INT addTypeInt RIGHTBRACK setCols
+    (40) varsMatrix -> .
+
+    LEFTBRACK       shift and go to state 95
+    COMA            reduce using rule 40 (varsMatrix -> .)
+    SEMICOLON       reduce using rule 40 (varsMatrix -> .)
+
+    varsMatrix                     shift and go to state 96
+
+state 73
+
+    (5) main -> mainTable MAIN LEFTPAR RIGHTPAR LEFTBRACE declaration statement RIGHTBRACE .
+
+    $end            reduce using rule 5 (main -> mainTable MAIN LEFTPAR RIGHTPAR LEFTBRACE declaration statement RIGHTBRACE .)
+
+
+state 74
+
+    (108) statement -> return checkVoidType .
+
+    RIGHTBRACE      reduce using rule 108 (statement -> return checkVoidType .)
+
+
+state 75
+
+    (109) statement -> if statement .
+
+    RIGHTBRACE      reduce using rule 109 (statement -> if statement .)
+
+
+state 76
+
+    (110) statement -> comment statement .
+
+    RIGHTBRACE      reduce using rule 110 (statement -> comment statement .)
+
+
+state 77
+
+    (111) statement -> read statement .
+
+    RIGHTBRACE      reduce using rule 111 (statement -> read statement .)
+
+
+state 78
+
+    (112) statement -> print statement .
+
+    RIGHTBRACE      reduce using rule 112 (statement -> print statement .)
+
+
+state 79
+
+    (113) statement -> assignment statement .
+
+    RIGHTBRACE      reduce using rule 113 (statement -> assignment statement .)
+
+
+state 80
+
+    (114) statement -> module SEMICOLON . statement
+    (108) statement -> . return checkVoidType
+    (109) statement -> . if statement
+    (110) statement -> . comment statement
+    (111) statement -> . read statement
+    (112) statement -> . print statement
+    (113) statement -> . assignment statement
+    (114) statement -> . module SEMICOLON statement
+    (115) statement -> . for statement
+    (116) statement -> . while statement
+    (117) statement -> . checkNonVoidType
+    (15) return -> . RETURN LEFTPAR hyperExpression RIGHTPAR SEMICOLON
+    (16) if -> . IF LEFTPAR hyperExpression RIGHTPAR createJumpQuadIf THEN LEFTBRACE statement RIGHTBRACE ifElse updateJumpQuad
+    (22) comment -> . COMMENT_TEXT
+    (95) read -> . READ LEFTPAR id_list RIGHTPAR SEMICOLON
+    (100) print -> . PRINT LEFTPAR printFunction RIGHTPAR SEMICOLON
+    (7) assignment -> . ID dimArray EQUAL hyperExpression SEMICOLON
+    (120) module -> . ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+    (27) for -> . FOR forAssignment TO insertJumpFor hyperExpression createQuadFor LEFTBRACE statement RIGHTBRACE updateQuadFor
+    (23) while -> . WHILE pushLoopJump LEFTPAR hyperExpression RIGHTPAR beginLoopAction LEFTBRACE statement RIGHTBRACE endLoopAction
+    (119) checkNonVoidType -> .
+
+    RETURN          shift and go to state 61
+    IF              shift and go to state 62
+    COMMENT_TEXT    shift and go to state 63
+    READ            shift and go to state 64
+    PRINT           shift and go to state 65
+    ID              shift and go to state 66
+    FOR             shift and go to state 67
+    WHILE           shift and go to state 68
+    RIGHTBRACE      reduce using rule 119 (checkNonVoidType -> .)
+
+    module                         shift and go to state 57
+    statement                      shift and go to state 97
+    return                         shift and go to state 51
+    if                             shift and go to state 52
+    comment                        shift and go to state 53
+    read                           shift and go to state 54
+    print                          shift and go to state 55
+    assignment                     shift and go to state 56
+    for                            shift and go to state 58
+    while                          shift and go to state 59
+    checkNonVoidType               shift and go to state 60
+
+state 81
+
+    (115) statement -> for statement .
+
+    RIGHTBRACE      reduce using rule 115 (statement -> for statement .)
+
+
+state 82
+
+    (116) statement -> while statement .
+
+    RIGHTBRACE      reduce using rule 116 (statement -> while statement .)
+
+
+state 83
+
+    (15) return -> RETURN LEFTPAR . hyperExpression RIGHTPAR SEMICOLON
+    (59) hyperExpression -> . superExpression evaluateHE opHyperExpression hyperExpressionNested
+    (60) hyperExpression -> . superExpression opMatrix evaluateOpMatrix
+    (61) hyperExpression -> . superExpression evaluateHE
+    (71) superExpression -> . exp evaluateSE opSuperExpression exp evaluateSE
+    (72) superExpression -> . exp evaluateSE
+    (78) exp -> . term evaluateTerm expFunction
+    (79) exp -> . term evaluateTerm
+    (83) term -> . factor evaluateFactor termFunction
+    (84) term -> . factor evaluateFactor
+    (89) factor -> . LEFTPAR addFF hyperExpression RIGHTPAR removeFF
+    (90) factor -> . cst_prim
+    (91) factor -> . module
+    (92) factor -> . ID dimArray
+    (53) cst_prim -> . CST_INT addTypeInt
+    (54) cst_prim -> . CST_FLOAT addTypeFloat
+    (55) cst_prim -> . CST_CHAR addTypeChar
+    (120) module -> . ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+
+    LEFTPAR         shift and go to state 98
+    ID              shift and go to state 106
+    CST_INT         shift and go to state 107
+    CST_FLOAT       shift and go to state 108
+    CST_CHAR        shift and go to state 109
+
+    hyperExpression                shift and go to state 99
+    superExpression                shift and go to state 100
+    exp                            shift and go to state 101
+    term                           shift and go to state 102
+    factor                         shift and go to state 103
+    cst_prim                       shift and go to state 104
+    module                         shift and go to state 105
+
+state 84
+
+    (16) if -> IF LEFTPAR . hyperExpression RIGHTPAR createJumpQuadIf THEN LEFTBRACE statement RIGHTBRACE ifElse updateJumpQuad
+    (59) hyperExpression -> . superExpression evaluateHE opHyperExpression hyperExpressionNested
+    (60) hyperExpression -> . superExpression opMatrix evaluateOpMatrix
+    (61) hyperExpression -> . superExpression evaluateHE
+    (71) superExpression -> . exp evaluateSE opSuperExpression exp evaluateSE
+    (72) superExpression -> . exp evaluateSE
+    (78) exp -> . term evaluateTerm expFunction
+    (79) exp -> . term evaluateTerm
+    (83) term -> . factor evaluateFactor termFunction
+    (84) term -> . factor evaluateFactor
+    (89) factor -> . LEFTPAR addFF hyperExpression RIGHTPAR removeFF
+    (90) factor -> . cst_prim
+    (91) factor -> . module
+    (92) factor -> . ID dimArray
+    (53) cst_prim -> . CST_INT addTypeInt
+    (54) cst_prim -> . CST_FLOAT addTypeFloat
+    (55) cst_prim -> . CST_CHAR addTypeChar
+    (120) module -> . ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+
+    LEFTPAR         shift and go to state 98
+    ID              shift and go to state 106
+    CST_INT         shift and go to state 107
+    CST_FLOAT       shift and go to state 108
+    CST_CHAR        shift and go to state 109
+
+    hyperExpression                shift and go to state 110
+    superExpression                shift and go to state 100
+    exp                            shift and go to state 101
+    term                           shift and go to state 102
+    factor                         shift and go to state 103
+    cst_prim                       shift and go to state 104
+    module                         shift and go to state 105
+
+state 85
+
+    (95) read -> READ LEFTPAR . id_list RIGHTPAR SEMICOLON
+    (96) id_list -> . ID dimArray addRead id_listFunction
+
+    ID              shift and go to state 112
+
+    id_list                        shift and go to state 111
+
+state 86
+
+    (100) print -> PRINT LEFTPAR . printFunction RIGHTPAR SEMICOLON
+    (101) printFunction -> . print_param COMA printFunction2
+    (102) printFunction -> . print_param
+    (104) print_param -> . hyperExpression addPrint
+    (105) print_param -> . CST_STRING addPrintString
+    (59) hyperExpression -> . superExpression evaluateHE opHyperExpression hyperExpressionNested
+    (60) hyperExpression -> . superExpression opMatrix evaluateOpMatrix
+    (61) hyperExpression -> . superExpression evaluateHE
+    (71) superExpression -> . exp evaluateSE opSuperExpression exp evaluateSE
+    (72) superExpression -> . exp evaluateSE
+    (78) exp -> . term evaluateTerm expFunction
+    (79) exp -> . term evaluateTerm
+    (83) term -> . factor evaluateFactor termFunction
+    (84) term -> . factor evaluateFactor
+    (89) factor -> . LEFTPAR addFF hyperExpression RIGHTPAR removeFF
+    (90) factor -> . cst_prim
+    (91) factor -> . module
+    (92) factor -> . ID dimArray
+    (53) cst_prim -> . CST_INT addTypeInt
+    (54) cst_prim -> . CST_FLOAT addTypeFloat
+    (55) cst_prim -> . CST_CHAR addTypeChar
+    (120) module -> . ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+
+    CST_STRING      shift and go to state 116
+    LEFTPAR         shift and go to state 98
+    ID              shift and go to state 106
+    CST_INT         shift and go to state 107
+    CST_FLOAT       shift and go to state 108
+    CST_CHAR        shift and go to state 109
+
+    printFunction                  shift and go to state 113
+    print_param                    shift and go to state 114
+    hyperExpression                shift and go to state 115
+    superExpression                shift and go to state 100
+    exp                            shift and go to state 101
+    term                           shift and go to state 102
+    factor                         shift and go to state 103
+    cst_prim                       shift and go to state 104
+    module                         shift and go to state 105
+
+state 87
+
+    (7) assignment -> ID dimArray . EQUAL hyperExpression SEMICOLON
+
+    EQUAL           shift and go to state 117
+
+
+state 88
+
+    (120) module -> ID checkFuncExists . genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+    (122) genERASize -> .
+
+    LEFTPAR         reduce using rule 122 (genERASize -> .)
+
+    genERASize                     shift and go to state 118
+
+state 89
+
+    (130) dimArray -> addOperandId . addTypeId LEFTBRACK readIDType hyperExpression verifyRows RIGHTBRACK dimMatrix
+    (131) dimArray -> addOperandId . addTypeId
+    (133) addTypeId -> .
+
+    LEFTBRACK       reduce using rule 133 (addTypeId -> .)
+    EQUAL           reduce using rule 133 (addTypeId -> .)
+    MULTIPLY        reduce using rule 133 (addTypeId -> .)
+    DIVIDE          reduce using rule 133 (addTypeId -> .)
+    PLUS            reduce using rule 133 (addTypeId -> .)
+    MINUS           reduce using rule 133 (addTypeId -> .)
+    GT              reduce using rule 133 (addTypeId -> .)
+    LT              reduce using rule 133 (addTypeId -> .)
+    NOTEQUAL        reduce using rule 133 (addTypeId -> .)
+    ISEQUAL         reduce using rule 133 (addTypeId -> .)
+    EXCLAMATION     reduce using rule 133 (addTypeId -> .)
+    QUESTION        reduce using rule 133 (addTypeId -> .)
+    DOLLARSIGN      reduce using rule 133 (addTypeId -> .)
+    AND             reduce using rule 133 (addTypeId -> .)
+    OR              reduce using rule 133 (addTypeId -> .)
+    RIGHTPAR        reduce using rule 133 (addTypeId -> .)
+    COMA            reduce using rule 133 (addTypeId -> .)
+    SEMICOLON       reduce using rule 133 (addTypeId -> .)
+    LEFTBRACE       reduce using rule 133 (addTypeId -> .)
+    RIGHTBRACK      reduce using rule 133 (addTypeId -> .)
+
+    addTypeId                      shift and go to state 119
+
+state 90
+
+    (27) for -> FOR forAssignment . TO insertJumpFor hyperExpression createQuadFor LEFTBRACE statement RIGHTBRACE updateQuadFor
+
+    TO              shift and go to state 120
+
+
+state 91
+
+    (31) forAssignment -> ID . EQUAL CST_INT addTypeInt
+
+    EQUAL           shift and go to state 121
+
+
+state 92
+
+    (23) while -> WHILE pushLoopJump . LEFTPAR hyperExpression RIGHTPAR beginLoopAction LEFTBRACE statement RIGHTBRACE endLoopAction
+
+    LEFTPAR         shift and go to state 122
+
+
+state 93
+
+    (42) function -> functionType ID addFuncToDir LEFTPAR param RIGHTPAR setParamLength LEFTBRACE declaration . statement RIGHTBRACE
+    (108) statement -> . return checkVoidType
+    (109) statement -> . if statement
+    (110) statement -> . comment statement
+    (111) statement -> . read statement
+    (112) statement -> . print statement
+    (113) statement -> . assignment statement
+    (114) statement -> . module SEMICOLON statement
+    (115) statement -> . for statement
+    (116) statement -> . while statement
+    (117) statement -> . checkNonVoidType
+    (15) return -> . RETURN LEFTPAR hyperExpression RIGHTPAR SEMICOLON
+    (16) if -> . IF LEFTPAR hyperExpression RIGHTPAR createJumpQuadIf THEN LEFTBRACE statement RIGHTBRACE ifElse updateJumpQuad
+    (22) comment -> . COMMENT_TEXT
+    (95) read -> . READ LEFTPAR id_list RIGHTPAR SEMICOLON
+    (100) print -> . PRINT LEFTPAR printFunction RIGHTPAR SEMICOLON
+    (7) assignment -> . ID dimArray EQUAL hyperExpression SEMICOLON
+    (120) module -> . ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+    (27) for -> . FOR forAssignment TO insertJumpFor hyperExpression createQuadFor LEFTBRACE statement RIGHTBRACE updateQuadFor
+    (23) while -> . WHILE pushLoopJump LEFTPAR hyperExpression RIGHTPAR beginLoopAction LEFTBRACE statement RIGHTBRACE endLoopAction
+    (119) checkNonVoidType -> .
+
+    RETURN          shift and go to state 61
+    IF              shift and go to state 62
+    COMMENT_TEXT    shift and go to state 63
+    READ            shift and go to state 64
+    PRINT           shift and go to state 65
+    ID              shift and go to state 66
+    FOR             shift and go to state 67
+    WHILE           shift and go to state 68
+    RIGHTBRACE      reduce using rule 119 (checkNonVoidType -> .)
+
+    statement                      shift and go to state 123
+    return                         shift and go to state 51
+    if                             shift and go to state 52
+    comment                        shift and go to state 53
+    read                           shift and go to state 54
+    print                          shift and go to state 55
+    assignment                     shift and go to state 56
+    module                         shift and go to state 57
+    for                            shift and go to state 58
+    while                          shift and go to state 59
+    checkNonVoidType               shift and go to state 60
+
+state 94
+
+    (51) functionParam -> COMA param .
+
+    RIGHTPAR        reduce using rule 51 (functionParam -> COMA param .)
+
+
+state 95
+
+    (39) varsMatrix -> LEFTBRACK . CST_INT addTypeInt RIGHTBRACK setCols
+
+    CST_INT         shift and go to state 124
+
+
+state 96
+
+    (36) varsArray -> LEFTBRACK CST_INT addTypeInt RIGHTBRACK setRows varsMatrix .
+
+    COMA            reduce using rule 36 (varsArray -> LEFTBRACK CST_INT addTypeInt RIGHTBRACK setRows varsMatrix .)
+    SEMICOLON       reduce using rule 36 (varsArray -> LEFTBRACK CST_INT addTypeInt RIGHTBRACK setRows varsMatrix .)
+
+
+state 97
+
+    (114) statement -> module SEMICOLON statement .
+
+    RIGHTBRACE      reduce using rule 114 (statement -> module SEMICOLON statement .)
+
+
+state 98
+
+    (89) factor -> LEFTPAR . addFF hyperExpression RIGHTPAR removeFF
+    (93) addFF -> .
+
+    LEFTPAR         reduce using rule 93 (addFF -> .)
+    ID              reduce using rule 93 (addFF -> .)
+    CST_INT         reduce using rule 93 (addFF -> .)
+    CST_FLOAT       reduce using rule 93 (addFF -> .)
+    CST_CHAR        reduce using rule 93 (addFF -> .)
+
+    addFF                          shift and go to state 125
+
+state 99
+
+    (15) return -> RETURN LEFTPAR hyperExpression . RIGHTPAR SEMICOLON
+
+    RIGHTPAR        shift and go to state 126
+
+
+state 100
+
+    (59) hyperExpression -> superExpression . evaluateHE opHyperExpression hyperExpressionNested
+    (60) hyperExpression -> superExpression . opMatrix evaluateOpMatrix
+    (61) hyperExpression -> superExpression . evaluateHE
+    (65) evaluateHE -> .
+    (66) opMatrix -> . EXCLAMATION addOperator
+    (67) opMatrix -> . QUESTION addOperator
+    (68) opMatrix -> . DOLLARSIGN addOperator
+
+    AND             reduce using rule 65 (evaluateHE -> .)
+    OR              reduce using rule 65 (evaluateHE -> .)
+    RIGHTPAR        reduce using rule 65 (evaluateHE -> .)
+    COMA            reduce using rule 65 (evaluateHE -> .)
+    SEMICOLON       reduce using rule 65 (evaluateHE -> .)
+    LEFTBRACE       reduce using rule 65 (evaluateHE -> .)
+    RIGHTBRACK      reduce using rule 65 (evaluateHE -> .)
+    EXCLAMATION     shift and go to state 129
+    QUESTION        shift and go to state 130
+    DOLLARSIGN      shift and go to state 131
+
+    evaluateHE                     shift and go to state 127
+    opMatrix                       shift and go to state 128
+
+state 101
+
+    (71) superExpression -> exp . evaluateSE opSuperExpression exp evaluateSE
+    (72) superExpression -> exp . evaluateSE
+    (73) evaluateSE -> .
+
+    GT              reduce using rule 73 (evaluateSE -> .)
+    LT              reduce using rule 73 (evaluateSE -> .)
+    NOTEQUAL        reduce using rule 73 (evaluateSE -> .)
+    ISEQUAL         reduce using rule 73 (evaluateSE -> .)
+    EXCLAMATION     reduce using rule 73 (evaluateSE -> .)
+    QUESTION        reduce using rule 73 (evaluateSE -> .)
+    DOLLARSIGN      reduce using rule 73 (evaluateSE -> .)
+    AND             reduce using rule 73 (evaluateSE -> .)
+    OR              reduce using rule 73 (evaluateSE -> .)
+    RIGHTPAR        reduce using rule 73 (evaluateSE -> .)
+    COMA            reduce using rule 73 (evaluateSE -> .)
+    SEMICOLON       reduce using rule 73 (evaluateSE -> .)
+    LEFTBRACE       reduce using rule 73 (evaluateSE -> .)
+    RIGHTBRACK      reduce using rule 73 (evaluateSE -> .)
+
+    evaluateSE                     shift and go to state 132
+
+state 102
+
+    (78) exp -> term . evaluateTerm expFunction
+    (79) exp -> term . evaluateTerm
+    (80) evaluateTerm -> .
+
+    PLUS            reduce using rule 80 (evaluateTerm -> .)
+    MINUS           reduce using rule 80 (evaluateTerm -> .)
+    GT              reduce using rule 80 (evaluateTerm -> .)
+    LT              reduce using rule 80 (evaluateTerm -> .)
+    NOTEQUAL        reduce using rule 80 (evaluateTerm -> .)
+    ISEQUAL         reduce using rule 80 (evaluateTerm -> .)
+    EXCLAMATION     reduce using rule 80 (evaluateTerm -> .)
+    QUESTION        reduce using rule 80 (evaluateTerm -> .)
+    DOLLARSIGN      reduce using rule 80 (evaluateTerm -> .)
+    AND             reduce using rule 80 (evaluateTerm -> .)
+    OR              reduce using rule 80 (evaluateTerm -> .)
+    RIGHTPAR        reduce using rule 80 (evaluateTerm -> .)
+    COMA            reduce using rule 80 (evaluateTerm -> .)
+    SEMICOLON       reduce using rule 80 (evaluateTerm -> .)
+    LEFTBRACE       reduce using rule 80 (evaluateTerm -> .)
+    RIGHTBRACK      reduce using rule 80 (evaluateTerm -> .)
+
+    evaluateTerm                   shift and go to state 133
+
+state 103
+
+    (83) term -> factor . evaluateFactor termFunction
+    (84) term -> factor . evaluateFactor
+    (85) evaluateFactor -> .
+
+    MULTIPLY        reduce using rule 85 (evaluateFactor -> .)
+    DIVIDE          reduce using rule 85 (evaluateFactor -> .)
+    PLUS            reduce using rule 85 (evaluateFactor -> .)
+    MINUS           reduce using rule 85 (evaluateFactor -> .)
+    GT              reduce using rule 85 (evaluateFactor -> .)
+    LT              reduce using rule 85 (evaluateFactor -> .)
+    NOTEQUAL        reduce using rule 85 (evaluateFactor -> .)
+    ISEQUAL         reduce using rule 85 (evaluateFactor -> .)
+    EXCLAMATION     reduce using rule 85 (evaluateFactor -> .)
+    QUESTION        reduce using rule 85 (evaluateFactor -> .)
+    DOLLARSIGN      reduce using rule 85 (evaluateFactor -> .)
+    AND             reduce using rule 85 (evaluateFactor -> .)
+    OR              reduce using rule 85 (evaluateFactor -> .)
+    RIGHTPAR        reduce using rule 85 (evaluateFactor -> .)
+    COMA            reduce using rule 85 (evaluateFactor -> .)
+    SEMICOLON       reduce using rule 85 (evaluateFactor -> .)
+    LEFTBRACE       reduce using rule 85 (evaluateFactor -> .)
+    RIGHTBRACK      reduce using rule 85 (evaluateFactor -> .)
+
+    evaluateFactor                 shift and go to state 134
+
+state 104
+
+    (90) factor -> cst_prim .
+
+    MULTIPLY        reduce using rule 90 (factor -> cst_prim .)
+    DIVIDE          reduce using rule 90 (factor -> cst_prim .)
+    PLUS            reduce using rule 90 (factor -> cst_prim .)
+    MINUS           reduce using rule 90 (factor -> cst_prim .)
+    GT              reduce using rule 90 (factor -> cst_prim .)
+    LT              reduce using rule 90 (factor -> cst_prim .)
+    NOTEQUAL        reduce using rule 90 (factor -> cst_prim .)
+    ISEQUAL         reduce using rule 90 (factor -> cst_prim .)
+    EXCLAMATION     reduce using rule 90 (factor -> cst_prim .)
+    QUESTION        reduce using rule 90 (factor -> cst_prim .)
+    DOLLARSIGN      reduce using rule 90 (factor -> cst_prim .)
+    AND             reduce using rule 90 (factor -> cst_prim .)
+    OR              reduce using rule 90 (factor -> cst_prim .)
+    RIGHTPAR        reduce using rule 90 (factor -> cst_prim .)
+    COMA            reduce using rule 90 (factor -> cst_prim .)
+    SEMICOLON       reduce using rule 90 (factor -> cst_prim .)
+    LEFTBRACE       reduce using rule 90 (factor -> cst_prim .)
+    RIGHTBRACK      reduce using rule 90 (factor -> cst_prim .)
+
+
+state 105
+
+    (91) factor -> module .
+
+    MULTIPLY        reduce using rule 91 (factor -> module .)
+    DIVIDE          reduce using rule 91 (factor -> module .)
+    PLUS            reduce using rule 91 (factor -> module .)
+    MINUS           reduce using rule 91 (factor -> module .)
+    GT              reduce using rule 91 (factor -> module .)
+    LT              reduce using rule 91 (factor -> module .)
+    NOTEQUAL        reduce using rule 91 (factor -> module .)
+    ISEQUAL         reduce using rule 91 (factor -> module .)
+    EXCLAMATION     reduce using rule 91 (factor -> module .)
+    QUESTION        reduce using rule 91 (factor -> module .)
+    DOLLARSIGN      reduce using rule 91 (factor -> module .)
+    AND             reduce using rule 91 (factor -> module .)
+    OR              reduce using rule 91 (factor -> module .)
+    RIGHTPAR        reduce using rule 91 (factor -> module .)
+    COMA            reduce using rule 91 (factor -> module .)
+    SEMICOLON       reduce using rule 91 (factor -> module .)
+    LEFTBRACE       reduce using rule 91 (factor -> module .)
+    RIGHTBRACK      reduce using rule 91 (factor -> module .)
+
+
+state 106
+
+    (92) factor -> ID . dimArray
+    (120) module -> ID . checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+    (130) dimArray -> . addOperandId addTypeId LEFTBRACK readIDType hyperExpression verifyRows RIGHTBRACK dimMatrix
+    (131) dimArray -> . addOperandId addTypeId
+    (121) checkFuncExists -> .
+    (132) addOperandId -> .
+
+    LEFTPAR         reduce using rule 121 (checkFuncExists -> .)
+    LEFTBRACK       reduce using rule 132 (addOperandId -> .)
+    MULTIPLY        reduce using rule 132 (addOperandId -> .)
+    DIVIDE          reduce using rule 132 (addOperandId -> .)
+    PLUS            reduce using rule 132 (addOperandId -> .)
+    MINUS           reduce using rule 132 (addOperandId -> .)
+    GT              reduce using rule 132 (addOperandId -> .)
+    LT              reduce using rule 132 (addOperandId -> .)
+    NOTEQUAL        reduce using rule 132 (addOperandId -> .)
+    ISEQUAL         reduce using rule 132 (addOperandId -> .)
+    EXCLAMATION     reduce using rule 132 (addOperandId -> .)
+    QUESTION        reduce using rule 132 (addOperandId -> .)
+    DOLLARSIGN      reduce using rule 132 (addOperandId -> .)
+    AND             reduce using rule 132 (addOperandId -> .)
+    OR              reduce using rule 132 (addOperandId -> .)
+    RIGHTPAR        reduce using rule 132 (addOperandId -> .)
+    COMA            reduce using rule 132 (addOperandId -> .)
+    SEMICOLON       reduce using rule 132 (addOperandId -> .)
+    LEFTBRACE       reduce using rule 132 (addOperandId -> .)
+    RIGHTBRACK      reduce using rule 132 (addOperandId -> .)
+
+    dimArray                       shift and go to state 135
+    checkFuncExists                shift and go to state 88
+    addOperandId                   shift and go to state 89
+
+state 107
+
+    (53) cst_prim -> CST_INT . addTypeInt
+    (56) addTypeInt -> .
+
+    MULTIPLY        reduce using rule 56 (addTypeInt -> .)
+    DIVIDE          reduce using rule 56 (addTypeInt -> .)
+    PLUS            reduce using rule 56 (addTypeInt -> .)
+    MINUS           reduce using rule 56 (addTypeInt -> .)
+    GT              reduce using rule 56 (addTypeInt -> .)
+    LT              reduce using rule 56 (addTypeInt -> .)
+    NOTEQUAL        reduce using rule 56 (addTypeInt -> .)
+    ISEQUAL         reduce using rule 56 (addTypeInt -> .)
+    EXCLAMATION     reduce using rule 56 (addTypeInt -> .)
+    QUESTION        reduce using rule 56 (addTypeInt -> .)
+    DOLLARSIGN      reduce using rule 56 (addTypeInt -> .)
+    AND             reduce using rule 56 (addTypeInt -> .)
+    OR              reduce using rule 56 (addTypeInt -> .)
+    RIGHTPAR        reduce using rule 56 (addTypeInt -> .)
+    COMA            reduce using rule 56 (addTypeInt -> .)
+    SEMICOLON       reduce using rule 56 (addTypeInt -> .)
+    LEFTBRACE       reduce using rule 56 (addTypeInt -> .)
+    RIGHTBRACK      reduce using rule 56 (addTypeInt -> .)
+
+    addTypeInt                     shift and go to state 136
+
+state 108
+
+    (54) cst_prim -> CST_FLOAT . addTypeFloat
+    (57) addTypeFloat -> .
+
+    MULTIPLY        reduce using rule 57 (addTypeFloat -> .)
+    DIVIDE          reduce using rule 57 (addTypeFloat -> .)
+    PLUS            reduce using rule 57 (addTypeFloat -> .)
+    MINUS           reduce using rule 57 (addTypeFloat -> .)
+    GT              reduce using rule 57 (addTypeFloat -> .)
+    LT              reduce using rule 57 (addTypeFloat -> .)
+    NOTEQUAL        reduce using rule 57 (addTypeFloat -> .)
+    ISEQUAL         reduce using rule 57 (addTypeFloat -> .)
+    EXCLAMATION     reduce using rule 57 (addTypeFloat -> .)
+    QUESTION        reduce using rule 57 (addTypeFloat -> .)
+    DOLLARSIGN      reduce using rule 57 (addTypeFloat -> .)
+    AND             reduce using rule 57 (addTypeFloat -> .)
+    OR              reduce using rule 57 (addTypeFloat -> .)
+    RIGHTPAR        reduce using rule 57 (addTypeFloat -> .)
+    COMA            reduce using rule 57 (addTypeFloat -> .)
+    SEMICOLON       reduce using rule 57 (addTypeFloat -> .)
+    LEFTBRACE       reduce using rule 57 (addTypeFloat -> .)
+    RIGHTBRACK      reduce using rule 57 (addTypeFloat -> .)
+
+    addTypeFloat                   shift and go to state 137
+
+state 109
+
+    (55) cst_prim -> CST_CHAR . addTypeChar
+    (58) addTypeChar -> .
+
+    MULTIPLY        reduce using rule 58 (addTypeChar -> .)
+    DIVIDE          reduce using rule 58 (addTypeChar -> .)
+    PLUS            reduce using rule 58 (addTypeChar -> .)
+    MINUS           reduce using rule 58 (addTypeChar -> .)
+    GT              reduce using rule 58 (addTypeChar -> .)
+    LT              reduce using rule 58 (addTypeChar -> .)
+    NOTEQUAL        reduce using rule 58 (addTypeChar -> .)
+    ISEQUAL         reduce using rule 58 (addTypeChar -> .)
+    EXCLAMATION     reduce using rule 58 (addTypeChar -> .)
+    QUESTION        reduce using rule 58 (addTypeChar -> .)
+    DOLLARSIGN      reduce using rule 58 (addTypeChar -> .)
+    AND             reduce using rule 58 (addTypeChar -> .)
+    OR              reduce using rule 58 (addTypeChar -> .)
+    RIGHTPAR        reduce using rule 58 (addTypeChar -> .)
+    COMA            reduce using rule 58 (addTypeChar -> .)
+    SEMICOLON       reduce using rule 58 (addTypeChar -> .)
+    LEFTBRACE       reduce using rule 58 (addTypeChar -> .)
+    RIGHTBRACK      reduce using rule 58 (addTypeChar -> .)
+
+    addTypeChar                    shift and go to state 138
+
+state 110
+
+    (16) if -> IF LEFTPAR hyperExpression . RIGHTPAR createJumpQuadIf THEN LEFTBRACE statement RIGHTBRACE ifElse updateJumpQuad
+
+    RIGHTPAR        shift and go to state 139
+
+
+state 111
+
+    (95) read -> READ LEFTPAR id_list . RIGHTPAR SEMICOLON
+
+    RIGHTPAR        shift and go to state 140
+
+
+state 112
+
+    (96) id_list -> ID . dimArray addRead id_listFunction
+    (130) dimArray -> . addOperandId addTypeId LEFTBRACK readIDType hyperExpression verifyRows RIGHTBRACK dimMatrix
+    (131) dimArray -> . addOperandId addTypeId
+    (132) addOperandId -> .
+
+    LEFTBRACK       reduce using rule 132 (addOperandId -> .)
+    COMA            reduce using rule 132 (addOperandId -> .)
+    RIGHTPAR        reduce using rule 132 (addOperandId -> .)
+
+    dimArray                       shift and go to state 141
+    addOperandId                   shift and go to state 89
+
+state 113
+
+    (100) print -> PRINT LEFTPAR printFunction . RIGHTPAR SEMICOLON
+
+    RIGHTPAR        shift and go to state 142
+
+
+state 114
+
+    (101) printFunction -> print_param . COMA printFunction2
+    (102) printFunction -> print_param .
+
+    COMA            shift and go to state 143
+    RIGHTPAR        reduce using rule 102 (printFunction -> print_param .)
+
+
+state 115
+
+    (104) print_param -> hyperExpression . addPrint
+    (106) addPrint -> .
+
+    COMA            reduce using rule 106 (addPrint -> .)
+    RIGHTPAR        reduce using rule 106 (addPrint -> .)
+
+    addPrint                       shift and go to state 144
+
+state 116
+
+    (105) print_param -> CST_STRING . addPrintString
+    (107) addPrintString -> .
+
+    COMA            reduce using rule 107 (addPrintString -> .)
+    RIGHTPAR        reduce using rule 107 (addPrintString -> .)
+
+    addPrintString                 shift and go to state 145
+
+state 117
+
+    (7) assignment -> ID dimArray EQUAL . hyperExpression SEMICOLON
+    (59) hyperExpression -> . superExpression evaluateHE opHyperExpression hyperExpressionNested
+    (60) hyperExpression -> . superExpression opMatrix evaluateOpMatrix
+    (61) hyperExpression -> . superExpression evaluateHE
+    (71) superExpression -> . exp evaluateSE opSuperExpression exp evaluateSE
+    (72) superExpression -> . exp evaluateSE
+    (78) exp -> . term evaluateTerm expFunction
+    (79) exp -> . term evaluateTerm
+    (83) term -> . factor evaluateFactor termFunction
+    (84) term -> . factor evaluateFactor
+    (89) factor -> . LEFTPAR addFF hyperExpression RIGHTPAR removeFF
+    (90) factor -> . cst_prim
+    (91) factor -> . module
+    (92) factor -> . ID dimArray
+    (53) cst_prim -> . CST_INT addTypeInt
+    (54) cst_prim -> . CST_FLOAT addTypeFloat
+    (55) cst_prim -> . CST_CHAR addTypeChar
+    (120) module -> . ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+
+    LEFTPAR         shift and go to state 98
+    ID              shift and go to state 106
+    CST_INT         shift and go to state 107
+    CST_FLOAT       shift and go to state 108
+    CST_CHAR        shift and go to state 109
+
+    hyperExpression                shift and go to state 146
+    superExpression                shift and go to state 100
+    exp                            shift and go to state 101
+    term                           shift and go to state 102
+    factor                         shift and go to state 103
+    cst_prim                       shift and go to state 104
+    module                         shift and go to state 105
+
+state 118
+
+    (120) module -> ID checkFuncExists genERASize . LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+
+    LEFTPAR         shift and go to state 147
+
+
+state 119
+
+    (130) dimArray -> addOperandId addTypeId . LEFTBRACK readIDType hyperExpression verifyRows RIGHTBRACK dimMatrix
+    (131) dimArray -> addOperandId addTypeId .
+
+    LEFTBRACK       shift and go to state 148
+    EQUAL           reduce using rule 131 (dimArray -> addOperandId addTypeId .)
+    MULTIPLY        reduce using rule 131 (dimArray -> addOperandId addTypeId .)
+    DIVIDE          reduce using rule 131 (dimArray -> addOperandId addTypeId .)
+    PLUS            reduce using rule 131 (dimArray -> addOperandId addTypeId .)
+    MINUS           reduce using rule 131 (dimArray -> addOperandId addTypeId .)
+    GT              reduce using rule 131 (dimArray -> addOperandId addTypeId .)
+    LT              reduce using rule 131 (dimArray -> addOperandId addTypeId .)
+    NOTEQUAL        reduce using rule 131 (dimArray -> addOperandId addTypeId .)
+    ISEQUAL         reduce using rule 131 (dimArray -> addOperandId addTypeId .)
+    EXCLAMATION     reduce using rule 131 (dimArray -> addOperandId addTypeId .)
+    QUESTION        reduce using rule 131 (dimArray -> addOperandId addTypeId .)
+    DOLLARSIGN      reduce using rule 131 (dimArray -> addOperandId addTypeId .)
+    AND             reduce using rule 131 (dimArray -> addOperandId addTypeId .)
+    OR              reduce using rule 131 (dimArray -> addOperandId addTypeId .)
+    RIGHTPAR        reduce using rule 131 (dimArray -> addOperandId addTypeId .)
+    COMA            reduce using rule 131 (dimArray -> addOperandId addTypeId .)
+    SEMICOLON       reduce using rule 131 (dimArray -> addOperandId addTypeId .)
+    LEFTBRACE       reduce using rule 131 (dimArray -> addOperandId addTypeId .)
+    RIGHTBRACK      reduce using rule 131 (dimArray -> addOperandId addTypeId .)
+
+
+state 120
+
+    (27) for -> FOR forAssignment TO . insertJumpFor hyperExpression createQuadFor LEFTBRACE statement RIGHTBRACE updateQuadFor
+    (28) insertJumpFor -> .
+
+    LEFTPAR         reduce using rule 28 (insertJumpFor -> .)
+    ID              reduce using rule 28 (insertJumpFor -> .)
+    CST_INT         reduce using rule 28 (insertJumpFor -> .)
+    CST_FLOAT       reduce using rule 28 (insertJumpFor -> .)
+    CST_CHAR        reduce using rule 28 (insertJumpFor -> .)
+
+    insertJumpFor                  shift and go to state 149
+
+state 121
+
+    (31) forAssignment -> ID EQUAL . CST_INT addTypeInt
+
+    CST_INT         shift and go to state 150
+
+
+state 122
+
+    (23) while -> WHILE pushLoopJump LEFTPAR . hyperExpression RIGHTPAR beginLoopAction LEFTBRACE statement RIGHTBRACE endLoopAction
+    (59) hyperExpression -> . superExpression evaluateHE opHyperExpression hyperExpressionNested
+    (60) hyperExpression -> . superExpression opMatrix evaluateOpMatrix
+    (61) hyperExpression -> . superExpression evaluateHE
+    (71) superExpression -> . exp evaluateSE opSuperExpression exp evaluateSE
+    (72) superExpression -> . exp evaluateSE
+    (78) exp -> . term evaluateTerm expFunction
+    (79) exp -> . term evaluateTerm
+    (83) term -> . factor evaluateFactor termFunction
+    (84) term -> . factor evaluateFactor
+    (89) factor -> . LEFTPAR addFF hyperExpression RIGHTPAR removeFF
+    (90) factor -> . cst_prim
+    (91) factor -> . module
+    (92) factor -> . ID dimArray
+    (53) cst_prim -> . CST_INT addTypeInt
+    (54) cst_prim -> . CST_FLOAT addTypeFloat
+    (55) cst_prim -> . CST_CHAR addTypeChar
+    (120) module -> . ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+
+    LEFTPAR         shift and go to state 98
+    ID              shift and go to state 106
+    CST_INT         shift and go to state 107
+    CST_FLOAT       shift and go to state 108
+    CST_CHAR        shift and go to state 109
+
+    hyperExpression                shift and go to state 151
+    superExpression                shift and go to state 100
+    exp                            shift and go to state 101
+    term                           shift and go to state 102
+    factor                         shift and go to state 103
+    cst_prim                       shift and go to state 104
+    module                         shift and go to state 105
+
+state 123
+
+    (42) function -> functionType ID addFuncToDir LEFTPAR param RIGHTPAR setParamLength LEFTBRACE declaration statement . RIGHTBRACE
+
+    RIGHTBRACE      shift and go to state 152
+
+
+state 124
+
+    (39) varsMatrix -> LEFTBRACK CST_INT . addTypeInt RIGHTBRACK setCols
+    (56) addTypeInt -> .
+
+    RIGHTBRACK      reduce using rule 56 (addTypeInt -> .)
+
+    addTypeInt                     shift and go to state 153
+
+state 125
+
+    (89) factor -> LEFTPAR addFF . hyperExpression RIGHTPAR removeFF
+    (59) hyperExpression -> . superExpression evaluateHE opHyperExpression hyperExpressionNested
+    (60) hyperExpression -> . superExpression opMatrix evaluateOpMatrix
+    (61) hyperExpression -> . superExpression evaluateHE
+    (71) superExpression -> . exp evaluateSE opSuperExpression exp evaluateSE
+    (72) superExpression -> . exp evaluateSE
+    (78) exp -> . term evaluateTerm expFunction
+    (79) exp -> . term evaluateTerm
+    (83) term -> . factor evaluateFactor termFunction
+    (84) term -> . factor evaluateFactor
+    (89) factor -> . LEFTPAR addFF hyperExpression RIGHTPAR removeFF
+    (90) factor -> . cst_prim
+    (91) factor -> . module
+    (92) factor -> . ID dimArray
+    (53) cst_prim -> . CST_INT addTypeInt
+    (54) cst_prim -> . CST_FLOAT addTypeFloat
+    (55) cst_prim -> . CST_CHAR addTypeChar
+    (120) module -> . ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+
+    LEFTPAR         shift and go to state 98
+    ID              shift and go to state 106
+    CST_INT         shift and go to state 107
+    CST_FLOAT       shift and go to state 108
+    CST_CHAR        shift and go to state 109
+
+    hyperExpression                shift and go to state 154
+    superExpression                shift and go to state 100
+    exp                            shift and go to state 101
+    term                           shift and go to state 102
+    factor                         shift and go to state 103
+    cst_prim                       shift and go to state 104
+    module                         shift and go to state 105
+
+state 126
+
+    (15) return -> RETURN LEFTPAR hyperExpression RIGHTPAR . SEMICOLON
+
+    SEMICOLON       shift and go to state 155
+
+
+state 127
+
+    (59) hyperExpression -> superExpression evaluateHE . opHyperExpression hyperExpressionNested
+    (61) hyperExpression -> superExpression evaluateHE .
+    (69) opHyperExpression -> . AND addOperator
+    (70) opHyperExpression -> . OR addOperator
+
+    RIGHTPAR        reduce using rule 61 (hyperExpression -> superExpression evaluateHE .)
+    COMA            reduce using rule 61 (hyperExpression -> superExpression evaluateHE .)
+    SEMICOLON       reduce using rule 61 (hyperExpression -> superExpression evaluateHE .)
+    LEFTBRACE       reduce using rule 61 (hyperExpression -> superExpression evaluateHE .)
+    RIGHTBRACK      reduce using rule 61 (hyperExpression -> superExpression evaluateHE .)
+    AND             shift and go to state 157
+    OR              shift and go to state 158
+
+    opHyperExpression              shift and go to state 156
+
+state 128
+
+    (60) hyperExpression -> superExpression opMatrix . evaluateOpMatrix
+    (64) evaluateOpMatrix -> .
+
+    RIGHTPAR        reduce using rule 64 (evaluateOpMatrix -> .)
+    COMA            reduce using rule 64 (evaluateOpMatrix -> .)
+    SEMICOLON       reduce using rule 64 (evaluateOpMatrix -> .)
+    LEFTBRACE       reduce using rule 64 (evaluateOpMatrix -> .)
+    RIGHTBRACK      reduce using rule 64 (evaluateOpMatrix -> .)
+
+    evaluateOpMatrix               shift and go to state 159
+
+state 129
+
+    (66) opMatrix -> EXCLAMATION . addOperator
+    (88) addOperator -> .
+
+    RIGHTPAR        reduce using rule 88 (addOperator -> .)
+    COMA            reduce using rule 88 (addOperator -> .)
+    SEMICOLON       reduce using rule 88 (addOperator -> .)
+    LEFTBRACE       reduce using rule 88 (addOperator -> .)
+    RIGHTBRACK      reduce using rule 88 (addOperator -> .)
+
+    addOperator                    shift and go to state 160
+
+state 130
+
+    (67) opMatrix -> QUESTION . addOperator
+    (88) addOperator -> .
+
+    RIGHTPAR        reduce using rule 88 (addOperator -> .)
+    COMA            reduce using rule 88 (addOperator -> .)
+    SEMICOLON       reduce using rule 88 (addOperator -> .)
+    LEFTBRACE       reduce using rule 88 (addOperator -> .)
+    RIGHTBRACK      reduce using rule 88 (addOperator -> .)
+
+    addOperator                    shift and go to state 161
+
+state 131
+
+    (68) opMatrix -> DOLLARSIGN . addOperator
+    (88) addOperator -> .
+
+    RIGHTPAR        reduce using rule 88 (addOperator -> .)
+    COMA            reduce using rule 88 (addOperator -> .)
+    SEMICOLON       reduce using rule 88 (addOperator -> .)
+    LEFTBRACE       reduce using rule 88 (addOperator -> .)
+    RIGHTBRACK      reduce using rule 88 (addOperator -> .)
+
+    addOperator                    shift and go to state 162
+
+state 132
+
+    (71) superExpression -> exp evaluateSE . opSuperExpression exp evaluateSE
+    (72) superExpression -> exp evaluateSE .
+    (74) opSuperExpression -> . GT addOperator
+    (75) opSuperExpression -> . LT addOperator
+    (76) opSuperExpression -> . NOTEQUAL addOperator
+    (77) opSuperExpression -> . ISEQUAL addOperator
+
+    EXCLAMATION     reduce using rule 72 (superExpression -> exp evaluateSE .)
+    QUESTION        reduce using rule 72 (superExpression -> exp evaluateSE .)
+    DOLLARSIGN      reduce using rule 72 (superExpression -> exp evaluateSE .)
+    AND             reduce using rule 72 (superExpression -> exp evaluateSE .)
+    OR              reduce using rule 72 (superExpression -> exp evaluateSE .)
+    RIGHTPAR        reduce using rule 72 (superExpression -> exp evaluateSE .)
+    COMA            reduce using rule 72 (superExpression -> exp evaluateSE .)
+    SEMICOLON       reduce using rule 72 (superExpression -> exp evaluateSE .)
+    LEFTBRACE       reduce using rule 72 (superExpression -> exp evaluateSE .)
+    RIGHTBRACK      reduce using rule 72 (superExpression -> exp evaluateSE .)
+    GT              shift and go to state 164
+    LT              shift and go to state 165
+    NOTEQUAL        shift and go to state 166
+    ISEQUAL         shift and go to state 167
+
+    opSuperExpression              shift and go to state 163
+
+state 133
+
+    (78) exp -> term evaluateTerm . expFunction
+    (79) exp -> term evaluateTerm .
+    (81) expFunction -> . PLUS addOperator exp
+    (82) expFunction -> . MINUS addOperator exp
+
+    GT              reduce using rule 79 (exp -> term evaluateTerm .)
+    LT              reduce using rule 79 (exp -> term evaluateTerm .)
+    NOTEQUAL        reduce using rule 79 (exp -> term evaluateTerm .)
+    ISEQUAL         reduce using rule 79 (exp -> term evaluateTerm .)
+    EXCLAMATION     reduce using rule 79 (exp -> term evaluateTerm .)
+    QUESTION        reduce using rule 79 (exp -> term evaluateTerm .)
+    DOLLARSIGN      reduce using rule 79 (exp -> term evaluateTerm .)
+    AND             reduce using rule 79 (exp -> term evaluateTerm .)
+    OR              reduce using rule 79 (exp -> term evaluateTerm .)
+    RIGHTPAR        reduce using rule 79 (exp -> term evaluateTerm .)
+    COMA            reduce using rule 79 (exp -> term evaluateTerm .)
+    SEMICOLON       reduce using rule 79 (exp -> term evaluateTerm .)
+    LEFTBRACE       reduce using rule 79 (exp -> term evaluateTerm .)
+    RIGHTBRACK      reduce using rule 79 (exp -> term evaluateTerm .)
+    PLUS            shift and go to state 169
+    MINUS           shift and go to state 170
+
+    expFunction                    shift and go to state 168
+
+state 134
+
+    (83) term -> factor evaluateFactor . termFunction
+    (84) term -> factor evaluateFactor .
+    (86) termFunction -> . MULTIPLY addOperator term
+    (87) termFunction -> . DIVIDE addOperator term
+
+    PLUS            reduce using rule 84 (term -> factor evaluateFactor .)
+    MINUS           reduce using rule 84 (term -> factor evaluateFactor .)
+    GT              reduce using rule 84 (term -> factor evaluateFactor .)
+    LT              reduce using rule 84 (term -> factor evaluateFactor .)
+    NOTEQUAL        reduce using rule 84 (term -> factor evaluateFactor .)
+    ISEQUAL         reduce using rule 84 (term -> factor evaluateFactor .)
+    EXCLAMATION     reduce using rule 84 (term -> factor evaluateFactor .)
+    QUESTION        reduce using rule 84 (term -> factor evaluateFactor .)
+    DOLLARSIGN      reduce using rule 84 (term -> factor evaluateFactor .)
+    AND             reduce using rule 84 (term -> factor evaluateFactor .)
+    OR              reduce using rule 84 (term -> factor evaluateFactor .)
+    RIGHTPAR        reduce using rule 84 (term -> factor evaluateFactor .)
+    COMA            reduce using rule 84 (term -> factor evaluateFactor .)
+    SEMICOLON       reduce using rule 84 (term -> factor evaluateFactor .)
+    LEFTBRACE       reduce using rule 84 (term -> factor evaluateFactor .)
+    RIGHTBRACK      reduce using rule 84 (term -> factor evaluateFactor .)
+    MULTIPLY        shift and go to state 172
+    DIVIDE          shift and go to state 173
+
+    termFunction                   shift and go to state 171
+
+state 135
+
+    (92) factor -> ID dimArray .
+
+    MULTIPLY        reduce using rule 92 (factor -> ID dimArray .)
+    DIVIDE          reduce using rule 92 (factor -> ID dimArray .)
+    PLUS            reduce using rule 92 (factor -> ID dimArray .)
+    MINUS           reduce using rule 92 (factor -> ID dimArray .)
+    GT              reduce using rule 92 (factor -> ID dimArray .)
+    LT              reduce using rule 92 (factor -> ID dimArray .)
+    NOTEQUAL        reduce using rule 92 (factor -> ID dimArray .)
+    ISEQUAL         reduce using rule 92 (factor -> ID dimArray .)
+    EXCLAMATION     reduce using rule 92 (factor -> ID dimArray .)
+    QUESTION        reduce using rule 92 (factor -> ID dimArray .)
+    DOLLARSIGN      reduce using rule 92 (factor -> ID dimArray .)
+    AND             reduce using rule 92 (factor -> ID dimArray .)
+    OR              reduce using rule 92 (factor -> ID dimArray .)
+    RIGHTPAR        reduce using rule 92 (factor -> ID dimArray .)
+    COMA            reduce using rule 92 (factor -> ID dimArray .)
+    SEMICOLON       reduce using rule 92 (factor -> ID dimArray .)
+    LEFTBRACE       reduce using rule 92 (factor -> ID dimArray .)
+    RIGHTBRACK      reduce using rule 92 (factor -> ID dimArray .)
+
+
+state 136
+
+    (53) cst_prim -> CST_INT addTypeInt .
+
+    MULTIPLY        reduce using rule 53 (cst_prim -> CST_INT addTypeInt .)
+    DIVIDE          reduce using rule 53 (cst_prim -> CST_INT addTypeInt .)
+    PLUS            reduce using rule 53 (cst_prim -> CST_INT addTypeInt .)
+    MINUS           reduce using rule 53 (cst_prim -> CST_INT addTypeInt .)
+    GT              reduce using rule 53 (cst_prim -> CST_INT addTypeInt .)
+    LT              reduce using rule 53 (cst_prim -> CST_INT addTypeInt .)
+    NOTEQUAL        reduce using rule 53 (cst_prim -> CST_INT addTypeInt .)
+    ISEQUAL         reduce using rule 53 (cst_prim -> CST_INT addTypeInt .)
+    EXCLAMATION     reduce using rule 53 (cst_prim -> CST_INT addTypeInt .)
+    QUESTION        reduce using rule 53 (cst_prim -> CST_INT addTypeInt .)
+    DOLLARSIGN      reduce using rule 53 (cst_prim -> CST_INT addTypeInt .)
+    AND             reduce using rule 53 (cst_prim -> CST_INT addTypeInt .)
+    OR              reduce using rule 53 (cst_prim -> CST_INT addTypeInt .)
+    RIGHTPAR        reduce using rule 53 (cst_prim -> CST_INT addTypeInt .)
+    COMA            reduce using rule 53 (cst_prim -> CST_INT addTypeInt .)
+    SEMICOLON       reduce using rule 53 (cst_prim -> CST_INT addTypeInt .)
+    LEFTBRACE       reduce using rule 53 (cst_prim -> CST_INT addTypeInt .)
+    RIGHTBRACK      reduce using rule 53 (cst_prim -> CST_INT addTypeInt .)
+
+
+state 137
+
+    (54) cst_prim -> CST_FLOAT addTypeFloat .
+
+    MULTIPLY        reduce using rule 54 (cst_prim -> CST_FLOAT addTypeFloat .)
+    DIVIDE          reduce using rule 54 (cst_prim -> CST_FLOAT addTypeFloat .)
+    PLUS            reduce using rule 54 (cst_prim -> CST_FLOAT addTypeFloat .)
+    MINUS           reduce using rule 54 (cst_prim -> CST_FLOAT addTypeFloat .)
+    GT              reduce using rule 54 (cst_prim -> CST_FLOAT addTypeFloat .)
+    LT              reduce using rule 54 (cst_prim -> CST_FLOAT addTypeFloat .)
+    NOTEQUAL        reduce using rule 54 (cst_prim -> CST_FLOAT addTypeFloat .)
+    ISEQUAL         reduce using rule 54 (cst_prim -> CST_FLOAT addTypeFloat .)
+    EXCLAMATION     reduce using rule 54 (cst_prim -> CST_FLOAT addTypeFloat .)
+    QUESTION        reduce using rule 54 (cst_prim -> CST_FLOAT addTypeFloat .)
+    DOLLARSIGN      reduce using rule 54 (cst_prim -> CST_FLOAT addTypeFloat .)
+    AND             reduce using rule 54 (cst_prim -> CST_FLOAT addTypeFloat .)
+    OR              reduce using rule 54 (cst_prim -> CST_FLOAT addTypeFloat .)
+    RIGHTPAR        reduce using rule 54 (cst_prim -> CST_FLOAT addTypeFloat .)
+    COMA            reduce using rule 54 (cst_prim -> CST_FLOAT addTypeFloat .)
+    SEMICOLON       reduce using rule 54 (cst_prim -> CST_FLOAT addTypeFloat .)
+    LEFTBRACE       reduce using rule 54 (cst_prim -> CST_FLOAT addTypeFloat .)
+    RIGHTBRACK      reduce using rule 54 (cst_prim -> CST_FLOAT addTypeFloat .)
+
+
+state 138
+
+    (55) cst_prim -> CST_CHAR addTypeChar .
+
+    MULTIPLY        reduce using rule 55 (cst_prim -> CST_CHAR addTypeChar .)
+    DIVIDE          reduce using rule 55 (cst_prim -> CST_CHAR addTypeChar .)
+    PLUS            reduce using rule 55 (cst_prim -> CST_CHAR addTypeChar .)
+    MINUS           reduce using rule 55 (cst_prim -> CST_CHAR addTypeChar .)
+    GT              reduce using rule 55 (cst_prim -> CST_CHAR addTypeChar .)
+    LT              reduce using rule 55 (cst_prim -> CST_CHAR addTypeChar .)
+    NOTEQUAL        reduce using rule 55 (cst_prim -> CST_CHAR addTypeChar .)
+    ISEQUAL         reduce using rule 55 (cst_prim -> CST_CHAR addTypeChar .)
+    EXCLAMATION     reduce using rule 55 (cst_prim -> CST_CHAR addTypeChar .)
+    QUESTION        reduce using rule 55 (cst_prim -> CST_CHAR addTypeChar .)
+    DOLLARSIGN      reduce using rule 55 (cst_prim -> CST_CHAR addTypeChar .)
+    AND             reduce using rule 55 (cst_prim -> CST_CHAR addTypeChar .)
+    OR              reduce using rule 55 (cst_prim -> CST_CHAR addTypeChar .)
+    RIGHTPAR        reduce using rule 55 (cst_prim -> CST_CHAR addTypeChar .)
+    COMA            reduce using rule 55 (cst_prim -> CST_CHAR addTypeChar .)
+    SEMICOLON       reduce using rule 55 (cst_prim -> CST_CHAR addTypeChar .)
+    LEFTBRACE       reduce using rule 55 (cst_prim -> CST_CHAR addTypeChar .)
+    RIGHTBRACK      reduce using rule 55 (cst_prim -> CST_CHAR addTypeChar .)
+
+
+state 139
+
+    (16) if -> IF LEFTPAR hyperExpression RIGHTPAR . createJumpQuadIf THEN LEFTBRACE statement RIGHTBRACE ifElse updateJumpQuad
+    (17) createJumpQuadIf -> .
+
+    THEN            reduce using rule 17 (createJumpQuadIf -> .)
+
+    createJumpQuadIf               shift and go to state 174
+
+state 140
+
+    (95) read -> READ LEFTPAR id_list RIGHTPAR . SEMICOLON
+
+    SEMICOLON       shift and go to state 175
+
+
+state 141
+
+    (96) id_list -> ID dimArray . addRead id_listFunction
+    (97) addRead -> .
+
+    COMA            reduce using rule 97 (addRead -> .)
+    RIGHTPAR        reduce using rule 97 (addRead -> .)
+
+    addRead                        shift and go to state 176
+
+state 142
+
+    (100) print -> PRINT LEFTPAR printFunction RIGHTPAR . SEMICOLON
+
+    SEMICOLON       shift and go to state 177
+
+
+state 143
+
+    (101) printFunction -> print_param COMA . printFunction2
+    (103) printFunction2 -> . printFunction
+    (101) printFunction -> . print_param COMA printFunction2
+    (102) printFunction -> . print_param
+    (104) print_param -> . hyperExpression addPrint
+    (105) print_param -> . CST_STRING addPrintString
+    (59) hyperExpression -> . superExpression evaluateHE opHyperExpression hyperExpressionNested
+    (60) hyperExpression -> . superExpression opMatrix evaluateOpMatrix
+    (61) hyperExpression -> . superExpression evaluateHE
+    (71) superExpression -> . exp evaluateSE opSuperExpression exp evaluateSE
+    (72) superExpression -> . exp evaluateSE
+    (78) exp -> . term evaluateTerm expFunction
+    (79) exp -> . term evaluateTerm
+    (83) term -> . factor evaluateFactor termFunction
+    (84) term -> . factor evaluateFactor
+    (89) factor -> . LEFTPAR addFF hyperExpression RIGHTPAR removeFF
+    (90) factor -> . cst_prim
+    (91) factor -> . module
+    (92) factor -> . ID dimArray
+    (53) cst_prim -> . CST_INT addTypeInt
+    (54) cst_prim -> . CST_FLOAT addTypeFloat
+    (55) cst_prim -> . CST_CHAR addTypeChar
+    (120) module -> . ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+
+    CST_STRING      shift and go to state 116
+    LEFTPAR         shift and go to state 98
+    ID              shift and go to state 106
+    CST_INT         shift and go to state 107
+    CST_FLOAT       shift and go to state 108
+    CST_CHAR        shift and go to state 109
+
+    print_param                    shift and go to state 114
+    printFunction2                 shift and go to state 178
+    printFunction                  shift and go to state 179
+    hyperExpression                shift and go to state 115
+    superExpression                shift and go to state 100
+    exp                            shift and go to state 101
+    term                           shift and go to state 102
+    factor                         shift and go to state 103
+    cst_prim                       shift and go to state 104
+    module                         shift and go to state 105
+
+state 144
+
+    (104) print_param -> hyperExpression addPrint .
+
+    COMA            reduce using rule 104 (print_param -> hyperExpression addPrint .)
+    RIGHTPAR        reduce using rule 104 (print_param -> hyperExpression addPrint .)
+
+
+state 145
+
+    (105) print_param -> CST_STRING addPrintString .
+
+    COMA            reduce using rule 105 (print_param -> CST_STRING addPrintString .)
+    RIGHTPAR        reduce using rule 105 (print_param -> CST_STRING addPrintString .)
+
+
+state 146
+
+    (7) assignment -> ID dimArray EQUAL hyperExpression . SEMICOLON
+
+    SEMICOLON       shift and go to state 180
+
+
+state 147
+
+    (120) module -> ID checkFuncExists genERASize LEFTPAR . moduleFunction nullParam RIGHTPAR genGosub
+    (125) moduleFunction -> . hyperExpression genParam nextParam COMA moduleFunction
+    (126) moduleFunction -> . hyperExpression genParam
+    (127) moduleFunction -> .
+    (59) hyperExpression -> . superExpression evaluateHE opHyperExpression hyperExpressionNested
+    (60) hyperExpression -> . superExpression opMatrix evaluateOpMatrix
+    (61) hyperExpression -> . superExpression evaluateHE
+    (71) superExpression -> . exp evaluateSE opSuperExpression exp evaluateSE
+    (72) superExpression -> . exp evaluateSE
+    (78) exp -> . term evaluateTerm expFunction
+    (79) exp -> . term evaluateTerm
+    (83) term -> . factor evaluateFactor termFunction
+    (84) term -> . factor evaluateFactor
+    (89) factor -> . LEFTPAR addFF hyperExpression RIGHTPAR removeFF
+    (90) factor -> . cst_prim
+    (91) factor -> . module
+    (92) factor -> . ID dimArray
+    (53) cst_prim -> . CST_INT addTypeInt
+    (54) cst_prim -> . CST_FLOAT addTypeFloat
+    (55) cst_prim -> . CST_CHAR addTypeChar
+    (120) module -> . ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+
+    RIGHTPAR        reduce using rule 127 (moduleFunction -> .)
+    LEFTPAR         shift and go to state 98
+    ID              shift and go to state 106
+    CST_INT         shift and go to state 107
+    CST_FLOAT       shift and go to state 108
+    CST_CHAR        shift and go to state 109
+
+    moduleFunction                 shift and go to state 181
+    hyperExpression                shift and go to state 182
+    superExpression                shift and go to state 100
+    exp                            shift and go to state 101
+    term                           shift and go to state 102
+    factor                         shift and go to state 103
+    cst_prim                       shift and go to state 104
+    module                         shift and go to state 105
+
+state 148
+
+    (130) dimArray -> addOperandId addTypeId LEFTBRACK . readIDType hyperExpression verifyRows RIGHTBRACK dimMatrix
+    (134) readIDType -> .
+
+    LEFTPAR         reduce using rule 134 (readIDType -> .)
+    ID              reduce using rule 134 (readIDType -> .)
+    CST_INT         reduce using rule 134 (readIDType -> .)
+    CST_FLOAT       reduce using rule 134 (readIDType -> .)
+    CST_CHAR        reduce using rule 134 (readIDType -> .)
+
+    readIDType                     shift and go to state 183
+
+state 149
+
+    (27) for -> FOR forAssignment TO insertJumpFor . hyperExpression createQuadFor LEFTBRACE statement RIGHTBRACE updateQuadFor
+    (59) hyperExpression -> . superExpression evaluateHE opHyperExpression hyperExpressionNested
+    (60) hyperExpression -> . superExpression opMatrix evaluateOpMatrix
+    (61) hyperExpression -> . superExpression evaluateHE
+    (71) superExpression -> . exp evaluateSE opSuperExpression exp evaluateSE
+    (72) superExpression -> . exp evaluateSE
+    (78) exp -> . term evaluateTerm expFunction
+    (79) exp -> . term evaluateTerm
+    (83) term -> . factor evaluateFactor termFunction
+    (84) term -> . factor evaluateFactor
+    (89) factor -> . LEFTPAR addFF hyperExpression RIGHTPAR removeFF
+    (90) factor -> . cst_prim
+    (91) factor -> . module
+    (92) factor -> . ID dimArray
+    (53) cst_prim -> . CST_INT addTypeInt
+    (54) cst_prim -> . CST_FLOAT addTypeFloat
+    (55) cst_prim -> . CST_CHAR addTypeChar
+    (120) module -> . ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+
+    LEFTPAR         shift and go to state 98
+    ID              shift and go to state 106
+    CST_INT         shift and go to state 107
+    CST_FLOAT       shift and go to state 108
+    CST_CHAR        shift and go to state 109
+
+    hyperExpression                shift and go to state 184
+    superExpression                shift and go to state 100
+    exp                            shift and go to state 101
+    term                           shift and go to state 102
+    factor                         shift and go to state 103
+    cst_prim                       shift and go to state 104
+    module                         shift and go to state 105
+
+state 150
+
+    (31) forAssignment -> ID EQUAL CST_INT . addTypeInt
+    (56) addTypeInt -> .
+
+    TO              reduce using rule 56 (addTypeInt -> .)
+
+    addTypeInt                     shift and go to state 185
+
+state 151
+
+    (23) while -> WHILE pushLoopJump LEFTPAR hyperExpression . RIGHTPAR beginLoopAction LEFTBRACE statement RIGHTBRACE endLoopAction
+
+    RIGHTPAR        shift and go to state 186
+
+
+state 152
+
+    (42) function -> functionType ID addFuncToDir LEFTPAR param RIGHTPAR setParamLength LEFTBRACE declaration statement RIGHTBRACE .
+
+    FUNCTION        reduce using rule 42 (function -> functionType ID addFuncToDir LEFTPAR param RIGHTPAR setParamLength LEFTBRACE declaration statement RIGHTBRACE .)
+    MAIN            reduce using rule 42 (function -> functionType ID addFuncToDir LEFTPAR param RIGHTPAR setParamLength LEFTBRACE declaration statement RIGHTBRACE .)
+
+
+state 153
+
+    (39) varsMatrix -> LEFTBRACK CST_INT addTypeInt . RIGHTBRACK setCols
+
+    RIGHTBRACK      shift and go to state 187
+
+
+state 154
+
+    (89) factor -> LEFTPAR addFF hyperExpression . RIGHTPAR removeFF
+
+    RIGHTPAR        shift and go to state 188
+
+
+state 155
+
+    (15) return -> RETURN LEFTPAR hyperExpression RIGHTPAR SEMICOLON .
+
+    RIGHTBRACE      reduce using rule 15 (return -> RETURN LEFTPAR hyperExpression RIGHTPAR SEMICOLON .)
+
+
+state 156
+
+    (59) hyperExpression -> superExpression evaluateHE opHyperExpression . hyperExpressionNested
+    (62) hyperExpressionNested -> . superExpression evaluateHE opHyperExpression hyperExpressionNested
+    (63) hyperExpressionNested -> . superExpression evaluateHE
+    (71) superExpression -> . exp evaluateSE opSuperExpression exp evaluateSE
+    (72) superExpression -> . exp evaluateSE
+    (78) exp -> . term evaluateTerm expFunction
+    (79) exp -> . term evaluateTerm
+    (83) term -> . factor evaluateFactor termFunction
+    (84) term -> . factor evaluateFactor
+    (89) factor -> . LEFTPAR addFF hyperExpression RIGHTPAR removeFF
+    (90) factor -> . cst_prim
+    (91) factor -> . module
+    (92) factor -> . ID dimArray
+    (53) cst_prim -> . CST_INT addTypeInt
+    (54) cst_prim -> . CST_FLOAT addTypeFloat
+    (55) cst_prim -> . CST_CHAR addTypeChar
+    (120) module -> . ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+
+    LEFTPAR         shift and go to state 98
+    ID              shift and go to state 106
+    CST_INT         shift and go to state 107
+    CST_FLOAT       shift and go to state 108
+    CST_CHAR        shift and go to state 109
+
+    superExpression                shift and go to state 189
+    hyperExpressionNested          shift and go to state 190
+    exp                            shift and go to state 101
+    term                           shift and go to state 102
+    factor                         shift and go to state 103
+    cst_prim                       shift and go to state 104
+    module                         shift and go to state 105
+
+state 157
+
+    (69) opHyperExpression -> AND . addOperator
+    (88) addOperator -> .
+
+    LEFTPAR         reduce using rule 88 (addOperator -> .)
+    ID              reduce using rule 88 (addOperator -> .)
+    CST_INT         reduce using rule 88 (addOperator -> .)
+    CST_FLOAT       reduce using rule 88 (addOperator -> .)
+    CST_CHAR        reduce using rule 88 (addOperator -> .)
+
+    addOperator                    shift and go to state 191
+
+state 158
+
+    (70) opHyperExpression -> OR . addOperator
+    (88) addOperator -> .
+
+    LEFTPAR         reduce using rule 88 (addOperator -> .)
+    ID              reduce using rule 88 (addOperator -> .)
+    CST_INT         reduce using rule 88 (addOperator -> .)
+    CST_FLOAT       reduce using rule 88 (addOperator -> .)
+    CST_CHAR        reduce using rule 88 (addOperator -> .)
+
+    addOperator                    shift and go to state 192
+
+state 159
+
+    (60) hyperExpression -> superExpression opMatrix evaluateOpMatrix .
+
+    RIGHTPAR        reduce using rule 60 (hyperExpression -> superExpression opMatrix evaluateOpMatrix .)
+    COMA            reduce using rule 60 (hyperExpression -> superExpression opMatrix evaluateOpMatrix .)
+    SEMICOLON       reduce using rule 60 (hyperExpression -> superExpression opMatrix evaluateOpMatrix .)
+    LEFTBRACE       reduce using rule 60 (hyperExpression -> superExpression opMatrix evaluateOpMatrix .)
+    RIGHTBRACK      reduce using rule 60 (hyperExpression -> superExpression opMatrix evaluateOpMatrix .)
+
+
+state 160
+
+    (66) opMatrix -> EXCLAMATION addOperator .
+
+    RIGHTPAR        reduce using rule 66 (opMatrix -> EXCLAMATION addOperator .)
+    COMA            reduce using rule 66 (opMatrix -> EXCLAMATION addOperator .)
+    SEMICOLON       reduce using rule 66 (opMatrix -> EXCLAMATION addOperator .)
+    LEFTBRACE       reduce using rule 66 (opMatrix -> EXCLAMATION addOperator .)
+    RIGHTBRACK      reduce using rule 66 (opMatrix -> EXCLAMATION addOperator .)
+
+
+state 161
+
+    (67) opMatrix -> QUESTION addOperator .
+
+    RIGHTPAR        reduce using rule 67 (opMatrix -> QUESTION addOperator .)
+    COMA            reduce using rule 67 (opMatrix -> QUESTION addOperator .)
+    SEMICOLON       reduce using rule 67 (opMatrix -> QUESTION addOperator .)
+    LEFTBRACE       reduce using rule 67 (opMatrix -> QUESTION addOperator .)
+    RIGHTBRACK      reduce using rule 67 (opMatrix -> QUESTION addOperator .)
+
+
+state 162
+
+    (68) opMatrix -> DOLLARSIGN addOperator .
+
+    RIGHTPAR        reduce using rule 68 (opMatrix -> DOLLARSIGN addOperator .)
+    COMA            reduce using rule 68 (opMatrix -> DOLLARSIGN addOperator .)
+    SEMICOLON       reduce using rule 68 (opMatrix -> DOLLARSIGN addOperator .)
+    LEFTBRACE       reduce using rule 68 (opMatrix -> DOLLARSIGN addOperator .)
+    RIGHTBRACK      reduce using rule 68 (opMatrix -> DOLLARSIGN addOperator .)
+
+
+state 163
+
+    (71) superExpression -> exp evaluateSE opSuperExpression . exp evaluateSE
+    (78) exp -> . term evaluateTerm expFunction
+    (79) exp -> . term evaluateTerm
+    (83) term -> . factor evaluateFactor termFunction
+    (84) term -> . factor evaluateFactor
+    (89) factor -> . LEFTPAR addFF hyperExpression RIGHTPAR removeFF
+    (90) factor -> . cst_prim
+    (91) factor -> . module
+    (92) factor -> . ID dimArray
+    (53) cst_prim -> . CST_INT addTypeInt
+    (54) cst_prim -> . CST_FLOAT addTypeFloat
+    (55) cst_prim -> . CST_CHAR addTypeChar
+    (120) module -> . ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+
+    LEFTPAR         shift and go to state 98
+    ID              shift and go to state 106
+    CST_INT         shift and go to state 107
+    CST_FLOAT       shift and go to state 108
+    CST_CHAR        shift and go to state 109
+
+    exp                            shift and go to state 193
+    term                           shift and go to state 102
+    factor                         shift and go to state 103
+    cst_prim                       shift and go to state 104
+    module                         shift and go to state 105
+
+state 164
+
+    (74) opSuperExpression -> GT . addOperator
+    (88) addOperator -> .
+
+    LEFTPAR         reduce using rule 88 (addOperator -> .)
+    ID              reduce using rule 88 (addOperator -> .)
+    CST_INT         reduce using rule 88 (addOperator -> .)
+    CST_FLOAT       reduce using rule 88 (addOperator -> .)
+    CST_CHAR        reduce using rule 88 (addOperator -> .)
+
+    addOperator                    shift and go to state 194
+
+state 165
+
+    (75) opSuperExpression -> LT . addOperator
+    (88) addOperator -> .
+
+    LEFTPAR         reduce using rule 88 (addOperator -> .)
+    ID              reduce using rule 88 (addOperator -> .)
+    CST_INT         reduce using rule 88 (addOperator -> .)
+    CST_FLOAT       reduce using rule 88 (addOperator -> .)
+    CST_CHAR        reduce using rule 88 (addOperator -> .)
+
+    addOperator                    shift and go to state 195
+
+state 166
+
+    (76) opSuperExpression -> NOTEQUAL . addOperator
+    (88) addOperator -> .
+
+    LEFTPAR         reduce using rule 88 (addOperator -> .)
+    ID              reduce using rule 88 (addOperator -> .)
+    CST_INT         reduce using rule 88 (addOperator -> .)
+    CST_FLOAT       reduce using rule 88 (addOperator -> .)
+    CST_CHAR        reduce using rule 88 (addOperator -> .)
+
+    addOperator                    shift and go to state 196
+
+state 167
+
+    (77) opSuperExpression -> ISEQUAL . addOperator
+    (88) addOperator -> .
+
+    LEFTPAR         reduce using rule 88 (addOperator -> .)
+    ID              reduce using rule 88 (addOperator -> .)
+    CST_INT         reduce using rule 88 (addOperator -> .)
+    CST_FLOAT       reduce using rule 88 (addOperator -> .)
+    CST_CHAR        reduce using rule 88 (addOperator -> .)
+
+    addOperator                    shift and go to state 197
+
+state 168
+
+    (78) exp -> term evaluateTerm expFunction .
+
+    GT              reduce using rule 78 (exp -> term evaluateTerm expFunction .)
+    LT              reduce using rule 78 (exp -> term evaluateTerm expFunction .)
+    NOTEQUAL        reduce using rule 78 (exp -> term evaluateTerm expFunction .)
+    ISEQUAL         reduce using rule 78 (exp -> term evaluateTerm expFunction .)
+    EXCLAMATION     reduce using rule 78 (exp -> term evaluateTerm expFunction .)
+    QUESTION        reduce using rule 78 (exp -> term evaluateTerm expFunction .)
+    DOLLARSIGN      reduce using rule 78 (exp -> term evaluateTerm expFunction .)
+    AND             reduce using rule 78 (exp -> term evaluateTerm expFunction .)
+    OR              reduce using rule 78 (exp -> term evaluateTerm expFunction .)
+    RIGHTPAR        reduce using rule 78 (exp -> term evaluateTerm expFunction .)
+    COMA            reduce using rule 78 (exp -> term evaluateTerm expFunction .)
+    SEMICOLON       reduce using rule 78 (exp -> term evaluateTerm expFunction .)
+    LEFTBRACE       reduce using rule 78 (exp -> term evaluateTerm expFunction .)
+    RIGHTBRACK      reduce using rule 78 (exp -> term evaluateTerm expFunction .)
+
+
+state 169
+
+    (81) expFunction -> PLUS . addOperator exp
+    (88) addOperator -> .
+
+    LEFTPAR         reduce using rule 88 (addOperator -> .)
+    ID              reduce using rule 88 (addOperator -> .)
+    CST_INT         reduce using rule 88 (addOperator -> .)
+    CST_FLOAT       reduce using rule 88 (addOperator -> .)
+    CST_CHAR        reduce using rule 88 (addOperator -> .)
+
+    addOperator                    shift and go to state 198
+
+state 170
+
+    (82) expFunction -> MINUS . addOperator exp
+    (88) addOperator -> .
+
+    LEFTPAR         reduce using rule 88 (addOperator -> .)
+    ID              reduce using rule 88 (addOperator -> .)
+    CST_INT         reduce using rule 88 (addOperator -> .)
+    CST_FLOAT       reduce using rule 88 (addOperator -> .)
+    CST_CHAR        reduce using rule 88 (addOperator -> .)
+
+    addOperator                    shift and go to state 199
+
+state 171
+
+    (83) term -> factor evaluateFactor termFunction .
+
+    PLUS            reduce using rule 83 (term -> factor evaluateFactor termFunction .)
+    MINUS           reduce using rule 83 (term -> factor evaluateFactor termFunction .)
+    GT              reduce using rule 83 (term -> factor evaluateFactor termFunction .)
+    LT              reduce using rule 83 (term -> factor evaluateFactor termFunction .)
+    NOTEQUAL        reduce using rule 83 (term -> factor evaluateFactor termFunction .)
+    ISEQUAL         reduce using rule 83 (term -> factor evaluateFactor termFunction .)
+    EXCLAMATION     reduce using rule 83 (term -> factor evaluateFactor termFunction .)
+    QUESTION        reduce using rule 83 (term -> factor evaluateFactor termFunction .)
+    DOLLARSIGN      reduce using rule 83 (term -> factor evaluateFactor termFunction .)
+    AND             reduce using rule 83 (term -> factor evaluateFactor termFunction .)
+    OR              reduce using rule 83 (term -> factor evaluateFactor termFunction .)
+    RIGHTPAR        reduce using rule 83 (term -> factor evaluateFactor termFunction .)
+    COMA            reduce using rule 83 (term -> factor evaluateFactor termFunction .)
+    SEMICOLON       reduce using rule 83 (term -> factor evaluateFactor termFunction .)
+    LEFTBRACE       reduce using rule 83 (term -> factor evaluateFactor termFunction .)
+    RIGHTBRACK      reduce using rule 83 (term -> factor evaluateFactor termFunction .)
+
+
+state 172
+
+    (86) termFunction -> MULTIPLY . addOperator term
+    (88) addOperator -> .
+
+    LEFTPAR         reduce using rule 88 (addOperator -> .)
+    ID              reduce using rule 88 (addOperator -> .)
+    CST_INT         reduce using rule 88 (addOperator -> .)
+    CST_FLOAT       reduce using rule 88 (addOperator -> .)
+    CST_CHAR        reduce using rule 88 (addOperator -> .)
+
+    addOperator                    shift and go to state 200
+
+state 173
+
+    (87) termFunction -> DIVIDE . addOperator term
+    (88) addOperator -> .
+
+    LEFTPAR         reduce using rule 88 (addOperator -> .)
+    ID              reduce using rule 88 (addOperator -> .)
+    CST_INT         reduce using rule 88 (addOperator -> .)
+    CST_FLOAT       reduce using rule 88 (addOperator -> .)
+    CST_CHAR        reduce using rule 88 (addOperator -> .)
+
+    addOperator                    shift and go to state 201
+
+state 174
+
+    (16) if -> IF LEFTPAR hyperExpression RIGHTPAR createJumpQuadIf . THEN LEFTBRACE statement RIGHTBRACE ifElse updateJumpQuad
+
+    THEN            shift and go to state 202
+
+
+state 175
+
+    (95) read -> READ LEFTPAR id_list RIGHTPAR SEMICOLON .
+
+    RETURN          reduce using rule 95 (read -> READ LEFTPAR id_list RIGHTPAR SEMICOLON .)
+    IF              reduce using rule 95 (read -> READ LEFTPAR id_list RIGHTPAR SEMICOLON .)
+    COMMENT_TEXT    reduce using rule 95 (read -> READ LEFTPAR id_list RIGHTPAR SEMICOLON .)
+    READ            reduce using rule 95 (read -> READ LEFTPAR id_list RIGHTPAR SEMICOLON .)
+    PRINT           reduce using rule 95 (read -> READ LEFTPAR id_list RIGHTPAR SEMICOLON .)
+    ID              reduce using rule 95 (read -> READ LEFTPAR id_list RIGHTPAR SEMICOLON .)
+    FOR             reduce using rule 95 (read -> READ LEFTPAR id_list RIGHTPAR SEMICOLON .)
+    WHILE           reduce using rule 95 (read -> READ LEFTPAR id_list RIGHTPAR SEMICOLON .)
+    RIGHTBRACE      reduce using rule 95 (read -> READ LEFTPAR id_list RIGHTPAR SEMICOLON .)
+
+
+state 176
+
+    (96) id_list -> ID dimArray addRead . id_listFunction
+    (98) id_listFunction -> . COMA id_list
+    (99) id_listFunction -> .
+
+    COMA            shift and go to state 204
+    RIGHTPAR        reduce using rule 99 (id_listFunction -> .)
+
+    id_listFunction                shift and go to state 203
+
+state 177
+
+    (100) print -> PRINT LEFTPAR printFunction RIGHTPAR SEMICOLON .
+
+    RETURN          reduce using rule 100 (print -> PRINT LEFTPAR printFunction RIGHTPAR SEMICOLON .)
+    IF              reduce using rule 100 (print -> PRINT LEFTPAR printFunction RIGHTPAR SEMICOLON .)
+    COMMENT_TEXT    reduce using rule 100 (print -> PRINT LEFTPAR printFunction RIGHTPAR SEMICOLON .)
+    READ            reduce using rule 100 (print -> PRINT LEFTPAR printFunction RIGHTPAR SEMICOLON .)
+    PRINT           reduce using rule 100 (print -> PRINT LEFTPAR printFunction RIGHTPAR SEMICOLON .)
+    ID              reduce using rule 100 (print -> PRINT LEFTPAR printFunction RIGHTPAR SEMICOLON .)
+    FOR             reduce using rule 100 (print -> PRINT LEFTPAR printFunction RIGHTPAR SEMICOLON .)
+    WHILE           reduce using rule 100 (print -> PRINT LEFTPAR printFunction RIGHTPAR SEMICOLON .)
+    RIGHTBRACE      reduce using rule 100 (print -> PRINT LEFTPAR printFunction RIGHTPAR SEMICOLON .)
+
+
+state 178
+
+    (101) printFunction -> print_param COMA printFunction2 .
+
+    RIGHTPAR        reduce using rule 101 (printFunction -> print_param COMA printFunction2 .)
+
+
+state 179
+
+    (103) printFunction2 -> printFunction .
+
+    RIGHTPAR        reduce using rule 103 (printFunction2 -> printFunction .)
+
+
+state 180
+
+    (7) assignment -> ID dimArray EQUAL hyperExpression SEMICOLON .
+
+    RETURN          reduce using rule 7 (assignment -> ID dimArray EQUAL hyperExpression SEMICOLON .)
+    IF              reduce using rule 7 (assignment -> ID dimArray EQUAL hyperExpression SEMICOLON .)
+    COMMENT_TEXT    reduce using rule 7 (assignment -> ID dimArray EQUAL hyperExpression SEMICOLON .)
+    READ            reduce using rule 7 (assignment -> ID dimArray EQUAL hyperExpression SEMICOLON .)
+    PRINT           reduce using rule 7 (assignment -> ID dimArray EQUAL hyperExpression SEMICOLON .)
+    ID              reduce using rule 7 (assignment -> ID dimArray EQUAL hyperExpression SEMICOLON .)
+    FOR             reduce using rule 7 (assignment -> ID dimArray EQUAL hyperExpression SEMICOLON .)
+    WHILE           reduce using rule 7 (assignment -> ID dimArray EQUAL hyperExpression SEMICOLON .)
+    RIGHTBRACE      reduce using rule 7 (assignment -> ID dimArray EQUAL hyperExpression SEMICOLON .)
+
+
+state 181
+
+    (120) module -> ID checkFuncExists genERASize LEFTPAR moduleFunction . nullParam RIGHTPAR genGosub
+    (123) nullParam -> .
+
+    RIGHTPAR        reduce using rule 123 (nullParam -> .)
+
+    nullParam                      shift and go to state 205
+
+state 182
+
+    (125) moduleFunction -> hyperExpression . genParam nextParam COMA moduleFunction
+    (126) moduleFunction -> hyperExpression . genParam
+    (128) genParam -> .
+
+    COMA            reduce using rule 128 (genParam -> .)
+    RIGHTPAR        reduce using rule 128 (genParam -> .)
+
+    genParam                       shift and go to state 206
+
+state 183
+
+    (130) dimArray -> addOperandId addTypeId LEFTBRACK readIDType . hyperExpression verifyRows RIGHTBRACK dimMatrix
+    (59) hyperExpression -> . superExpression evaluateHE opHyperExpression hyperExpressionNested
+    (60) hyperExpression -> . superExpression opMatrix evaluateOpMatrix
+    (61) hyperExpression -> . superExpression evaluateHE
+    (71) superExpression -> . exp evaluateSE opSuperExpression exp evaluateSE
+    (72) superExpression -> . exp evaluateSE
+    (78) exp -> . term evaluateTerm expFunction
+    (79) exp -> . term evaluateTerm
+    (83) term -> . factor evaluateFactor termFunction
+    (84) term -> . factor evaluateFactor
+    (89) factor -> . LEFTPAR addFF hyperExpression RIGHTPAR removeFF
+    (90) factor -> . cst_prim
+    (91) factor -> . module
+    (92) factor -> . ID dimArray
+    (53) cst_prim -> . CST_INT addTypeInt
+    (54) cst_prim -> . CST_FLOAT addTypeFloat
+    (55) cst_prim -> . CST_CHAR addTypeChar
+    (120) module -> . ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+
+    LEFTPAR         shift and go to state 98
+    ID              shift and go to state 106
+    CST_INT         shift and go to state 107
+    CST_FLOAT       shift and go to state 108
+    CST_CHAR        shift and go to state 109
+
+    hyperExpression                shift and go to state 207
+    superExpression                shift and go to state 100
+    exp                            shift and go to state 101
+    term                           shift and go to state 102
+    factor                         shift and go to state 103
+    cst_prim                       shift and go to state 104
+    module                         shift and go to state 105
+
+state 184
+
+    (27) for -> FOR forAssignment TO insertJumpFor hyperExpression . createQuadFor LEFTBRACE statement RIGHTBRACE updateQuadFor
+    (29) createQuadFor -> .
+
+    LEFTBRACE       reduce using rule 29 (createQuadFor -> .)
+
+    createQuadFor                  shift and go to state 208
+
+state 185
+
+    (31) forAssignment -> ID EQUAL CST_INT addTypeInt .
+
+    TO              reduce using rule 31 (forAssignment -> ID EQUAL CST_INT addTypeInt .)
+
+
+state 186
+
+    (23) while -> WHILE pushLoopJump LEFTPAR hyperExpression RIGHTPAR . beginLoopAction LEFTBRACE statement RIGHTBRACE endLoopAction
+    (25) beginLoopAction -> .
+
+    LEFTBRACE       reduce using rule 25 (beginLoopAction -> .)
+
+    beginLoopAction                shift and go to state 209
+
+state 187
+
+    (39) varsMatrix -> LEFTBRACK CST_INT addTypeInt RIGHTBRACK . setCols
+    (41) setCols -> .
+
+    COMA            reduce using rule 41 (setCols -> .)
+    SEMICOLON       reduce using rule 41 (setCols -> .)
+
+    setCols                        shift and go to state 210
+
+state 188
+
+    (89) factor -> LEFTPAR addFF hyperExpression RIGHTPAR . removeFF
+    (94) removeFF -> .
+
+    MULTIPLY        reduce using rule 94 (removeFF -> .)
+    DIVIDE          reduce using rule 94 (removeFF -> .)
+    PLUS            reduce using rule 94 (removeFF -> .)
+    MINUS           reduce using rule 94 (removeFF -> .)
+    GT              reduce using rule 94 (removeFF -> .)
+    LT              reduce using rule 94 (removeFF -> .)
+    NOTEQUAL        reduce using rule 94 (removeFF -> .)
+    ISEQUAL         reduce using rule 94 (removeFF -> .)
+    EXCLAMATION     reduce using rule 94 (removeFF -> .)
+    QUESTION        reduce using rule 94 (removeFF -> .)
+    DOLLARSIGN      reduce using rule 94 (removeFF -> .)
+    AND             reduce using rule 94 (removeFF -> .)
+    OR              reduce using rule 94 (removeFF -> .)
+    RIGHTPAR        reduce using rule 94 (removeFF -> .)
+    COMA            reduce using rule 94 (removeFF -> .)
+    SEMICOLON       reduce using rule 94 (removeFF -> .)
+    LEFTBRACE       reduce using rule 94 (removeFF -> .)
+    RIGHTBRACK      reduce using rule 94 (removeFF -> .)
+
+    removeFF                       shift and go to state 211
+
+state 189
+
+    (62) hyperExpressionNested -> superExpression . evaluateHE opHyperExpression hyperExpressionNested
+    (63) hyperExpressionNested -> superExpression . evaluateHE
+    (65) evaluateHE -> .
+
+    AND             reduce using rule 65 (evaluateHE -> .)
+    OR              reduce using rule 65 (evaluateHE -> .)
+    RIGHTPAR        reduce using rule 65 (evaluateHE -> .)
+    COMA            reduce using rule 65 (evaluateHE -> .)
+    SEMICOLON       reduce using rule 65 (evaluateHE -> .)
+    LEFTBRACE       reduce using rule 65 (evaluateHE -> .)
+    RIGHTBRACK      reduce using rule 65 (evaluateHE -> .)
+
+    evaluateHE                     shift and go to state 212
+
+state 190
+
+    (59) hyperExpression -> superExpression evaluateHE opHyperExpression hyperExpressionNested .
+
+    RIGHTPAR        reduce using rule 59 (hyperExpression -> superExpression evaluateHE opHyperExpression hyperExpressionNested .)
+    COMA            reduce using rule 59 (hyperExpression -> superExpression evaluateHE opHyperExpression hyperExpressionNested .)
+    SEMICOLON       reduce using rule 59 (hyperExpression -> superExpression evaluateHE opHyperExpression hyperExpressionNested .)
+    LEFTBRACE       reduce using rule 59 (hyperExpression -> superExpression evaluateHE opHyperExpression hyperExpressionNested .)
+    RIGHTBRACK      reduce using rule 59 (hyperExpression -> superExpression evaluateHE opHyperExpression hyperExpressionNested .)
+
+
+state 191
+
+    (69) opHyperExpression -> AND addOperator .
+
+    LEFTPAR         reduce using rule 69 (opHyperExpression -> AND addOperator .)
+    ID              reduce using rule 69 (opHyperExpression -> AND addOperator .)
+    CST_INT         reduce using rule 69 (opHyperExpression -> AND addOperator .)
+    CST_FLOAT       reduce using rule 69 (opHyperExpression -> AND addOperator .)
+    CST_CHAR        reduce using rule 69 (opHyperExpression -> AND addOperator .)
+
+
+state 192
+
+    (70) opHyperExpression -> OR addOperator .
+
+    LEFTPAR         reduce using rule 70 (opHyperExpression -> OR addOperator .)
+    ID              reduce using rule 70 (opHyperExpression -> OR addOperator .)
+    CST_INT         reduce using rule 70 (opHyperExpression -> OR addOperator .)
+    CST_FLOAT       reduce using rule 70 (opHyperExpression -> OR addOperator .)
+    CST_CHAR        reduce using rule 70 (opHyperExpression -> OR addOperator .)
+
+
+state 193
+
+    (71) superExpression -> exp evaluateSE opSuperExpression exp . evaluateSE
+    (73) evaluateSE -> .
+
+    EXCLAMATION     reduce using rule 73 (evaluateSE -> .)
+    QUESTION        reduce using rule 73 (evaluateSE -> .)
+    DOLLARSIGN      reduce using rule 73 (evaluateSE -> .)
+    AND             reduce using rule 73 (evaluateSE -> .)
+    OR              reduce using rule 73 (evaluateSE -> .)
+    RIGHTPAR        reduce using rule 73 (evaluateSE -> .)
+    COMA            reduce using rule 73 (evaluateSE -> .)
+    SEMICOLON       reduce using rule 73 (evaluateSE -> .)
+    LEFTBRACE       reduce using rule 73 (evaluateSE -> .)
+    RIGHTBRACK      reduce using rule 73 (evaluateSE -> .)
+
+    evaluateSE                     shift and go to state 213
+
+state 194
+
+    (74) opSuperExpression -> GT addOperator .
+
+    LEFTPAR         reduce using rule 74 (opSuperExpression -> GT addOperator .)
+    ID              reduce using rule 74 (opSuperExpression -> GT addOperator .)
+    CST_INT         reduce using rule 74 (opSuperExpression -> GT addOperator .)
+    CST_FLOAT       reduce using rule 74 (opSuperExpression -> GT addOperator .)
+    CST_CHAR        reduce using rule 74 (opSuperExpression -> GT addOperator .)
+
+
+state 195
+
+    (75) opSuperExpression -> LT addOperator .
+
+    LEFTPAR         reduce using rule 75 (opSuperExpression -> LT addOperator .)
+    ID              reduce using rule 75 (opSuperExpression -> LT addOperator .)
+    CST_INT         reduce using rule 75 (opSuperExpression -> LT addOperator .)
+    CST_FLOAT       reduce using rule 75 (opSuperExpression -> LT addOperator .)
+    CST_CHAR        reduce using rule 75 (opSuperExpression -> LT addOperator .)
+
+
+state 196
+
+    (76) opSuperExpression -> NOTEQUAL addOperator .
+
+    LEFTPAR         reduce using rule 76 (opSuperExpression -> NOTEQUAL addOperator .)
+    ID              reduce using rule 76 (opSuperExpression -> NOTEQUAL addOperator .)
+    CST_INT         reduce using rule 76 (opSuperExpression -> NOTEQUAL addOperator .)
+    CST_FLOAT       reduce using rule 76 (opSuperExpression -> NOTEQUAL addOperator .)
+    CST_CHAR        reduce using rule 76 (opSuperExpression -> NOTEQUAL addOperator .)
+
+
+state 197
+
+    (77) opSuperExpression -> ISEQUAL addOperator .
+
+    LEFTPAR         reduce using rule 77 (opSuperExpression -> ISEQUAL addOperator .)
+    ID              reduce using rule 77 (opSuperExpression -> ISEQUAL addOperator .)
+    CST_INT         reduce using rule 77 (opSuperExpression -> ISEQUAL addOperator .)
+    CST_FLOAT       reduce using rule 77 (opSuperExpression -> ISEQUAL addOperator .)
+    CST_CHAR        reduce using rule 77 (opSuperExpression -> ISEQUAL addOperator .)
+
+
+state 198
+
+    (81) expFunction -> PLUS addOperator . exp
+    (78) exp -> . term evaluateTerm expFunction
+    (79) exp -> . term evaluateTerm
+    (83) term -> . factor evaluateFactor termFunction
+    (84) term -> . factor evaluateFactor
+    (89) factor -> . LEFTPAR addFF hyperExpression RIGHTPAR removeFF
+    (90) factor -> . cst_prim
+    (91) factor -> . module
+    (92) factor -> . ID dimArray
+    (53) cst_prim -> . CST_INT addTypeInt
+    (54) cst_prim -> . CST_FLOAT addTypeFloat
+    (55) cst_prim -> . CST_CHAR addTypeChar
+    (120) module -> . ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+
+    LEFTPAR         shift and go to state 98
+    ID              shift and go to state 106
+    CST_INT         shift and go to state 107
+    CST_FLOAT       shift and go to state 108
+    CST_CHAR        shift and go to state 109
+
+    exp                            shift and go to state 214
+    term                           shift and go to state 102
+    factor                         shift and go to state 103
+    cst_prim                       shift and go to state 104
+    module                         shift and go to state 105
+
+state 199
+
+    (82) expFunction -> MINUS addOperator . exp
+    (78) exp -> . term evaluateTerm expFunction
+    (79) exp -> . term evaluateTerm
+    (83) term -> . factor evaluateFactor termFunction
+    (84) term -> . factor evaluateFactor
+    (89) factor -> . LEFTPAR addFF hyperExpression RIGHTPAR removeFF
+    (90) factor -> . cst_prim
+    (91) factor -> . module
+    (92) factor -> . ID dimArray
+    (53) cst_prim -> . CST_INT addTypeInt
+    (54) cst_prim -> . CST_FLOAT addTypeFloat
+    (55) cst_prim -> . CST_CHAR addTypeChar
+    (120) module -> . ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+
+    LEFTPAR         shift and go to state 98
+    ID              shift and go to state 106
+    CST_INT         shift and go to state 107
+    CST_FLOAT       shift and go to state 108
+    CST_CHAR        shift and go to state 109
+
+    exp                            shift and go to state 215
+    term                           shift and go to state 102
+    factor                         shift and go to state 103
+    cst_prim                       shift and go to state 104
+    module                         shift and go to state 105
+
+state 200
+
+    (86) termFunction -> MULTIPLY addOperator . term
+    (83) term -> . factor evaluateFactor termFunction
+    (84) term -> . factor evaluateFactor
+    (89) factor -> . LEFTPAR addFF hyperExpression RIGHTPAR removeFF
+    (90) factor -> . cst_prim
+    (91) factor -> . module
+    (92) factor -> . ID dimArray
+    (53) cst_prim -> . CST_INT addTypeInt
+    (54) cst_prim -> . CST_FLOAT addTypeFloat
+    (55) cst_prim -> . CST_CHAR addTypeChar
+    (120) module -> . ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+
+    LEFTPAR         shift and go to state 98
+    ID              shift and go to state 106
+    CST_INT         shift and go to state 107
+    CST_FLOAT       shift and go to state 108
+    CST_CHAR        shift and go to state 109
+
+    term                           shift and go to state 216
+    factor                         shift and go to state 103
+    cst_prim                       shift and go to state 104
+    module                         shift and go to state 105
+
+state 201
+
+    (87) termFunction -> DIVIDE addOperator . term
+    (83) term -> . factor evaluateFactor termFunction
+    (84) term -> . factor evaluateFactor
+    (89) factor -> . LEFTPAR addFF hyperExpression RIGHTPAR removeFF
+    (90) factor -> . cst_prim
+    (91) factor -> . module
+    (92) factor -> . ID dimArray
+    (53) cst_prim -> . CST_INT addTypeInt
+    (54) cst_prim -> . CST_FLOAT addTypeFloat
+    (55) cst_prim -> . CST_CHAR addTypeChar
+    (120) module -> . ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+
+    LEFTPAR         shift and go to state 98
+    ID              shift and go to state 106
+    CST_INT         shift and go to state 107
+    CST_FLOAT       shift and go to state 108
+    CST_CHAR        shift and go to state 109
+
+    term                           shift and go to state 217
+    factor                         shift and go to state 103
+    cst_prim                       shift and go to state 104
+    module                         shift and go to state 105
+
+state 202
+
+    (16) if -> IF LEFTPAR hyperExpression RIGHTPAR createJumpQuadIf THEN . LEFTBRACE statement RIGHTBRACE ifElse updateJumpQuad
+
+    LEFTBRACE       shift and go to state 218
+
+
+state 203
+
+    (96) id_list -> ID dimArray addRead id_listFunction .
+
+    RIGHTPAR        reduce using rule 96 (id_list -> ID dimArray addRead id_listFunction .)
+
+
+state 204
+
+    (98) id_listFunction -> COMA . id_list
+    (96) id_list -> . ID dimArray addRead id_listFunction
+
+    ID              shift and go to state 112
+
+    id_list                        shift and go to state 219
+
+state 205
+
+    (120) module -> ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam . RIGHTPAR genGosub
+
+    RIGHTPAR        shift and go to state 220
+
+
+state 206
+
+    (125) moduleFunction -> hyperExpression genParam . nextParam COMA moduleFunction
+    (126) moduleFunction -> hyperExpression genParam .
+    (129) nextParam -> .
+
+    RIGHTPAR        reduce using rule 126 (moduleFunction -> hyperExpression genParam .)
+    COMA            reduce using rule 129 (nextParam -> .)
+
+    nextParam                      shift and go to state 221
+
+state 207
+
+    (130) dimArray -> addOperandId addTypeId LEFTBRACK readIDType hyperExpression . verifyRows RIGHTBRACK dimMatrix
+    (135) verifyRows -> .
+
+    RIGHTBRACK      reduce using rule 135 (verifyRows -> .)
+
+    verifyRows                     shift and go to state 222
+
+state 208
+
+    (27) for -> FOR forAssignment TO insertJumpFor hyperExpression createQuadFor . LEFTBRACE statement RIGHTBRACE updateQuadFor
+
+    LEFTBRACE       shift and go to state 223
+
+
+state 209
+
+    (23) while -> WHILE pushLoopJump LEFTPAR hyperExpression RIGHTPAR beginLoopAction . LEFTBRACE statement RIGHTBRACE endLoopAction
+
+    LEFTBRACE       shift and go to state 224
+
+
+state 210
+
+    (39) varsMatrix -> LEFTBRACK CST_INT addTypeInt RIGHTBRACK setCols .
+
+    COMA            reduce using rule 39 (varsMatrix -> LEFTBRACK CST_INT addTypeInt RIGHTBRACK setCols .)
+    SEMICOLON       reduce using rule 39 (varsMatrix -> LEFTBRACK CST_INT addTypeInt RIGHTBRACK setCols .)
+
+
+state 211
+
+    (89) factor -> LEFTPAR addFF hyperExpression RIGHTPAR removeFF .
+
+    MULTIPLY        reduce using rule 89 (factor -> LEFTPAR addFF hyperExpression RIGHTPAR removeFF .)
+    DIVIDE          reduce using rule 89 (factor -> LEFTPAR addFF hyperExpression RIGHTPAR removeFF .)
+    PLUS            reduce using rule 89 (factor -> LEFTPAR addFF hyperExpression RIGHTPAR removeFF .)
+    MINUS           reduce using rule 89 (factor -> LEFTPAR addFF hyperExpression RIGHTPAR removeFF .)
+    GT              reduce using rule 89 (factor -> LEFTPAR addFF hyperExpression RIGHTPAR removeFF .)
+    LT              reduce using rule 89 (factor -> LEFTPAR addFF hyperExpression RIGHTPAR removeFF .)
+    NOTEQUAL        reduce using rule 89 (factor -> LEFTPAR addFF hyperExpression RIGHTPAR removeFF .)
+    ISEQUAL         reduce using rule 89 (factor -> LEFTPAR addFF hyperExpression RIGHTPAR removeFF .)
+    EXCLAMATION     reduce using rule 89 (factor -> LEFTPAR addFF hyperExpression RIGHTPAR removeFF .)
+    QUESTION        reduce using rule 89 (factor -> LEFTPAR addFF hyperExpression RIGHTPAR removeFF .)
+    DOLLARSIGN      reduce using rule 89 (factor -> LEFTPAR addFF hyperExpression RIGHTPAR removeFF .)
+    AND             reduce using rule 89 (factor -> LEFTPAR addFF hyperExpression RIGHTPAR removeFF .)
+    OR              reduce using rule 89 (factor -> LEFTPAR addFF hyperExpression RIGHTPAR removeFF .)
+    RIGHTPAR        reduce using rule 89 (factor -> LEFTPAR addFF hyperExpression RIGHTPAR removeFF .)
+    COMA            reduce using rule 89 (factor -> LEFTPAR addFF hyperExpression RIGHTPAR removeFF .)
+    SEMICOLON       reduce using rule 89 (factor -> LEFTPAR addFF hyperExpression RIGHTPAR removeFF .)
+    LEFTBRACE       reduce using rule 89 (factor -> LEFTPAR addFF hyperExpression RIGHTPAR removeFF .)
+    RIGHTBRACK      reduce using rule 89 (factor -> LEFTPAR addFF hyperExpression RIGHTPAR removeFF .)
+
+
+state 212
+
+    (62) hyperExpressionNested -> superExpression evaluateHE . opHyperExpression hyperExpressionNested
+    (63) hyperExpressionNested -> superExpression evaluateHE .
+    (69) opHyperExpression -> . AND addOperator
+    (70) opHyperExpression -> . OR addOperator
+
+    RIGHTPAR        reduce using rule 63 (hyperExpressionNested -> superExpression evaluateHE .)
+    COMA            reduce using rule 63 (hyperExpressionNested -> superExpression evaluateHE .)
+    SEMICOLON       reduce using rule 63 (hyperExpressionNested -> superExpression evaluateHE .)
+    LEFTBRACE       reduce using rule 63 (hyperExpressionNested -> superExpression evaluateHE .)
+    RIGHTBRACK      reduce using rule 63 (hyperExpressionNested -> superExpression evaluateHE .)
+    AND             shift and go to state 157
+    OR              shift and go to state 158
+
+    opHyperExpression              shift and go to state 225
+
+state 213
+
+    (71) superExpression -> exp evaluateSE opSuperExpression exp evaluateSE .
+
+    EXCLAMATION     reduce using rule 71 (superExpression -> exp evaluateSE opSuperExpression exp evaluateSE .)
+    QUESTION        reduce using rule 71 (superExpression -> exp evaluateSE opSuperExpression exp evaluateSE .)
+    DOLLARSIGN      reduce using rule 71 (superExpression -> exp evaluateSE opSuperExpression exp evaluateSE .)
+    AND             reduce using rule 71 (superExpression -> exp evaluateSE opSuperExpression exp evaluateSE .)
+    OR              reduce using rule 71 (superExpression -> exp evaluateSE opSuperExpression exp evaluateSE .)
+    RIGHTPAR        reduce using rule 71 (superExpression -> exp evaluateSE opSuperExpression exp evaluateSE .)
+    COMA            reduce using rule 71 (superExpression -> exp evaluateSE opSuperExpression exp evaluateSE .)
+    SEMICOLON       reduce using rule 71 (superExpression -> exp evaluateSE opSuperExpression exp evaluateSE .)
+    LEFTBRACE       reduce using rule 71 (superExpression -> exp evaluateSE opSuperExpression exp evaluateSE .)
+    RIGHTBRACK      reduce using rule 71 (superExpression -> exp evaluateSE opSuperExpression exp evaluateSE .)
+
+
+state 214
+
+    (81) expFunction -> PLUS addOperator exp .
+
+    GT              reduce using rule 81 (expFunction -> PLUS addOperator exp .)
+    LT              reduce using rule 81 (expFunction -> PLUS addOperator exp .)
+    NOTEQUAL        reduce using rule 81 (expFunction -> PLUS addOperator exp .)
+    ISEQUAL         reduce using rule 81 (expFunction -> PLUS addOperator exp .)
+    EXCLAMATION     reduce using rule 81 (expFunction -> PLUS addOperator exp .)
+    QUESTION        reduce using rule 81 (expFunction -> PLUS addOperator exp .)
+    DOLLARSIGN      reduce using rule 81 (expFunction -> PLUS addOperator exp .)
+    AND             reduce using rule 81 (expFunction -> PLUS addOperator exp .)
+    OR              reduce using rule 81 (expFunction -> PLUS addOperator exp .)
+    RIGHTPAR        reduce using rule 81 (expFunction -> PLUS addOperator exp .)
+    COMA            reduce using rule 81 (expFunction -> PLUS addOperator exp .)
+    SEMICOLON       reduce using rule 81 (expFunction -> PLUS addOperator exp .)
+    LEFTBRACE       reduce using rule 81 (expFunction -> PLUS addOperator exp .)
+    RIGHTBRACK      reduce using rule 81 (expFunction -> PLUS addOperator exp .)
+
+
+state 215
+
+    (82) expFunction -> MINUS addOperator exp .
+
+    GT              reduce using rule 82 (expFunction -> MINUS addOperator exp .)
+    LT              reduce using rule 82 (expFunction -> MINUS addOperator exp .)
+    NOTEQUAL        reduce using rule 82 (expFunction -> MINUS addOperator exp .)
+    ISEQUAL         reduce using rule 82 (expFunction -> MINUS addOperator exp .)
+    EXCLAMATION     reduce using rule 82 (expFunction -> MINUS addOperator exp .)
+    QUESTION        reduce using rule 82 (expFunction -> MINUS addOperator exp .)
+    DOLLARSIGN      reduce using rule 82 (expFunction -> MINUS addOperator exp .)
+    AND             reduce using rule 82 (expFunction -> MINUS addOperator exp .)
+    OR              reduce using rule 82 (expFunction -> MINUS addOperator exp .)
+    RIGHTPAR        reduce using rule 82 (expFunction -> MINUS addOperator exp .)
+    COMA            reduce using rule 82 (expFunction -> MINUS addOperator exp .)
+    SEMICOLON       reduce using rule 82 (expFunction -> MINUS addOperator exp .)
+    LEFTBRACE       reduce using rule 82 (expFunction -> MINUS addOperator exp .)
+    RIGHTBRACK      reduce using rule 82 (expFunction -> MINUS addOperator exp .)
+
+
+state 216
+
+    (86) termFunction -> MULTIPLY addOperator term .
+
+    PLUS            reduce using rule 86 (termFunction -> MULTIPLY addOperator term .)
+    MINUS           reduce using rule 86 (termFunction -> MULTIPLY addOperator term .)
+    GT              reduce using rule 86 (termFunction -> MULTIPLY addOperator term .)
+    LT              reduce using rule 86 (termFunction -> MULTIPLY addOperator term .)
+    NOTEQUAL        reduce using rule 86 (termFunction -> MULTIPLY addOperator term .)
+    ISEQUAL         reduce using rule 86 (termFunction -> MULTIPLY addOperator term .)
+    EXCLAMATION     reduce using rule 86 (termFunction -> MULTIPLY addOperator term .)
+    QUESTION        reduce using rule 86 (termFunction -> MULTIPLY addOperator term .)
+    DOLLARSIGN      reduce using rule 86 (termFunction -> MULTIPLY addOperator term .)
+    AND             reduce using rule 86 (termFunction -> MULTIPLY addOperator term .)
+    OR              reduce using rule 86 (termFunction -> MULTIPLY addOperator term .)
+    RIGHTPAR        reduce using rule 86 (termFunction -> MULTIPLY addOperator term .)
+    COMA            reduce using rule 86 (termFunction -> MULTIPLY addOperator term .)
+    SEMICOLON       reduce using rule 86 (termFunction -> MULTIPLY addOperator term .)
+    LEFTBRACE       reduce using rule 86 (termFunction -> MULTIPLY addOperator term .)
+    RIGHTBRACK      reduce using rule 86 (termFunction -> MULTIPLY addOperator term .)
+
+
+state 217
+
+    (87) termFunction -> DIVIDE addOperator term .
+
+    PLUS            reduce using rule 87 (termFunction -> DIVIDE addOperator term .)
+    MINUS           reduce using rule 87 (termFunction -> DIVIDE addOperator term .)
+    GT              reduce using rule 87 (termFunction -> DIVIDE addOperator term .)
+    LT              reduce using rule 87 (termFunction -> DIVIDE addOperator term .)
+    NOTEQUAL        reduce using rule 87 (termFunction -> DIVIDE addOperator term .)
+    ISEQUAL         reduce using rule 87 (termFunction -> DIVIDE addOperator term .)
+    EXCLAMATION     reduce using rule 87 (termFunction -> DIVIDE addOperator term .)
+    QUESTION        reduce using rule 87 (termFunction -> DIVIDE addOperator term .)
+    DOLLARSIGN      reduce using rule 87 (termFunction -> DIVIDE addOperator term .)
+    AND             reduce using rule 87 (termFunction -> DIVIDE addOperator term .)
+    OR              reduce using rule 87 (termFunction -> DIVIDE addOperator term .)
+    RIGHTPAR        reduce using rule 87 (termFunction -> DIVIDE addOperator term .)
+    COMA            reduce using rule 87 (termFunction -> DIVIDE addOperator term .)
+    SEMICOLON       reduce using rule 87 (termFunction -> DIVIDE addOperator term .)
+    LEFTBRACE       reduce using rule 87 (termFunction -> DIVIDE addOperator term .)
+    RIGHTBRACK      reduce using rule 87 (termFunction -> DIVIDE addOperator term .)
+
+
+state 218
+
+    (16) if -> IF LEFTPAR hyperExpression RIGHTPAR createJumpQuadIf THEN LEFTBRACE . statement RIGHTBRACE ifElse updateJumpQuad
+    (108) statement -> . return checkVoidType
+    (109) statement -> . if statement
+    (110) statement -> . comment statement
+    (111) statement -> . read statement
+    (112) statement -> . print statement
+    (113) statement -> . assignment statement
+    (114) statement -> . module SEMICOLON statement
+    (115) statement -> . for statement
+    (116) statement -> . while statement
+    (117) statement -> . checkNonVoidType
+    (15) return -> . RETURN LEFTPAR hyperExpression RIGHTPAR SEMICOLON
+    (16) if -> . IF LEFTPAR hyperExpression RIGHTPAR createJumpQuadIf THEN LEFTBRACE statement RIGHTBRACE ifElse updateJumpQuad
+    (22) comment -> . COMMENT_TEXT
+    (95) read -> . READ LEFTPAR id_list RIGHTPAR SEMICOLON
+    (100) print -> . PRINT LEFTPAR printFunction RIGHTPAR SEMICOLON
+    (7) assignment -> . ID dimArray EQUAL hyperExpression SEMICOLON
+    (120) module -> . ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+    (27) for -> . FOR forAssignment TO insertJumpFor hyperExpression createQuadFor LEFTBRACE statement RIGHTBRACE updateQuadFor
+    (23) while -> . WHILE pushLoopJump LEFTPAR hyperExpression RIGHTPAR beginLoopAction LEFTBRACE statement RIGHTBRACE endLoopAction
+    (119) checkNonVoidType -> .
+
+    RETURN          shift and go to state 61
+    IF              shift and go to state 62
+    COMMENT_TEXT    shift and go to state 63
+    READ            shift and go to state 64
+    PRINT           shift and go to state 65
+    ID              shift and go to state 66
+    FOR             shift and go to state 67
+    WHILE           shift and go to state 68
+    RIGHTBRACE      reduce using rule 119 (checkNonVoidType -> .)
+
+    statement                      shift and go to state 226
+    return                         shift and go to state 51
+    if                             shift and go to state 52
+    comment                        shift and go to state 53
+    read                           shift and go to state 54
+    print                          shift and go to state 55
+    assignment                     shift and go to state 56
+    module                         shift and go to state 57
+    for                            shift and go to state 58
+    while                          shift and go to state 59
+    checkNonVoidType               shift and go to state 60
+
+state 219
+
+    (98) id_listFunction -> COMA id_list .
+
+    RIGHTPAR        reduce using rule 98 (id_listFunction -> COMA id_list .)
+
+
+state 220
+
+    (120) module -> ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR . genGosub
+    (124) genGosub -> .
+
+    SEMICOLON       reduce using rule 124 (genGosub -> .)
+    MULTIPLY        reduce using rule 124 (genGosub -> .)
+    DIVIDE          reduce using rule 124 (genGosub -> .)
+    PLUS            reduce using rule 124 (genGosub -> .)
+    MINUS           reduce using rule 124 (genGosub -> .)
+    GT              reduce using rule 124 (genGosub -> .)
+    LT              reduce using rule 124 (genGosub -> .)
+    NOTEQUAL        reduce using rule 124 (genGosub -> .)
+    ISEQUAL         reduce using rule 124 (genGosub -> .)
+    EXCLAMATION     reduce using rule 124 (genGosub -> .)
+    QUESTION        reduce using rule 124 (genGosub -> .)
+    DOLLARSIGN      reduce using rule 124 (genGosub -> .)
+    AND             reduce using rule 124 (genGosub -> .)
+    OR              reduce using rule 124 (genGosub -> .)
+    RIGHTPAR        reduce using rule 124 (genGosub -> .)
+    COMA            reduce using rule 124 (genGosub -> .)
+    LEFTBRACE       reduce using rule 124 (genGosub -> .)
+    RIGHTBRACK      reduce using rule 124 (genGosub -> .)
+
+    genGosub                       shift and go to state 227
+
+state 221
+
+    (125) moduleFunction -> hyperExpression genParam nextParam . COMA moduleFunction
+
+    COMA            shift and go to state 228
+
+
+state 222
+
+    (130) dimArray -> addOperandId addTypeId LEFTBRACK readIDType hyperExpression verifyRows . RIGHTBRACK dimMatrix
+
+    RIGHTBRACK      shift and go to state 229
+
+
+state 223
+
+    (27) for -> FOR forAssignment TO insertJumpFor hyperExpression createQuadFor LEFTBRACE . statement RIGHTBRACE updateQuadFor
+    (108) statement -> . return checkVoidType
+    (109) statement -> . if statement
+    (110) statement -> . comment statement
+    (111) statement -> . read statement
+    (112) statement -> . print statement
+    (113) statement -> . assignment statement
+    (114) statement -> . module SEMICOLON statement
+    (115) statement -> . for statement
+    (116) statement -> . while statement
+    (117) statement -> . checkNonVoidType
+    (15) return -> . RETURN LEFTPAR hyperExpression RIGHTPAR SEMICOLON
+    (16) if -> . IF LEFTPAR hyperExpression RIGHTPAR createJumpQuadIf THEN LEFTBRACE statement RIGHTBRACE ifElse updateJumpQuad
+    (22) comment -> . COMMENT_TEXT
+    (95) read -> . READ LEFTPAR id_list RIGHTPAR SEMICOLON
+    (100) print -> . PRINT LEFTPAR printFunction RIGHTPAR SEMICOLON
+    (7) assignment -> . ID dimArray EQUAL hyperExpression SEMICOLON
+    (120) module -> . ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+    (27) for -> . FOR forAssignment TO insertJumpFor hyperExpression createQuadFor LEFTBRACE statement RIGHTBRACE updateQuadFor
+    (23) while -> . WHILE pushLoopJump LEFTPAR hyperExpression RIGHTPAR beginLoopAction LEFTBRACE statement RIGHTBRACE endLoopAction
+    (119) checkNonVoidType -> .
+
+    RETURN          shift and go to state 61
+    IF              shift and go to state 62
+    COMMENT_TEXT    shift and go to state 63
+    READ            shift and go to state 64
+    PRINT           shift and go to state 65
+    ID              shift and go to state 66
+    FOR             shift and go to state 67
+    WHILE           shift and go to state 68
+    RIGHTBRACE      reduce using rule 119 (checkNonVoidType -> .)
+
+    statement                      shift and go to state 230
+    return                         shift and go to state 51
+    if                             shift and go to state 52
+    comment                        shift and go to state 53
+    read                           shift and go to state 54
+    print                          shift and go to state 55
+    assignment                     shift and go to state 56
+    module                         shift and go to state 57
+    for                            shift and go to state 58
+    while                          shift and go to state 59
+    checkNonVoidType               shift and go to state 60
+
+state 224
+
+    (23) while -> WHILE pushLoopJump LEFTPAR hyperExpression RIGHTPAR beginLoopAction LEFTBRACE . statement RIGHTBRACE endLoopAction
+    (108) statement -> . return checkVoidType
+    (109) statement -> . if statement
+    (110) statement -> . comment statement
+    (111) statement -> . read statement
+    (112) statement -> . print statement
+    (113) statement -> . assignment statement
+    (114) statement -> . module SEMICOLON statement
+    (115) statement -> . for statement
+    (116) statement -> . while statement
+    (117) statement -> . checkNonVoidType
+    (15) return -> . RETURN LEFTPAR hyperExpression RIGHTPAR SEMICOLON
+    (16) if -> . IF LEFTPAR hyperExpression RIGHTPAR createJumpQuadIf THEN LEFTBRACE statement RIGHTBRACE ifElse updateJumpQuad
+    (22) comment -> . COMMENT_TEXT
+    (95) read -> . READ LEFTPAR id_list RIGHTPAR SEMICOLON
+    (100) print -> . PRINT LEFTPAR printFunction RIGHTPAR SEMICOLON
+    (7) assignment -> . ID dimArray EQUAL hyperExpression SEMICOLON
+    (120) module -> . ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+    (27) for -> . FOR forAssignment TO insertJumpFor hyperExpression createQuadFor LEFTBRACE statement RIGHTBRACE updateQuadFor
+    (23) while -> . WHILE pushLoopJump LEFTPAR hyperExpression RIGHTPAR beginLoopAction LEFTBRACE statement RIGHTBRACE endLoopAction
+    (119) checkNonVoidType -> .
+
+    RETURN          shift and go to state 61
+    IF              shift and go to state 62
+    COMMENT_TEXT    shift and go to state 63
+    READ            shift and go to state 64
+    PRINT           shift and go to state 65
+    ID              shift and go to state 66
+    FOR             shift and go to state 67
+    WHILE           shift and go to state 68
+    RIGHTBRACE      reduce using rule 119 (checkNonVoidType -> .)
+
+    statement                      shift and go to state 231
+    return                         shift and go to state 51
+    if                             shift and go to state 52
+    comment                        shift and go to state 53
+    read                           shift and go to state 54
+    print                          shift and go to state 55
+    assignment                     shift and go to state 56
+    module                         shift and go to state 57
+    for                            shift and go to state 58
+    while                          shift and go to state 59
+    checkNonVoidType               shift and go to state 60
+
+state 225
+
+    (62) hyperExpressionNested -> superExpression evaluateHE opHyperExpression . hyperExpressionNested
+    (62) hyperExpressionNested -> . superExpression evaluateHE opHyperExpression hyperExpressionNested
+    (63) hyperExpressionNested -> . superExpression evaluateHE
+    (71) superExpression -> . exp evaluateSE opSuperExpression exp evaluateSE
+    (72) superExpression -> . exp evaluateSE
+    (78) exp -> . term evaluateTerm expFunction
+    (79) exp -> . term evaluateTerm
+    (83) term -> . factor evaluateFactor termFunction
+    (84) term -> . factor evaluateFactor
+    (89) factor -> . LEFTPAR addFF hyperExpression RIGHTPAR removeFF
+    (90) factor -> . cst_prim
+    (91) factor -> . module
+    (92) factor -> . ID dimArray
+    (53) cst_prim -> . CST_INT addTypeInt
+    (54) cst_prim -> . CST_FLOAT addTypeFloat
+    (55) cst_prim -> . CST_CHAR addTypeChar
+    (120) module -> . ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+
+    LEFTPAR         shift and go to state 98
+    ID              shift and go to state 106
+    CST_INT         shift and go to state 107
+    CST_FLOAT       shift and go to state 108
+    CST_CHAR        shift and go to state 109
+
+    superExpression                shift and go to state 189
+    hyperExpressionNested          shift and go to state 232
+    exp                            shift and go to state 101
+    term                           shift and go to state 102
+    factor                         shift and go to state 103
+    cst_prim                       shift and go to state 104
+    module                         shift and go to state 105
+
+state 226
+
+    (16) if -> IF LEFTPAR hyperExpression RIGHTPAR createJumpQuadIf THEN LEFTBRACE statement . RIGHTBRACE ifElse updateJumpQuad
+
+    RIGHTBRACE      shift and go to state 233
+
+
+state 227
+
+    (120) module -> ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub .
+
+    SEMICOLON       reduce using rule 120 (module -> ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub .)
+    MULTIPLY        reduce using rule 120 (module -> ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub .)
+    DIVIDE          reduce using rule 120 (module -> ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub .)
+    PLUS            reduce using rule 120 (module -> ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub .)
+    MINUS           reduce using rule 120 (module -> ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub .)
+    GT              reduce using rule 120 (module -> ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub .)
+    LT              reduce using rule 120 (module -> ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub .)
+    NOTEQUAL        reduce using rule 120 (module -> ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub .)
+    ISEQUAL         reduce using rule 120 (module -> ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub .)
+    EXCLAMATION     reduce using rule 120 (module -> ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub .)
+    QUESTION        reduce using rule 120 (module -> ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub .)
+    DOLLARSIGN      reduce using rule 120 (module -> ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub .)
+    AND             reduce using rule 120 (module -> ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub .)
+    OR              reduce using rule 120 (module -> ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub .)
+    RIGHTPAR        reduce using rule 120 (module -> ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub .)
+    COMA            reduce using rule 120 (module -> ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub .)
+    LEFTBRACE       reduce using rule 120 (module -> ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub .)
+    RIGHTBRACK      reduce using rule 120 (module -> ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub .)
+
+
+state 228
+
+    (125) moduleFunction -> hyperExpression genParam nextParam COMA . moduleFunction
+    (125) moduleFunction -> . hyperExpression genParam nextParam COMA moduleFunction
+    (126) moduleFunction -> . hyperExpression genParam
+    (127) moduleFunction -> .
+    (59) hyperExpression -> . superExpression evaluateHE opHyperExpression hyperExpressionNested
+    (60) hyperExpression -> . superExpression opMatrix evaluateOpMatrix
+    (61) hyperExpression -> . superExpression evaluateHE
+    (71) superExpression -> . exp evaluateSE opSuperExpression exp evaluateSE
+    (72) superExpression -> . exp evaluateSE
+    (78) exp -> . term evaluateTerm expFunction
+    (79) exp -> . term evaluateTerm
+    (83) term -> . factor evaluateFactor termFunction
+    (84) term -> . factor evaluateFactor
+    (89) factor -> . LEFTPAR addFF hyperExpression RIGHTPAR removeFF
+    (90) factor -> . cst_prim
+    (91) factor -> . module
+    (92) factor -> . ID dimArray
+    (53) cst_prim -> . CST_INT addTypeInt
+    (54) cst_prim -> . CST_FLOAT addTypeFloat
+    (55) cst_prim -> . CST_CHAR addTypeChar
+    (120) module -> . ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+
+    RIGHTPAR        reduce using rule 127 (moduleFunction -> .)
+    LEFTPAR         shift and go to state 98
+    ID              shift and go to state 106
+    CST_INT         shift and go to state 107
+    CST_FLOAT       shift and go to state 108
+    CST_CHAR        shift and go to state 109
+
+    hyperExpression                shift and go to state 182
+    moduleFunction                 shift and go to state 234
+    superExpression                shift and go to state 100
+    exp                            shift and go to state 101
+    term                           shift and go to state 102
+    factor                         shift and go to state 103
+    cst_prim                       shift and go to state 104
+    module                         shift and go to state 105
+
+state 229
+
+    (130) dimArray -> addOperandId addTypeId LEFTBRACK readIDType hyperExpression verifyRows RIGHTBRACK . dimMatrix
+    (136) dimMatrix -> . LEFTBRACK hyperExpression verifyCols RIGHTBRACK
+    (137) dimMatrix -> . checkMatAsArray
+    (139) checkMatAsArray -> .
+
+    LEFTBRACK       shift and go to state 235
+    EQUAL           reduce using rule 139 (checkMatAsArray -> .)
+    MULTIPLY        reduce using rule 139 (checkMatAsArray -> .)
+    DIVIDE          reduce using rule 139 (checkMatAsArray -> .)
+    PLUS            reduce using rule 139 (checkMatAsArray -> .)
+    MINUS           reduce using rule 139 (checkMatAsArray -> .)
+    GT              reduce using rule 139 (checkMatAsArray -> .)
+    LT              reduce using rule 139 (checkMatAsArray -> .)
+    NOTEQUAL        reduce using rule 139 (checkMatAsArray -> .)
+    ISEQUAL         reduce using rule 139 (checkMatAsArray -> .)
+    EXCLAMATION     reduce using rule 139 (checkMatAsArray -> .)
+    QUESTION        reduce using rule 139 (checkMatAsArray -> .)
+    DOLLARSIGN      reduce using rule 139 (checkMatAsArray -> .)
+    AND             reduce using rule 139 (checkMatAsArray -> .)
+    OR              reduce using rule 139 (checkMatAsArray -> .)
+    RIGHTPAR        reduce using rule 139 (checkMatAsArray -> .)
+    COMA            reduce using rule 139 (checkMatAsArray -> .)
+    SEMICOLON       reduce using rule 139 (checkMatAsArray -> .)
+    LEFTBRACE       reduce using rule 139 (checkMatAsArray -> .)
+    RIGHTBRACK      reduce using rule 139 (checkMatAsArray -> .)
+
+    dimMatrix                      shift and go to state 236
+    checkMatAsArray                shift and go to state 237
+
+state 230
+
+    (27) for -> FOR forAssignment TO insertJumpFor hyperExpression createQuadFor LEFTBRACE statement . RIGHTBRACE updateQuadFor
+
+    RIGHTBRACE      shift and go to state 238
+
+
+state 231
+
+    (23) while -> WHILE pushLoopJump LEFTPAR hyperExpression RIGHTPAR beginLoopAction LEFTBRACE statement . RIGHTBRACE endLoopAction
+
+    RIGHTBRACE      shift and go to state 239
+
+
+state 232
+
+    (62) hyperExpressionNested -> superExpression evaluateHE opHyperExpression hyperExpressionNested .
+
+    RIGHTPAR        reduce using rule 62 (hyperExpressionNested -> superExpression evaluateHE opHyperExpression hyperExpressionNested .)
+    COMA            reduce using rule 62 (hyperExpressionNested -> superExpression evaluateHE opHyperExpression hyperExpressionNested .)
+    SEMICOLON       reduce using rule 62 (hyperExpressionNested -> superExpression evaluateHE opHyperExpression hyperExpressionNested .)
+    LEFTBRACE       reduce using rule 62 (hyperExpressionNested -> superExpression evaluateHE opHyperExpression hyperExpressionNested .)
+    RIGHTBRACK      reduce using rule 62 (hyperExpressionNested -> superExpression evaluateHE opHyperExpression hyperExpressionNested .)
+
+
+state 233
+
+    (16) if -> IF LEFTPAR hyperExpression RIGHTPAR createJumpQuadIf THEN LEFTBRACE statement RIGHTBRACE . ifElse updateJumpQuad
+    (19) ifElse -> . ELSE createJumpQuadElse LEFTBRACE statement RIGHTBRACE
+    (20) ifElse -> .
+
+    ELSE            shift and go to state 241
+    RETURN          reduce using rule 20 (ifElse -> .)
+    IF              reduce using rule 20 (ifElse -> .)
+    COMMENT_TEXT    reduce using rule 20 (ifElse -> .)
+    READ            reduce using rule 20 (ifElse -> .)
+    PRINT           reduce using rule 20 (ifElse -> .)
+    ID              reduce using rule 20 (ifElse -> .)
+    FOR             reduce using rule 20 (ifElse -> .)
+    WHILE           reduce using rule 20 (ifElse -> .)
+    RIGHTBRACE      reduce using rule 20 (ifElse -> .)
+
+    ifElse                         shift and go to state 240
+
+state 234
+
+    (125) moduleFunction -> hyperExpression genParam nextParam COMA moduleFunction .
+
+    RIGHTPAR        reduce using rule 125 (moduleFunction -> hyperExpression genParam nextParam COMA moduleFunction .)
+
+
+state 235
+
+    (136) dimMatrix -> LEFTBRACK . hyperExpression verifyCols RIGHTBRACK
+    (59) hyperExpression -> . superExpression evaluateHE opHyperExpression hyperExpressionNested
+    (60) hyperExpression -> . superExpression opMatrix evaluateOpMatrix
+    (61) hyperExpression -> . superExpression evaluateHE
+    (71) superExpression -> . exp evaluateSE opSuperExpression exp evaluateSE
+    (72) superExpression -> . exp evaluateSE
+    (78) exp -> . term evaluateTerm expFunction
+    (79) exp -> . term evaluateTerm
+    (83) term -> . factor evaluateFactor termFunction
+    (84) term -> . factor evaluateFactor
+    (89) factor -> . LEFTPAR addFF hyperExpression RIGHTPAR removeFF
+    (90) factor -> . cst_prim
+    (91) factor -> . module
+    (92) factor -> . ID dimArray
+    (53) cst_prim -> . CST_INT addTypeInt
+    (54) cst_prim -> . CST_FLOAT addTypeFloat
+    (55) cst_prim -> . CST_CHAR addTypeChar
+    (120) module -> . ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+
+    LEFTPAR         shift and go to state 98
+    ID              shift and go to state 106
+    CST_INT         shift and go to state 107
+    CST_FLOAT       shift and go to state 108
+    CST_CHAR        shift and go to state 109
+
+    hyperExpression                shift and go to state 242
+    superExpression                shift and go to state 100
+    exp                            shift and go to state 101
+    term                           shift and go to state 102
+    factor                         shift and go to state 103
+    cst_prim                       shift and go to state 104
+    module                         shift and go to state 105
+
+state 236
+
+    (130) dimArray -> addOperandId addTypeId LEFTBRACK readIDType hyperExpression verifyRows RIGHTBRACK dimMatrix .
+
+    EQUAL           reduce using rule 130 (dimArray -> addOperandId addTypeId LEFTBRACK readIDType hyperExpression verifyRows RIGHTBRACK dimMatrix .)
+    MULTIPLY        reduce using rule 130 (dimArray -> addOperandId addTypeId LEFTBRACK readIDType hyperExpression verifyRows RIGHTBRACK dimMatrix .)
+    DIVIDE          reduce using rule 130 (dimArray -> addOperandId addTypeId LEFTBRACK readIDType hyperExpression verifyRows RIGHTBRACK dimMatrix .)
+    PLUS            reduce using rule 130 (dimArray -> addOperandId addTypeId LEFTBRACK readIDType hyperExpression verifyRows RIGHTBRACK dimMatrix .)
+    MINUS           reduce using rule 130 (dimArray -> addOperandId addTypeId LEFTBRACK readIDType hyperExpression verifyRows RIGHTBRACK dimMatrix .)
+    GT              reduce using rule 130 (dimArray -> addOperandId addTypeId LEFTBRACK readIDType hyperExpression verifyRows RIGHTBRACK dimMatrix .)
+    LT              reduce using rule 130 (dimArray -> addOperandId addTypeId LEFTBRACK readIDType hyperExpression verifyRows RIGHTBRACK dimMatrix .)
+    NOTEQUAL        reduce using rule 130 (dimArray -> addOperandId addTypeId LEFTBRACK readIDType hyperExpression verifyRows RIGHTBRACK dimMatrix .)
+    ISEQUAL         reduce using rule 130 (dimArray -> addOperandId addTypeId LEFTBRACK readIDType hyperExpression verifyRows RIGHTBRACK dimMatrix .)
+    EXCLAMATION     reduce using rule 130 (dimArray -> addOperandId addTypeId LEFTBRACK readIDType hyperExpression verifyRows RIGHTBRACK dimMatrix .)
+    QUESTION        reduce using rule 130 (dimArray -> addOperandId addTypeId LEFTBRACK readIDType hyperExpression verifyRows RIGHTBRACK dimMatrix .)
+    DOLLARSIGN      reduce using rule 130 (dimArray -> addOperandId addTypeId LEFTBRACK readIDType hyperExpression verifyRows RIGHTBRACK dimMatrix .)
+    AND             reduce using rule 130 (dimArray -> addOperandId addTypeId LEFTBRACK readIDType hyperExpression verifyRows RIGHTBRACK dimMatrix .)
+    OR              reduce using rule 130 (dimArray -> addOperandId addTypeId LEFTBRACK readIDType hyperExpression verifyRows RIGHTBRACK dimMatrix .)
+    RIGHTPAR        reduce using rule 130 (dimArray -> addOperandId addTypeId LEFTBRACK readIDType hyperExpression verifyRows RIGHTBRACK dimMatrix .)
+    COMA            reduce using rule 130 (dimArray -> addOperandId addTypeId LEFTBRACK readIDType hyperExpression verifyRows RIGHTBRACK dimMatrix .)
+    SEMICOLON       reduce using rule 130 (dimArray -> addOperandId addTypeId LEFTBRACK readIDType hyperExpression verifyRows RIGHTBRACK dimMatrix .)
+    LEFTBRACE       reduce using rule 130 (dimArray -> addOperandId addTypeId LEFTBRACK readIDType hyperExpression verifyRows RIGHTBRACK dimMatrix .)
+    RIGHTBRACK      reduce using rule 130 (dimArray -> addOperandId addTypeId LEFTBRACK readIDType hyperExpression verifyRows RIGHTBRACK dimMatrix .)
+
+
+state 237
+
+    (137) dimMatrix -> checkMatAsArray .
+
+    EQUAL           reduce using rule 137 (dimMatrix -> checkMatAsArray .)
+    MULTIPLY        reduce using rule 137 (dimMatrix -> checkMatAsArray .)
+    DIVIDE          reduce using rule 137 (dimMatrix -> checkMatAsArray .)
+    PLUS            reduce using rule 137 (dimMatrix -> checkMatAsArray .)
+    MINUS           reduce using rule 137 (dimMatrix -> checkMatAsArray .)
+    GT              reduce using rule 137 (dimMatrix -> checkMatAsArray .)
+    LT              reduce using rule 137 (dimMatrix -> checkMatAsArray .)
+    NOTEQUAL        reduce using rule 137 (dimMatrix -> checkMatAsArray .)
+    ISEQUAL         reduce using rule 137 (dimMatrix -> checkMatAsArray .)
+    EXCLAMATION     reduce using rule 137 (dimMatrix -> checkMatAsArray .)
+    QUESTION        reduce using rule 137 (dimMatrix -> checkMatAsArray .)
+    DOLLARSIGN      reduce using rule 137 (dimMatrix -> checkMatAsArray .)
+    AND             reduce using rule 137 (dimMatrix -> checkMatAsArray .)
+    OR              reduce using rule 137 (dimMatrix -> checkMatAsArray .)
+    RIGHTPAR        reduce using rule 137 (dimMatrix -> checkMatAsArray .)
+    COMA            reduce using rule 137 (dimMatrix -> checkMatAsArray .)
+    SEMICOLON       reduce using rule 137 (dimMatrix -> checkMatAsArray .)
+    LEFTBRACE       reduce using rule 137 (dimMatrix -> checkMatAsArray .)
+    RIGHTBRACK      reduce using rule 137 (dimMatrix -> checkMatAsArray .)
+
+
+state 238
+
+    (27) for -> FOR forAssignment TO insertJumpFor hyperExpression createQuadFor LEFTBRACE statement RIGHTBRACE . updateQuadFor
+    (30) updateQuadFor -> .
+
+    RETURN          reduce using rule 30 (updateQuadFor -> .)
+    IF              reduce using rule 30 (updateQuadFor -> .)
+    COMMENT_TEXT    reduce using rule 30 (updateQuadFor -> .)
+    READ            reduce using rule 30 (updateQuadFor -> .)
+    PRINT           reduce using rule 30 (updateQuadFor -> .)
+    ID              reduce using rule 30 (updateQuadFor -> .)
+    FOR             reduce using rule 30 (updateQuadFor -> .)
+    WHILE           reduce using rule 30 (updateQuadFor -> .)
+    RIGHTBRACE      reduce using rule 30 (updateQuadFor -> .)
+
+    updateQuadFor                  shift and go to state 243
+
+state 239
+
+    (23) while -> WHILE pushLoopJump LEFTPAR hyperExpression RIGHTPAR beginLoopAction LEFTBRACE statement RIGHTBRACE . endLoopAction
+    (26) endLoopAction -> .
+
+    RETURN          reduce using rule 26 (endLoopAction -> .)
+    IF              reduce using rule 26 (endLoopAction -> .)
+    COMMENT_TEXT    reduce using rule 26 (endLoopAction -> .)
+    READ            reduce using rule 26 (endLoopAction -> .)
+    PRINT           reduce using rule 26 (endLoopAction -> .)
+    ID              reduce using rule 26 (endLoopAction -> .)
+    FOR             reduce using rule 26 (endLoopAction -> .)
+    WHILE           reduce using rule 26 (endLoopAction -> .)
+    RIGHTBRACE      reduce using rule 26 (endLoopAction -> .)
+
+    endLoopAction                  shift and go to state 244
+
+state 240
+
+    (16) if -> IF LEFTPAR hyperExpression RIGHTPAR createJumpQuadIf THEN LEFTBRACE statement RIGHTBRACE ifElse . updateJumpQuad
+    (18) updateJumpQuad -> .
+
+    RETURN          reduce using rule 18 (updateJumpQuad -> .)
+    IF              reduce using rule 18 (updateJumpQuad -> .)
+    COMMENT_TEXT    reduce using rule 18 (updateJumpQuad -> .)
+    READ            reduce using rule 18 (updateJumpQuad -> .)
+    PRINT           reduce using rule 18 (updateJumpQuad -> .)
+    ID              reduce using rule 18 (updateJumpQuad -> .)
+    FOR             reduce using rule 18 (updateJumpQuad -> .)
+    WHILE           reduce using rule 18 (updateJumpQuad -> .)
+    RIGHTBRACE      reduce using rule 18 (updateJumpQuad -> .)
+
+    updateJumpQuad                 shift and go to state 245
+
+state 241
+
+    (19) ifElse -> ELSE . createJumpQuadElse LEFTBRACE statement RIGHTBRACE
+    (21) createJumpQuadElse -> .
+
+    LEFTBRACE       reduce using rule 21 (createJumpQuadElse -> .)
+
+    createJumpQuadElse             shift and go to state 246
+
+state 242
+
+    (136) dimMatrix -> LEFTBRACK hyperExpression . verifyCols RIGHTBRACK
+    (138) verifyCols -> .
+
+    RIGHTBRACK      reduce using rule 138 (verifyCols -> .)
+
+    verifyCols                     shift and go to state 247
+
+state 243
+
+    (27) for -> FOR forAssignment TO insertJumpFor hyperExpression createQuadFor LEFTBRACE statement RIGHTBRACE updateQuadFor .
+
+    RETURN          reduce using rule 27 (for -> FOR forAssignment TO insertJumpFor hyperExpression createQuadFor LEFTBRACE statement RIGHTBRACE updateQuadFor .)
+    IF              reduce using rule 27 (for -> FOR forAssignment TO insertJumpFor hyperExpression createQuadFor LEFTBRACE statement RIGHTBRACE updateQuadFor .)
+    COMMENT_TEXT    reduce using rule 27 (for -> FOR forAssignment TO insertJumpFor hyperExpression createQuadFor LEFTBRACE statement RIGHTBRACE updateQuadFor .)
+    READ            reduce using rule 27 (for -> FOR forAssignment TO insertJumpFor hyperExpression createQuadFor LEFTBRACE statement RIGHTBRACE updateQuadFor .)
+    PRINT           reduce using rule 27 (for -> FOR forAssignment TO insertJumpFor hyperExpression createQuadFor LEFTBRACE statement RIGHTBRACE updateQuadFor .)
+    ID              reduce using rule 27 (for -> FOR forAssignment TO insertJumpFor hyperExpression createQuadFor LEFTBRACE statement RIGHTBRACE updateQuadFor .)
+    FOR             reduce using rule 27 (for -> FOR forAssignment TO insertJumpFor hyperExpression createQuadFor LEFTBRACE statement RIGHTBRACE updateQuadFor .)
+    WHILE           reduce using rule 27 (for -> FOR forAssignment TO insertJumpFor hyperExpression createQuadFor LEFTBRACE statement RIGHTBRACE updateQuadFor .)
+    RIGHTBRACE      reduce using rule 27 (for -> FOR forAssignment TO insertJumpFor hyperExpression createQuadFor LEFTBRACE statement RIGHTBRACE updateQuadFor .)
+
+
+state 244
+
+    (23) while -> WHILE pushLoopJump LEFTPAR hyperExpression RIGHTPAR beginLoopAction LEFTBRACE statement RIGHTBRACE endLoopAction .
+
+    RETURN          reduce using rule 23 (while -> WHILE pushLoopJump LEFTPAR hyperExpression RIGHTPAR beginLoopAction LEFTBRACE statement RIGHTBRACE endLoopAction .)
+    IF              reduce using rule 23 (while -> WHILE pushLoopJump LEFTPAR hyperExpression RIGHTPAR beginLoopAction LEFTBRACE statement RIGHTBRACE endLoopAction .)
+    COMMENT_TEXT    reduce using rule 23 (while -> WHILE pushLoopJump LEFTPAR hyperExpression RIGHTPAR beginLoopAction LEFTBRACE statement RIGHTBRACE endLoopAction .)
+    READ            reduce using rule 23 (while -> WHILE pushLoopJump LEFTPAR hyperExpression RIGHTPAR beginLoopAction LEFTBRACE statement RIGHTBRACE endLoopAction .)
+    PRINT           reduce using rule 23 (while -> WHILE pushLoopJump LEFTPAR hyperExpression RIGHTPAR beginLoopAction LEFTBRACE statement RIGHTBRACE endLoopAction .)
+    ID              reduce using rule 23 (while -> WHILE pushLoopJump LEFTPAR hyperExpression RIGHTPAR beginLoopAction LEFTBRACE statement RIGHTBRACE endLoopAction .)
+    FOR             reduce using rule 23 (while -> WHILE pushLoopJump LEFTPAR hyperExpression RIGHTPAR beginLoopAction LEFTBRACE statement RIGHTBRACE endLoopAction .)
+    WHILE           reduce using rule 23 (while -> WHILE pushLoopJump LEFTPAR hyperExpression RIGHTPAR beginLoopAction LEFTBRACE statement RIGHTBRACE endLoopAction .)
+    RIGHTBRACE      reduce using rule 23 (while -> WHILE pushLoopJump LEFTPAR hyperExpression RIGHTPAR beginLoopAction LEFTBRACE statement RIGHTBRACE endLoopAction .)
+
+
+state 245
+
+    (16) if -> IF LEFTPAR hyperExpression RIGHTPAR createJumpQuadIf THEN LEFTBRACE statement RIGHTBRACE ifElse updateJumpQuad .
+
+    RETURN          reduce using rule 16 (if -> IF LEFTPAR hyperExpression RIGHTPAR createJumpQuadIf THEN LEFTBRACE statement RIGHTBRACE ifElse updateJumpQuad .)
+    IF              reduce using rule 16 (if -> IF LEFTPAR hyperExpression RIGHTPAR createJumpQuadIf THEN LEFTBRACE statement RIGHTBRACE ifElse updateJumpQuad .)
+    COMMENT_TEXT    reduce using rule 16 (if -> IF LEFTPAR hyperExpression RIGHTPAR createJumpQuadIf THEN LEFTBRACE statement RIGHTBRACE ifElse updateJumpQuad .)
+    READ            reduce using rule 16 (if -> IF LEFTPAR hyperExpression RIGHTPAR createJumpQuadIf THEN LEFTBRACE statement RIGHTBRACE ifElse updateJumpQuad .)
+    PRINT           reduce using rule 16 (if -> IF LEFTPAR hyperExpression RIGHTPAR createJumpQuadIf THEN LEFTBRACE statement RIGHTBRACE ifElse updateJumpQuad .)
+    ID              reduce using rule 16 (if -> IF LEFTPAR hyperExpression RIGHTPAR createJumpQuadIf THEN LEFTBRACE statement RIGHTBRACE ifElse updateJumpQuad .)
+    FOR             reduce using rule 16 (if -> IF LEFTPAR hyperExpression RIGHTPAR createJumpQuadIf THEN LEFTBRACE statement RIGHTBRACE ifElse updateJumpQuad .)
+    WHILE           reduce using rule 16 (if -> IF LEFTPAR hyperExpression RIGHTPAR createJumpQuadIf THEN LEFTBRACE statement RIGHTBRACE ifElse updateJumpQuad .)
+    RIGHTBRACE      reduce using rule 16 (if -> IF LEFTPAR hyperExpression RIGHTPAR createJumpQuadIf THEN LEFTBRACE statement RIGHTBRACE ifElse updateJumpQuad .)
+
+
+state 246
+
+    (19) ifElse -> ELSE createJumpQuadElse . LEFTBRACE statement RIGHTBRACE
+
+    LEFTBRACE       shift and go to state 248
+
+
+state 247
+
+    (136) dimMatrix -> LEFTBRACK hyperExpression verifyCols . RIGHTBRACK
+
+    RIGHTBRACK      shift and go to state 249
+
+
+state 248
+
+    (19) ifElse -> ELSE createJumpQuadElse LEFTBRACE . statement RIGHTBRACE
+    (108) statement -> . return checkVoidType
+    (109) statement -> . if statement
+    (110) statement -> . comment statement
+    (111) statement -> . read statement
+    (112) statement -> . print statement
+    (113) statement -> . assignment statement
+    (114) statement -> . module SEMICOLON statement
+    (115) statement -> . for statement
+    (116) statement -> . while statement
+    (117) statement -> . checkNonVoidType
+    (15) return -> . RETURN LEFTPAR hyperExpression RIGHTPAR SEMICOLON
+    (16) if -> . IF LEFTPAR hyperExpression RIGHTPAR createJumpQuadIf THEN LEFTBRACE statement RIGHTBRACE ifElse updateJumpQuad
+    (22) comment -> . COMMENT_TEXT
+    (95) read -> . READ LEFTPAR id_list RIGHTPAR SEMICOLON
+    (100) print -> . PRINT LEFTPAR printFunction RIGHTPAR SEMICOLON
+    (7) assignment -> . ID dimArray EQUAL hyperExpression SEMICOLON
+    (120) module -> . ID checkFuncExists genERASize LEFTPAR moduleFunction nullParam RIGHTPAR genGosub
+    (27) for -> . FOR forAssignment TO insertJumpFor hyperExpression createQuadFor LEFTBRACE statement RIGHTBRACE updateQuadFor
+    (23) while -> . WHILE pushLoopJump LEFTPAR hyperExpression RIGHTPAR beginLoopAction LEFTBRACE statement RIGHTBRACE endLoopAction
+    (119) checkNonVoidType -> .
+
+    RETURN          shift and go to state 61
+    IF              shift and go to state 62
+    COMMENT_TEXT    shift and go to state 63
+    READ            shift and go to state 64
+    PRINT           shift and go to state 65
+    ID              shift and go to state 66
+    FOR             shift and go to state 67
+    WHILE           shift and go to state 68
+    RIGHTBRACE      reduce using rule 119 (checkNonVoidType -> .)
+
+    statement                      shift and go to state 250
+    return                         shift and go to state 51
+    if                             shift and go to state 52
+    comment                        shift and go to state 53
+    read                           shift and go to state 54
+    print                          shift and go to state 55
+    assignment                     shift and go to state 56
+    module                         shift and go to state 57
+    for                            shift and go to state 58
+    while                          shift and go to state 59
+    checkNonVoidType               shift and go to state 60
+
+state 249
+
+    (136) dimMatrix -> LEFTBRACK hyperExpression verifyCols RIGHTBRACK .
+
+    EQUAL           reduce using rule 136 (dimMatrix -> LEFTBRACK hyperExpression verifyCols RIGHTBRACK .)
+    MULTIPLY        reduce using rule 136 (dimMatrix -> LEFTBRACK hyperExpression verifyCols RIGHTBRACK .)
+    DIVIDE          reduce using rule 136 (dimMatrix -> LEFTBRACK hyperExpression verifyCols RIGHTBRACK .)
+    PLUS            reduce using rule 136 (dimMatrix -> LEFTBRACK hyperExpression verifyCols RIGHTBRACK .)
+    MINUS           reduce using rule 136 (dimMatrix -> LEFTBRACK hyperExpression verifyCols RIGHTBRACK .)
+    GT              reduce using rule 136 (dimMatrix -> LEFTBRACK hyperExpression verifyCols RIGHTBRACK .)
+    LT              reduce using rule 136 (dimMatrix -> LEFTBRACK hyperExpression verifyCols RIGHTBRACK .)
+    NOTEQUAL        reduce using rule 136 (dimMatrix -> LEFTBRACK hyperExpression verifyCols RIGHTBRACK .)
+    ISEQUAL         reduce using rule 136 (dimMatrix -> LEFTBRACK hyperExpression verifyCols RIGHTBRACK .)
+    EXCLAMATION     reduce using rule 136 (dimMatrix -> LEFTBRACK hyperExpression verifyCols RIGHTBRACK .)
+    QUESTION        reduce using rule 136 (dimMatrix -> LEFTBRACK hyperExpression verifyCols RIGHTBRACK .)
+    DOLLARSIGN      reduce using rule 136 (dimMatrix -> LEFTBRACK hyperExpression verifyCols RIGHTBRACK .)
+    AND             reduce using rule 136 (dimMatrix -> LEFTBRACK hyperExpression verifyCols RIGHTBRACK .)
+    OR              reduce using rule 136 (dimMatrix -> LEFTBRACK hyperExpression verifyCols RIGHTBRACK .)
+    RIGHTPAR        reduce using rule 136 (dimMatrix -> LEFTBRACK hyperExpression verifyCols RIGHTBRACK .)
+    COMA            reduce using rule 136 (dimMatrix -> LEFTBRACK hyperExpression verifyCols RIGHTBRACK .)
+    SEMICOLON       reduce using rule 136 (dimMatrix -> LEFTBRACK hyperExpression verifyCols RIGHTBRACK .)
+    LEFTBRACE       reduce using rule 136 (dimMatrix -> LEFTBRACK hyperExpression verifyCols RIGHTBRACK .)
+    RIGHTBRACK      reduce using rule 136 (dimMatrix -> LEFTBRACK hyperExpression verifyCols RIGHTBRACK .)
+
+
+state 250
+
+    (19) ifElse -> ELSE createJumpQuadElse LEFTBRACE statement . RIGHTBRACE
+
+    RIGHTBRACE      shift and go to state 251
+
+
+state 251
+
+    (19) ifElse -> ELSE createJumpQuadElse LEFTBRACE statement RIGHTBRACE .
+
+    RETURN          reduce using rule 19 (ifElse -> ELSE createJumpQuadElse LEFTBRACE statement RIGHTBRACE .)
+    IF              reduce using rule 19 (ifElse -> ELSE createJumpQuadElse LEFTBRACE statement RIGHTBRACE .)
+    COMMENT_TEXT    reduce using rule 19 (ifElse -> ELSE createJumpQuadElse LEFTBRACE statement RIGHTBRACE .)
+    READ            reduce using rule 19 (ifElse -> ELSE createJumpQuadElse LEFTBRACE statement RIGHTBRACE .)
+    PRINT           reduce using rule 19 (ifElse -> ELSE createJumpQuadElse LEFTBRACE statement RIGHTBRACE .)
+    ID              reduce using rule 19 (ifElse -> ELSE createJumpQuadElse LEFTBRACE statement RIGHTBRACE .)
+    FOR             reduce using rule 19 (ifElse -> ELSE createJumpQuadElse LEFTBRACE statement RIGHTBRACE .)
+    WHILE           reduce using rule 19 (ifElse -> ELSE createJumpQuadElse LEFTBRACE statement RIGHTBRACE .)
+    RIGHTBRACE      reduce using rule 19 (ifElse -> ELSE createJumpQuadElse LEFTBRACE statement RIGHTBRACE .)
+

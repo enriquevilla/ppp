@@ -1,0 +1,15 @@
+program fibonacciRecursive;
+
+function int fibonacci(int n) { 
+    var int a, b;
+    if (n < 2) then {
+        return(n); 
+    }
+    a = fibonacci(n - 1);
+    b = fibonacci(n - 2);
+    return(a + b); 
+} 
+
+main() {
+    print(fibonacci(10));
+}
