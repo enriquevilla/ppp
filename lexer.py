@@ -101,12 +101,19 @@ def t_error(t):
 
 lexer = lex.lex()
 
-f = open('prog.txt', 'r')
-program = f.read()
-
 lex.lex()
-# lex.input(program)
-# while 1:
-#     tok = lex.token()
-#     if not tok: break
-#     print(tok)
+
+# Print tokens for debugging
+'''
+import sys
+if len(sys.argv) > 1:
+	f = open(sys.argv[1], "r")
+else:
+	f = open("prog.txt", "r")
+program = f.read()
+lex.input(program)
+while 1:
+    tok = lex.token()
+    if not tok: break
+    print(tok)
+'''

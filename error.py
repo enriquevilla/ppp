@@ -66,12 +66,12 @@ class Error:
 
 	@staticmethod
 	def return_on_void_function(t, lineno):
-		print("Error: return statement on void function. Line: %d." % (lineno))
+		print("Error: return statement on void function in line %d." % (lineno))
 		exit(0)
 
 	@staticmethod
 	def no_return_on_function(t, lineno):
-		print("Error: no return statement on function with return type. Line: %d." % (lineno))
+		print("Error: no return statement on function with return type in line %d." % (lineno))
 		exit(0)
 
 	@staticmethod
@@ -154,4 +154,12 @@ class Error:
 		print("Error: type mismatch in array assignment in line %d." % (lineno))
 		exit(0)
 	
-	# TODO ADD MISSING ERRORS FROM PARSER AND VIRTUAL MACHINE
+	@staticmethod
+	def inverse_determinant_zero():
+		print("Error: determinant of the inverse is zero.")
+		exit(0)
+		
+	@staticmethod
+	def type_mismatch_on_return(lineno):
+		print("Error: type mismatch on return in line %d." % (lineno))
+		exit(0)

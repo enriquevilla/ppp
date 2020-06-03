@@ -53,14 +53,19 @@ class Memory:
         realSup = supLim % 1000
         while len(self.ints) < realSup:
             self.ints.append(0)
+        if len(self.ints) == 0:
+            self.ints.append(0)
 
     def adjustFloatArrSize(self, supLim):
         realSup = supLim % 1000
         while len(self.floats) < realSup:
             self.floats.append(0.0)
+        if len(self.floats) == 0:
+            self.floats.append(0)
 
     def adjustCharArrSize(self, supLim):
         realSup = supLim % 1000
         while len(self.chars) < realSup:
             self.chars.append("")
-
+        if len(self.chars) == 0:
+            self.chars.append(0)

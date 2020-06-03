@@ -245,7 +245,9 @@ def add(quad):
         tempMem.insertFloat(result, quad.result)
     # Address addition for array and matrix (base address + access index)
     elif res_address == 12:
-        pointerMemStack.insert(quad.result % 1000, lOp + rOp)
+        while len(pointerMemStack) <= quad.result % 1000:
+            pointerMemStack.append(0)
+        pointerMemStack[quad.result % 1000] = lOp + rOp
 
 def subtract(quad):
     res_address = quad.result // 1000
@@ -418,6 +420,18 @@ def printScreen(quad):
     if quad.result >= 12000:
         print(getValueFromAddress(getValueFromAddress(quad.result)))
     else:
+        if quad.result >= 0 and quad.result < 1000:
+            globalMem.adjustIntArrSize(quad.result)
+        elif quad.result >= 1000 and quad.result < 2000:
+            globalMem.adjustFloatArrSize(quad.result)
+        elif quad.result >= 2000 and quad.result < 3000:
+            globalMem.adjustCharArrSize(quad.result)
+        elif quad.result >= 3000 and quad.result < 4000:
+            localMem.adjustIntArrSize(quad.result)
+        elif quad.result >= 4000 and quad.result < 5000:
+            localMem.adjustFloatArrSize(quad.result)
+        elif quad.result >= 5000 and quad.result < 6000:
+            localMem.adjustCharArrSize(quad.result)
         print(getValueFromAddress(quad.result))
 
 def endFunc(quad):
@@ -666,6 +680,9 @@ def arrInverse(quad):
         for j in range(quad.left_operand["rows"]):
             leftOpArray[j][i] = getValueFromAddress(leftOpAddress + memoryIterator)
             memoryIterator += 1
+    determinant = np.linalg.det(leftOpArray)
+    if determinant == 0:
+        Error.inverse_determinant_zero()
     resultArray = np.linalg.inv(leftOpArray)
     memoryIterator = 0
     arrayIterator = 0

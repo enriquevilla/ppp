@@ -11,7 +11,7 @@ arrMatScope = Stack()
 
 def p_program(t):
 	'program : PROGRAM ID globalTable SEMICOLON declaration programFunc main'
-	print("Code valid")
+	print("Compiled successfully")
 	# show variable table and function directory
 	# print()
 	# print(variableTable["constants"])
@@ -97,6 +97,7 @@ def p_assignment(t):
 				address = operands.pop()
 				temp_quad = Quadruple("=", assign, "_", address)
 			else:
+				types.pop()
 				address = variableTable[currentScope][t[1]]["address"]
 				temp_quad = Quadruple("=", operands.pop(), '_', address)
 				operands.pop()
@@ -112,6 +113,7 @@ def p_assignment(t):
 				address = operands.pop()
 				temp_quad = Quadruple("=", assign, "_", address)
 			else:
+				types.pop()
 				address = variableTable["global"][t[1]]["address"]
 				temp_quad = Quadruple("=", operands.pop(), '_', address)
 				operands.pop()
@@ -374,7 +376,8 @@ def p_function(t):
 	addresses["lInt"] -= addresses["lInt"] % 1000
 	addresses["lFloat"] -= addresses["lFloat"] % 1000
 	addresses["lChar"] -= addresses["lChar"] % 1000
-	types.pop()
+	global returnMade
+	returnMade = False
 
 def p_addFuncToDir(t):
 	'addFuncToDir : '
@@ -395,6 +398,8 @@ def p_addFuncToDir(t):
 		elif currentType == "char":
 			address = addresses["gChar"]
 			addresses["gChar"] += 1
+		else:
+			address = addresses["void"]
 		variableTable["global"][t[-1]]["address"] = address
 		# Change scope to new function id
 		currentScope = t[-1]
@@ -725,7 +730,8 @@ def p_evaluateTerm(t):
 					arrMatOperands.push({
 						"address": addresses[address_type],
 						"rows": lOp["rows"],
-						"cols": lOp["cols"]
+						"cols": lOp["cols"],
+						"type": resType
 					})
 					addresses[address_type] += lOp["rows"] * lOp["cols"]
 				else:
@@ -801,7 +807,8 @@ def p_evaluateFactor(t):
 					arrMatOperands.push({
 						"address": addresses[address_type],
 						"rows": lOp["rows"],
-						"cols": rOp["cols"]
+						"cols": rOp["cols"],
+						"type": resType
 					})
 					addresses[address_type] += lOp["rows"] * rOp["cols"]
 				types.push(resType)
@@ -843,11 +850,11 @@ def p_addRead(t):
 	'addRead : '
 	# Generate read quadruple
 	if t[-2] in variableTable[currentScope]:
-		address = variableTable[currentScope][t[-1]]["address"]
+		address = variableTable[currentScope][t[-2]]["address"]
 		temp_quad = Quadruple("read", '_', '_', address)
 		Quadruples.push_quad(temp_quad)
 	elif t[-2] in variableTable["global"]:
-		address = variableTable["global"][t[-1]]["address"]
+		address = variableTable["global"][t[-2]]["address"]
 		temp_quad = Quadruple("read", '_', '_', address)
 		Quadruples.push_quad(temp_quad)
 	else:
@@ -876,7 +883,6 @@ def p_addPrint(t):
 	# Generate print quadruple
 	if arrMatOperands.size() > 0:
 		Error.invalid_print_on_array_variable(t.lexer.lineno)
-
 	temp_quad = Quadruple("print", '_', '_', operands.pop())
 	Quadruples.push_quad(temp_quad)
 	types.pop()
@@ -885,12 +891,13 @@ def p_addPrintString(t):
 	'addPrintString : '
 	# Add string to print quadruple
 	address = 0
-	if t[-1] not in variableTable["constants"]:
-		variableTable["constants"][t[-1]] = {"address": addresses["cChar"]}
-		address = variableTable["constants"][t[-1]]["address"]
+	stringToPrint = t[-1][1:len(t[-1]) - 1]
+	if stringToPrint not in variableTable["constants"]:
+		variableTable["constants"][stringToPrint] = {"address": addresses["cChar"]}
+		address = variableTable["constants"][stringToPrint]["address"]
 		addresses["cChar"] += 1
 	else:
-		address = variableTable["constants"][t[-1]]["address"]
+		address = variableTable["constants"][stringToPrint]["address"]
 	temp_quad = Quadruple("print", '_', '_', address)
 	Quadruples.push_quad(temp_quad)
 
@@ -911,10 +918,14 @@ def p_checkVoidType(t):
 	global currentScope
 	if functionDir[currentScope]["type"] == "void":
 		Error.return_on_void_function(0, t.lexer.lineno)
-	else:
+	if types.pop() == functionDir[currentScope]["type"]:
 		tmp_quad = Quadruple("RETURN", "_", "_", operands.pop())
 		Quadruples.push_quad(tmp_quad)
-
+		global returnMade
+		returnMade = True
+	else:
+		Error.type_mismatch_on_return(t.lexer.lineno)
+	
 def p_checkNonVoidType(t):
 	'checkNonVoidType : '
 	if functionDir[currentScope]["type"] != "void":
@@ -967,7 +978,6 @@ def p_genGosub(t):
 		operands.push(tmpAddress)
 		types.push(variableTable["global"][funcName]["type"])
 	operators.pop()
-	types.pop()
 
 def p_moduleFunction(t):
 	'''moduleFunction : hyperExpression genParam nextParam COMA moduleFunction
@@ -1048,9 +1058,14 @@ def p_readIDType(t):
 	operands.pop()
 	operators.push("Mat")
 	arrMatOperands.pop()
-	if types.pop() != variableTable[currentScope][arrMatId.peek()]["type"]:
-		Error.type_mismatch(arrMatId.peek(), t.lexer.lineno)
-	if "rows" not in variableTable[currentScope][arrMatId.peek()]:
+	if arrMatId.peek() in variableTable[currentScope]:
+		if types.pop() != variableTable[currentScope][arrMatId.peek()]["type"]:
+			Error.type_mismatch(arrMatId.peek(), t.lexer.lineno)
+		if "rows" not in variableTable[currentScope][arrMatId.peek()]:
+			Error.variable_not_subscriptable_as_array(arrMatId.peek(), t.lexer.lineno)
+	elif arrMatId.peek() in variableTable["global"]:
+		if types.pop() != variableTable["global"][arrMatId.peek()]["type"]:
+			Error.type_mismatch(arrMatId.peek(), t.lexer.lineno)
 		if "rows" not in variableTable["global"][arrMatId.peek()]:
 			Error.variable_not_subscriptable_as_array(arrMatId.peek(), t.lexer.lineno)
 
@@ -1086,8 +1101,6 @@ def p_verifyCols(t):
 	'verifyCols : '
 	if "cols" not in variableTable[arrMatScope.peek()][arrMatId.peek()]:
 		Error.variable_not_subscriptable_as_matrix(arrMatId, t.lexer.lineno)
-
-	#TODO TEST MIXING GLOBAL/LOCAL ARRAYS
 	if types.pop() != "int":
 		Error.type_mismatch_in_index(arrMatId.peek(),t.lexer.lineno)
 	# Address calculation formula for C-style array and matrix 
@@ -1117,8 +1130,12 @@ def p_verifyCols(t):
 def p_checkMatAsArray(t):
 	'checkMatAsArray : '
 	global arrMatId
-	if "cols" in variableTable[currentScope][arrMatId.peek()]:
-		Error.matrix_accessed_as_array(arrMatId.peek(), t.lexer.lineno)
+	if arrMatId.peek() in variableTable[currentScope]:
+		if "cols" in variableTable[currentScope][arrMatId.peek()]:
+			Error.matrix_accessed_as_array(arrMatId.peek(), t.lexer.lineno)
+	elif arrMatId.peek() in variableTable["global"]:
+		if "cols" in variableTable["global"][arrMatId.peek()]:
+			Error.matrix_accessed_as_array(arrMatId.peek(), t.lexer.lineno)
 
 def p_error(t):
 	Error.syntax(t.value, t.lexer.lineno)
